@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@ForDevelopmentOnly
 public class Name {
 	public static Map<Integer, String> list = new HashMap<>();
 

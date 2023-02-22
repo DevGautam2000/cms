@@ -3,6 +3,7 @@ package com.nrifintech.cms.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,8 +25,8 @@ public class ItemController {
 	}
 
 	@PostMapping(Route.Item.getItem)
-	public Response getItem(@RequestBody Item item) {
-		return Response.set(itemService.getItem(item.getId()), HttpStatus.OK);
+	public Response getItem(@PathVariable Integer itemId) {
+		return Response.set(itemService.getItem(itemId), HttpStatus.OK);
 	}
 
 	@PostMapping(Route.Item.addItem)

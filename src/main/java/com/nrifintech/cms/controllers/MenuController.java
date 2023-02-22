@@ -2,9 +2,9 @@ package com.nrifintech.cms.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
@@ -27,16 +27,16 @@ public class MenuController {
 
 	}
 
-	@PostMapping(Route.Menu.addToMenu)
-	public Response addToMenu(@RequestBody  MenuUpdateRequest menuUpdateRequest) {
+	@PostMapping(Route.Menu.addToMenu + "/{menuId}/{itemId}")
+	public Response addToMenu(@PathVariable Integer menuId, @PathVariable Integer itemId) {
 
-		menuService.addItemToMenu(menuUpdateRequest);
-		return Response.set("Added new item to menu( id : " + menuUpdateRequest.getMenuId() + " )", HttpStatus.OK);
+		menuService.addItemToMenu(menuId,itemId);
+		return Response.set("Added new item to menu( id : " + menuId + " )", HttpStatus.OK);
 
 	}
 
-	@PostMapping(Route.Menu.getMenu)
-	public Response getMenu(@RequestParam(name="id") Integer id) {
+	@PostMapping(Route.Menu.getMenu + "/{id}")
+	public Response getMenu(@PathVariable Integer id) {
 		return Response.set(menuService.getMenu(id), HttpStatus.OK);
 	}
 

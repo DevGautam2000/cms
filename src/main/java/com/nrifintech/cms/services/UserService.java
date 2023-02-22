@@ -21,12 +21,9 @@ public class UserService implements Validator {
 		userRepo.save(user);
 	}
 
-	public boolean isValid(User paramUser, User dbUser) {
-
-		if (isNotNull(dbUser)) {
-			if (dbUser.getPassword().equals(paramUser.getPassword())) {
-				return true;
-			}
+	public boolean checkPassword(User... users) {
+		if (users[0].getPassword().equals(users[1].getPassword())) {
+			return true;
 		}
 
 		return false;

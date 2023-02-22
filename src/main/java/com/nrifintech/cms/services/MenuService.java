@@ -43,6 +43,24 @@ public class MenuService implements Validator {
 
 		}
 	}
+	
+	public void addItemToMenu(Integer menuId, Integer itemId) {
+
+		Menu m = menuRepo.findById(menuId).orElse(null);
+		if (isNotNull(m)) {
+			// get the food using the id
+			Item f =  itemService.getItem(itemId);
+
+			if (isNotNull(f)) {
+				// instead get the food id of the food as a request as add the food to the menu
+				m.getItems().add(f);
+
+//				m.getFoods().add(menu.getFoods().get(0));
+				menuRepo.save(m);
+			}
+
+		}
+	}
 
 	public MenuDto getMenu(Integer id) {
 		Menu m = menuRepo.findById(id).orElse(null);
