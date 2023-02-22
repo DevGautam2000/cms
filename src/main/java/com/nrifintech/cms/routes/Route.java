@@ -20,6 +20,7 @@ public class Route {
 		String addMenu = "addmenu";
 		String addToMenu = "addtomenu";
 		String updateMenu = "updatemenu";
+		String monthMenu = "monthmenu";
 	}
 
 	public  interface Item {

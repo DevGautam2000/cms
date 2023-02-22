@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class MenuUpdateRequest {
 		private Integer menuId;
-		private Integer foodId;
+		private Integer itemId;
 }
