@@ -27,4 +27,6 @@ public class Item {
 	private Integer quantity;
 	private Double price;
 	private ItemType itemType;
+	private String imagePath = "";
+	private String name = "";
 }

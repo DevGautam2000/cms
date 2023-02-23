@@ -1,12 +1,9 @@
 package com.nrifintech.cms.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.nrifintech.cms.dtos.ItemDto;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.repositories.ItemRepo;
 import com.nrifintech.cms.utils.Validator;
@@ -34,10 +31,8 @@ public class ItemService implements Validator {
 	}
 
 	// get foods
-	public List<ItemDto> getItems() {
-		List<Item> items = itemRepo.findAll();
-		return items.stream().map(i -> new ItemDto(i)).collect(Collectors.toList());
-
+	public List<Item> getItems() {
+		return itemRepo.findAll();
 	}
 
 	public List<Item> getItemsRaw() {

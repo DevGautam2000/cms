@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.nrifintech.cms.types.MealType;
+import com.nrifintech.cms.types.Status;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,9 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-enum Status {
-	Delivered, Pending, InProgress
-}
+
 
 @Getter
 @Setter
@@ -36,5 +35,4 @@ public class Order {
 	private MealType orderType;
 	private Timestamp timeStamp;
 
-	// map user id
 }

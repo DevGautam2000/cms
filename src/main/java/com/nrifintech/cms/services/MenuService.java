@@ -1,15 +1,17 @@
 package com.nrifintech.cms.services;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.dtos.MenuDto;
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.repositories.MenuRepo;
+import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.utils.SameRoute;
 import com.nrifintech.cms.utils.Validator;
 
@@ -22,16 +24,51 @@ public class MenuService implements Validator {
 	@Autowired
 	private ItemService itemService;
 
-	public void addMenu() {
+	public Menu addMenu() {
 
 		Menu m = new Menu();
-		menuRepo.save(m);
+		return menuRepo.save(m);
 
 	}
 
-	public void addItemToMenu(Integer menuId, Integer itemId) {
+	public Menu getMenu(Integer menuId) {
 
 		Menu m = menuRepo.findById(menuId).orElse(null);
+		return m;
+	}
+
+	public List<Menu> getAllMenu() {
+		return menuRepo.findAll();
+	}
+
+	public Optional<Menu> removeMenu(Integer menuId) {
+		Menu menu = this.getMenu(menuId);
+		Optional<Menu> m = Optional.ofNullable(menu);
+
+		if (m.isPresent()) {
+			menuRepo.deleteById(menuId);
+		}
+
+		return m;
+	}
+
+	public Optional<Menu> approveMenu(Integer menuId) {
+
+		Menu menu = this.getMenu(menuId);
+		Optional<Menu> m = Optional.ofNullable(menu);
+
+		if (m.isPresent()) {
+			m.get().setApproval(Approval.Approved);
+			menuRepo.save(m.get());
+		}
+
+		return m;
+	}
+
+	public Menu addItemToMenu(Integer menuId, Integer itemId) {
+
+		Menu m = menuRepo.findById(menuId).orElse(null);
+
 		if (isNotNull(m)) {
 			// get the food using the id
 			Item f = itemService.getItem(itemId);
@@ -47,10 +84,12 @@ public class MenuService implements Validator {
 			}
 
 		}
+
+		return m;
 	}
 
 	@SameRoute
-	public void addItemToMenu(MenuUpdateRequest menuUpdateRequest) {
+	public Menu addItemToMenu(MenuUpdateRequest menuUpdateRequest) {
 
 		Menu m = menuRepo.findById(menuUpdateRequest.getMenuId()).orElse(null);
 		if (isNotNull(m)) {
@@ -68,31 +107,55 @@ public class MenuService implements Validator {
 			}
 
 		}
+
+		return m;
 	}
 
-	public MenuDto getMenu(Integer id) {
-		Menu m = menuRepo.findById(id).orElse(null);
-
-		if (isNotNull(m)) {
-			return new MenuDto(m);
-		}
-
-		return null;
-	}
-
-	public Menu updateMenu(Integer menuId, Item food) {
+	public Menu removeItemFromMenu(Integer menuId, Integer itemId) {
 		Menu m = menuRepo.findById(menuId).orElse(null);
 
 		if (isNotNull(m)) {
-			int index = m.getItems().indexOf(food);
-			m.getItems().remove(index);
-			menuRepo.save(m);
+
+			Item item = itemService.getItem(itemId);
+
+			if (isNotNull(item)) {
+				if (!m.getItems().isEmpty()) {
+					int index = m.getItems().indexOf(item);
+
+					m.getItems().remove(index);
+					menuRepo.save(m);
+				} else
+					m = null;
+			} else
+				m = null;
+
 		}
 		return m;
 	}
-	
-	public List<Menu> getAllMenu(){
-		return menuRepo.findAll();
+
+	public Menu addItemsToMenu(Integer menuId, List<String> itemIds) {
+
+		Menu m = menuRepo.findById(menuId).orElse(null);
+
+		if (isNotNull(m)) {
+
+			List<Item> items = new ArrayList<>();
+
+			itemIds.forEach(itemId -> {
+				Item item = itemService.getItem(Integer.valueOf(itemId));
+				
+				if(isNotNull(item))
+					items.add(item);
+		 			
+			});
+			
+			m.getItems().addAll(items);
+			menuRepo.save(m);
+
+		}
+
+		return m;
+
 	}
 
 }
