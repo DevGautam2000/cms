@@ -24,15 +24,22 @@ public class ItemController {
 		return Response.set(itemService.getItems(), HttpStatus.OK);
 	}
 
-	@PostMapping(Route.Item.getItem)
+	@GetMapping(Route.Item.getItem + "/{itemId}")
 	public Response getItem(@PathVariable Integer itemId) {
-		return Response.set(itemService.getItem(itemId), HttpStatus.OK);
+		Item item = itemService.getItem(itemId);
+		if (itemService.isNotNull(item))
+			return Response.set(item, HttpStatus.OK);
+
+		return Response.set("Item with id(" + itemId + ") not found.", HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping(Route.Item.addItem)
 	public Response addItem(@RequestBody Item item) {
-		itemService.addItem(item);
-		return Response.set("Food added.", HttpStatus.OK);
+		Item i = itemService.addItem(item);
+		if (itemService.isNotNull(i))
+			return Response.set("Item added.", HttpStatus.OK);
+		
+		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

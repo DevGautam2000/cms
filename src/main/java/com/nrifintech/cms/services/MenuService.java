@@ -52,14 +52,18 @@ public class MenuService implements Validator {
 		return m;
 	}
 
-	public Optional<Menu> approveMenu(Integer menuId) {
+	public Menu approveMenu(Integer menuId) {
 
-		Menu menu = this.getMenu(menuId);
-		Optional<Menu> m = Optional.ofNullable(menu);
 
-		if (m.isPresent()) {
-			m.get().setApproval(Approval.Approved);
-			menuRepo.save(m.get());
+		Menu m = this.getMenu(menuId);
+
+		if (isNotNull(m)) {
+			if (m.getApproval().equals(Approval.Pending)) {
+				
+				m.setApproval(Approval.Approved);
+				menuRepo.save(m);
+				
+			}else m = null;
 		}
 
 		return m;
@@ -80,8 +84,10 @@ public class MenuService implements Validator {
 
 					// m.getFoods().add(menu.getFoods().get(0));
 					menuRepo.save(m);
-				}
+				} else
+					return null;
 			}
+			return null;
 
 		}
 
@@ -138,18 +144,19 @@ public class MenuService implements Validator {
 		Menu m = menuRepo.findById(menuId).orElse(null);
 
 		if (isNotNull(m)) {
-
+			
+			List<Item> exItems = m.getItems();
 			List<Item> items = new ArrayList<>();
 
 			itemIds.forEach(itemId -> {
 				Item item = itemService.getItem(Integer.valueOf(itemId));
-				
-				if(isNotNull(item))
-					items.add(item);
-		 			
+
+				if (isNotNull(item) && !exItems.contains(item))
+						items.add(item);
+
 			});
-			
-			m.getItems().addAll(items);
+
+			exItems.addAll(items);
 			menuRepo.save(m);
 
 		}

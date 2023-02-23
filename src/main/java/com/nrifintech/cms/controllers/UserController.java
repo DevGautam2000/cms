@@ -2,6 +2,7 @@ package com.nrifintech.cms.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@PostMapping(Route.User.getUser)
+	@GetMapping(Route.User.getUser)
 	public Response getUser(@RequestBody User user) {
 
 		User exUser = userService.getuser(user.getEmail());
@@ -39,9 +40,25 @@ public class UserController {
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
 	public Response addUser(@RequestBody User user) {
-		userService.addUser(user);
+		User u =  userService.addUser(user);
 
+		if(userService.isNotNull(u))
+			return Response.set("User already exists.", HttpStatus.BAD_REQUEST);
+		
 		return Response.set("User added.", HttpStatus.OK);
+	}
+
+	@PostMapping(Route.User.removeUser)
+	public Response removeUser(@RequestBody User user) {
+
+		User u = userService.removeUser(user.getEmail());
+
+		if (userService.isNotNull(u)) {
+			return Response.set("User removed.", HttpStatus.OK);
+		}
+
+		return Response.set("Error removing user.", HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 
 }

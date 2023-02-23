@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
@@ -37,7 +36,7 @@ public class MenuController {
 
 	}
 
-	@PostMapping(Route.Menu.getMenu + "/{id}")
+	@GetMapping(Route.Menu.getMenu + "/{id}")
 	public Response getMenu(@PathVariable Integer id) {
 		Optional<Menu> m = Optional.ofNullable(menuService.getMenu(id));
 		if (m.isPresent())
@@ -68,12 +67,12 @@ public class MenuController {
 	@PostMapping(Route.Menu.approveMenu + "/{menuId}")
 	public Response approveMenu(@PathVariable Integer menuId) {
 
-		Optional<Menu> m = menuService.approveMenu(menuId);
+		Menu m = menuService.approveMenu(menuId);
 
-		if (m.isPresent())
+		if (menuService.isNotNull(m))
 			return Response.set("Menu approved.", HttpStatus.OK);
 
-		return Response.set("Error approving menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.set("Menu already approved.", HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -101,9 +100,13 @@ public class MenuController {
 	}
 
 	@PostMapping(Route.Menu.addItemsToMenu + "/{menuId}/{itemIds}")
-	public Response addItemsToMenu(@PathVariable Integer menuId,@PathVariable List<String> itemIds) {
+	public Response addItemsToMenu(@PathVariable Integer menuId, @PathVariable List<String> itemIds) {
 
-		Menu m = menuService.addItemsToMenu(menuId,itemIds);
+		for(Object s : itemIds) {
+			System.out.println(s);
+		}
+		
+		Menu m = menuService.addItemsToMenu(menuId, itemIds);
 		if (menuService.isNotNull(m))
 			return Response.set("Added items to menu.", HttpStatus.OK);
 

@@ -17,8 +17,14 @@ public class UserService implements Validator {
 		return userRepo.findByEmail(email).orElse(null);
 	}
 
-	public void addUser(User user) {
-		userRepo.save(user);
+	public User addUser(User user) {
+		User exUser  = this.getuser(user.getEmail());
+		
+		if(!isNotNull(exUser)) {
+			userRepo.save(user);
+		}
+		
+		return exUser;
 	}
 
 	public boolean checkPassword(User... users) {
@@ -27,6 +33,16 @@ public class UserService implements Validator {
 		}
 
 		return false;
+	}
+
+	public User removeUser(String email) {
+		
+		User exUser = this.getuser(email);
+		if(isNotNull(exUser)) {
+			userRepo.delete(exUser);
+		}
+		
+		return exUser;
 	}
 
 }

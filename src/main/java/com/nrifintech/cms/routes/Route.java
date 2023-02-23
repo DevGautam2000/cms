@@ -10,6 +10,7 @@ public class Route {
 
 		String getUser = "getuser";
 		String addUser = "adduser";
+		String removeUser = "removeuser";
 
 	}
 
