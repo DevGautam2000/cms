@@ -3,7 +3,7 @@ package com.nrifintech.cms.routes;
 public class Route {
 	public interface Admin {
 		String prefix = "/admin";
-		String getAdmin = prefix +"/" + "getadmin";
+		String getAdmin = prefix + "/" + "getadmin";
 	}
 
 	public interface User {
@@ -33,6 +33,15 @@ public class Route {
 		String getItems = "getitems";
 		String getItem = "getitem";
 		String addItem = "additem";
+	}
+
+	public interface FeedBack {
+		String addFeedback = "addfeedback";
+		String getFeedback = "getfeedback";
+	}
+	
+	public interface Order {
+		String addOrder = "addorder";
 	}
 
 }

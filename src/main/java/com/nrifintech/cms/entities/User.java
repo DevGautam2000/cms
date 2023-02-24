@@ -1,7 +1,7 @@
 package com.nrifintech.cms.entities;
 
+
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,17 +32,18 @@ public class User {
 	private Integer id;
 
 	private String username;
-	
-	@Column(unique=true)
+
+	@Column(unique = true)
 	private String email;
 	private String password;
 	private String phoneNumber;
 	private Role role = Role.User;
 
+	
+	@Column(unique=true)
 	@OneToMany
-	private List<Pass> pass;
-
-	@OneToMany
-	private Set<Order> record;
+	private List<Order> records;
+	
+	
 
 }

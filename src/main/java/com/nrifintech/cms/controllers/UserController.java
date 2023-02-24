@@ -33,7 +33,7 @@ public class UserController {
 				return Response.set("Incorrect Password.", HttpStatus.BAD_REQUEST);
 		}
 
-		return Response.set("User does not exists.", HttpStatus.BAD_REQUEST);
+		return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
 
 	}
 

@@ -102,10 +102,6 @@ public class MenuController {
 	@PostMapping(Route.Menu.addItemsToMenu + "/{menuId}/{itemIds}")
 	public Response addItemsToMenu(@PathVariable Integer menuId, @PathVariable List<String> itemIds) {
 
-		for(Object s : itemIds) {
-			System.out.println(s);
-		}
-		
 		Menu m = menuService.addItemsToMenu(menuId, itemIds);
 		if (menuService.isNotNull(m))
 			return Response.set("Added items to menu.", HttpStatus.OK);

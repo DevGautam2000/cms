@@ -1,10 +1,12 @@
 package com.nrifintech.cms.entities;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.nrifintech.cms.types.MealType;
@@ -33,6 +35,12 @@ public class Order {
 
 	private Status status = Status.Pending;
 	private MealType orderType;
-	private Timestamp timeStamp;
+	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+	
+	@OneToMany
+	private List<FeedBack> feedBacks;
+	
+	@OneToMany
+	private List<Item> items;
 
 }
