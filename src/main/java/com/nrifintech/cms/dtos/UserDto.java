@@ -11,13 +11,13 @@ import lombok.Data;
 public class UserDto{
 
 	@Data
-	public static class Priviledged{
+	public static class Privileged{
 		
 		private Integer id;
 		private String username;
 		private Role role;	
 		
-		public Priviledged(User user) {
+		public Privileged(User user) {
 
 			this.id = user.getId();
 			this.username = user.getUsername();
@@ -27,13 +27,13 @@ public class UserDto{
 	}
 	
 	@Data
-	public static class Unpriviledged{
+	public static class Unprivileged{
 		private Integer id;
 		private String username;
 		private Role role;
 		private Integer cartCount=0;
 		
-		public Unpriviledged(User user) {
+		public Unprivileged(User user) {
 
 			this.id = user.getId();
 			this.username = user.getUsername();

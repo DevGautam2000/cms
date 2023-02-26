@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.UserDto;
-import com.nrifintech.cms.dtos.UserDto.Priviledged;
-import com.nrifintech.cms.dtos.UserDto.Unpriviledged;
+import com.nrifintech.cms.dtos.UserDto.Privileged;
+import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.routes.Route;
@@ -56,12 +56,12 @@ public class UserController {
 				
 				if(exUser.getRole().equals(Role.User)) {
 					
-					Unpriviledged userDto = new UserDto.Unpriviledged(exUser);
+					Unprivileged userDto = new UserDto.Unprivileged(exUser);
 					return Response.set( userDto, HttpStatus.OK);
 					
 				}
 				
-				Priviledged userDto = new UserDto.Priviledged(exUser);
+				Privileged userDto = new UserDto.Privileged(exUser);
 				return Response.set( userDto, HttpStatus.OK);
 			}
 			else
