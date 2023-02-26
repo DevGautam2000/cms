@@ -1,5 +1,7 @@
 package com.nrifintech.cms.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +40,15 @@ public class ItemController {
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))
 			return Response.set("Item added.", HttpStatus.OK);
+		
+		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@PostMapping(Route.Item.addItems)
+	public Response addItems(@RequestBody List<Item> items) {
+		List<Item> i = itemService.addItems(items);
+		if (!i.isEmpty())
+			return Response.set("Items added.", HttpStatus.OK);
 		
 		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}

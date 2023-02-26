@@ -27,8 +27,8 @@ public class ItemService implements Validator {
 	}
 
 	// add foods
-	public void addItems(List<Item> items) {
-		itemRepo.saveAll(items);
+	public List<Item> addItems(List<Item> items) {
+		return itemRepo.saveAll(items);
 	}
 
 	// get foods

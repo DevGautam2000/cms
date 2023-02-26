@@ -99,7 +99,7 @@ public class MenuController {
 
 	}
 
-	@PostMapping(Route.Menu.addItemsToMenu + "/{menuId}/{itemIds}")
+	@PostMapping(Route.Item.addItems + "tomenu/{menuId}/{itemIds}")
 	public Response addItemsToMenu(@PathVariable Integer menuId, @PathVariable List<String> itemIds) {
 
 		Menu m = menuService.addItemsToMenu(menuId, itemIds);

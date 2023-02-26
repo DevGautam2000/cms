@@ -1,5 +1,6 @@
 package com.nrifintech.cms.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -28,5 +29,13 @@ public class Item {
 	private Double price;
 	private ItemType itemType;
 	private String imagePath = "";
+	
+	@Column(unique=true)
 	private String name = "";
+	
+	public Item(Item item, Integer quantity) {
+		
+		this(item.getId(),quantity,item.getPrice(),item.getItemType(),item.getImagePath(),item.getName());
+		
+	}
 }

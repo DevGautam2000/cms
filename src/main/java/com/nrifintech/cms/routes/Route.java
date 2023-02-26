@@ -11,6 +11,7 @@ public class Route {
 		String getUser = "getuser";
 		String addUser = "adduser";
 		String removeUser = "removeuser";
+		String placeOrder = "placeorder";
 
 	}
 
@@ -25,14 +26,13 @@ public class Route {
 
 		String removeMenu = "removemenu";
 		String approveMenu = "approvemenu";
-
-		String addItemsToMenu = "additemstomenu";
 	}
 
 	public interface Item {
 		String getItems = "getitems";
 		String getItem = "getitem";
 		String addItem = "additem";
+		String addItems = "additems";
 	}
 
 	public interface FeedBack {
@@ -41,7 +41,8 @@ public class Route {
 	}
 	
 	public interface Order {
-		String addOrder = "addorder";
+		String addOrders = "addorders";
+		String getOrders = "getorders";
 	}
 
 }

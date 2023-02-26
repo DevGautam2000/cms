@@ -1,12 +1,10 @@
 package com.nrifintech.cms.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.utils.Validator;
@@ -19,6 +17,10 @@ public class UserService implements Validator {
 
 	public User getuser(String email) {
 		return userRepo.findByEmail(email).orElse(null);
+	}
+	
+	public User getuser(Integer id) {
+		return userRepo.findById(id).orElse(null);
 	}
 
 	public User addUser(User user) {
@@ -49,23 +51,8 @@ public class UserService implements Validator {
 		return exUser;
 	}
 	
-	public void addOrders(Integer userId, List<String> orderIds) {
-		User exUser = userRepo.findById(userId).orElse(null);
-		
-//		??TODO:  complete the orders part
-//		if(isNotNull(exUser)){
-//			
-//			List<Order> orders = new ArrayList<>();
-//			
-//			orderIds.forEach(o -> {
-//				
-//				orders
-//				
-//				//TODO : add orders
-//				
-//			});
-//			
-//		}
+	public User saveUser(User user) {
+		return userRepo.save(user);
 	}
 
 }

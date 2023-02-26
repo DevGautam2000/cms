@@ -6,4 +6,7 @@ public interface Validator {
 		return o != null;
 	}
 	
+	default boolean isNull(Object o) {
+		return o == null;
+	}
 }
