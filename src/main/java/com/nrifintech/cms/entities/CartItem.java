@@ -19,8 +19,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-public class Item {
+public class CartItem {
 
+	
 	@Id
 	@GeneratedValue
 	private Integer id;
@@ -30,6 +31,17 @@ public class Item {
 	private ItemType itemType;
 	private String imagePath = "";
 	
-	@Column(unique=true)
 	private String name = "";
+	
+	
+	public CartItem(Item item, Integer quantity) {
+		id = item.getId();
+		this.quantity = quantity;
+		price = item.getPrice();
+		itemType = item.getItemType();
+		imagePath = item.getImagePath();
+		name = item.getName();
+	}
+
+	
 }

@@ -32,6 +32,7 @@ public class UserDto{
 		private String username;
 		private Role role;
 		private Integer cartCount=0;
+		private Integer cartId;
 		
 		public Unprivileged(User user) {
 
@@ -42,6 +43,7 @@ public class UserDto{
 			Cart c = user.getCart();
 			
 			if(c != null) {
+				this.cartId = c.getId();
 				this.cartCount = c.getItems().size();
 			}
 		}

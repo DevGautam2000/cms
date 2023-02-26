@@ -29,7 +29,7 @@ public class Menu{
 	private Integer id;
 	private Approval approval = Approval.Pending;
 
-	@ManyToMany
+	@ManyToMany(fetch=FetchType.EAGER)
 	private List<Item> items;
 
 }

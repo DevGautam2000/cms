@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
@@ -34,7 +35,7 @@ public class OrderService implements Validator {
 
 		Order order = new Order();
 		order.setOrderType(orderType);
-		
+
 		return orderRepo.save(order);
 	}
 
@@ -93,23 +94,23 @@ public class OrderService implements Validator {
 
 		if (isNotNull(order)) {
 
-			List<Item> exItems = order.getItems();
+			List<CartItem> exItems = order.getCartItems();
 
 			if (exItems.isEmpty()) {
 
-				List<Item> items = new ArrayList<>();
+				List<CartItem> items = new ArrayList<>();
 
 				itemIds.forEach(id -> {
 
 					Item item = itemService.getItem(Integer.valueOf(id));
 
 					if (isNotNull(item)) {
-						items.add(new Item(item, Integer.valueOf(quantities.get(itemIds.lastIndexOf(id)))));
+						items.add(new CartItem(item, Integer.valueOf(quantities.get(itemIds.lastIndexOf(id)))));
 					}
 
 				});
 
-				order.setItems(items);
+				order.setCartItems(items);
 				orderRepo.save(order);
 
 			} else

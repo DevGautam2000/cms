@@ -43,10 +43,10 @@ public class User {
 
 	
 	@Column(unique=true)
-	@OneToMany
+	@OneToMany(fetch=FetchType.LAZY)
 	private List<Order> records;
 	
-	@OneToOne
+	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;
 	
 	

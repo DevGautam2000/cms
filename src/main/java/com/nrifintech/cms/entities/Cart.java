@@ -3,6 +3,7 @@ package com.nrifintech.cms.entities;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -23,7 +24,6 @@ public class Cart {
 	@GeneratedValue
 	private Integer id;
 	
-	@ManyToMany
-	private List<Item> items;
-	
+	@ManyToMany(fetch=FetchType.EAGER)
+	private List<CartItem> items;
 }

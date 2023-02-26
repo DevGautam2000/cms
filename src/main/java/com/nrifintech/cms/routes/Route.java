@@ -44,5 +44,10 @@ public class Route {
 		String addOrders = "addorders";
 		String getOrders = "getorders";
 	}
+	
+	public interface Cart {
+		String addToCart = "addtocart";
+		String getCart = "getcart";
+	}
 
 }
