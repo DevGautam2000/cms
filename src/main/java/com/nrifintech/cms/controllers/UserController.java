@@ -1,5 +1,7 @@
 package com.nrifintech.cms.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.UserDto;
+import com.nrifintech.cms.dtos.UserDto.Priviledged;
+import com.nrifintech.cms.dtos.UserDto.Unpriviledged;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.routes.Route;
@@ -15,6 +20,7 @@ import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
 @RestController
@@ -46,8 +52,18 @@ public class UserController {
 		if (userService.isNotNull(exUser)) {
 
 			// check password
-			if (userService.checkPassword(user, exUser))
-				return Response.set(exUser, HttpStatus.OK);
+			if (userService.checkPassword(user, exUser)) {
+				
+				if(exUser.getRole().equals(Role.User)) {
+					
+					Unpriviledged userDto = new UserDto.Unpriviledged(exUser);
+					return Response.set( userDto, HttpStatus.OK);
+					
+				}
+				
+				Priviledged userDto = new UserDto.Priviledged(exUser);
+				return Response.set( userDto, HttpStatus.OK);
+			}
 			else
 				return Response.set("Incorrect Password.", HttpStatus.BAD_REQUEST);
 		}
@@ -99,5 +115,19 @@ public class UserController {
 
 		return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
+	
+	@GetMapping(Route.Order.getOrders+"/user/{userId}")
+	public Response getOrders(@PathVariable Integer userId) {
+		
+		User user = userService.getuser(userId);
+		List<Order> orders = user.getRecords();
+		
+		if(!orders.isEmpty())
+			return Response.set(orders , HttpStatus.OK); 
+		
+		return Response.set("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
 
+	
 }

@@ -113,7 +113,7 @@ public class OrderService implements Validator {
 				orderRepo.save(order);
 
 			} else
-				return exItems.isEmpty() ? null : exItems;
+				return exItems.size() > 0 ? new Item() : null;
 		}
 		return order;
 	}
