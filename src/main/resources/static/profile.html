@@ -74,10 +74,10 @@
                 	const uId = 1;
                 	// Fetch and display pastOrders
                     const url = `http://localhost:8080/getorders/user/${uId}`;
+					const pastOrdersElem = document.getElementById('pastOrders');
                     fetch(url).then(async res => {
                         const responseJSON = await res.json();
                         console.log(responseJSON);
-                        const pastOrdersElem = document.getElementById('pastOrders');
                         responseJSON.forEach((order) => {
                             const orderElement = document.createElement("div");
                             orderElement.innerHTML = `
@@ -96,7 +96,10 @@
                             `;
                             pastOrdersElem.appendChild(orderElement);
                         });
-                    })
+                    }).catch((e)  => {
+						console.error(e);
+						pastOrdersElem.innerHTML = `Failed to fetch orders of the user id ${uId}`;
+					});
                 </script>
             </main>
         </div>
