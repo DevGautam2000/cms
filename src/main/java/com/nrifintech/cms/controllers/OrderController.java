@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.entities.FeedBack;
@@ -23,6 +24,7 @@ import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
 @RestController
+@RequestMapping(Route.Order.prefix)
 public class OrderController {
 
 	@Autowired
@@ -83,7 +85,7 @@ public class OrderController {
 
 	}
 
-	@PostMapping(Route.Item.addItems + "toorder/{orderId}/{itemIds}")
+	@PostMapping(Route.CartItem.addItems + "/{orderId}/{itemIds}")
 	public Response addItems(@PathVariable Integer orderId, @PathVariable List<String> itemIds,
 			@RequestBody List<String> quantities) {
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
@@ -21,6 +22,7 @@ import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
 @RestController
+@RequestMapping(Route.Menu.prefix)
 public class MenuController {
 
 	@Autowired
