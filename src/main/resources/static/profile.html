@@ -1,112 +1,35 @@
-<!doctype html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.84.0">
-    <title>Profile Page</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-</head>
-
-<body>
-
-    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-        <div class="col-md-3 col-lg-2">
-            <a class="navbar-brand d-none d-md-block me-0 px-3">CMS</a>
-        </div>
-        <a class="navbar-brand px-3 d-md-none" style="padding-left:10% !important;">CMS</a>
-        <button class="btn btn-link position-absolute d-md-none col-md-3 col-lg-2 collapsed me-0 px-3" type="button"
-            data-bs-toggle="collapse" data-bs-target=".js-sidebar" aria-expanded="false" aria-label="Toggle navigation"
-            style="box-shadow: none;">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="dropdown">
-            <a href="#" class="link-light text-decoration-none dropdown-toggle px-2" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <img src="https://avatars.githubusercontent.com/u/123241206?s=400&v=4" class="rounded-circle" width="32"
-                    height="32">
-            </a>
-            <div class="dropdown-menu text-small dropdown-menu-right" style="right:0; left: auto;">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item" href="#">Sign out</a></li>
-            </div>
-        </div>
-    </header>
-
-    <div class="container-fluid">
-        <div class="row">
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse js-sidebar">
-                <div class="position-sticky pt-3" style="top:60px">
-                    <ul class="nav nav-pills flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Manage Menu
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                Manage Inventory
-                            </a>
-                        </li>
-                    </ul>
+<title>Profile Page</title>
+<h4>Past Orders:</h4>
+<div id="pastOrders"></div>
+<script>
+    const uId = 1;
+    // Fetch and display pastOrders
+    const url = `http://localhost:8080/getorders/user/${uId}`;
+    const pastOrdersElem = document.getElementById('pastOrders');
+    fetch(url).then(async res => {
+        const responseJSON = await res.json();
+        console.log(responseJSON);
+        console.log(responseJSON);
+        responseJSON.forEach((order) => {
+            const orderElement = document.createElement("div");
+            orderElement.innerHTML = `
+                <div class="card">
+                <div class="card-header">
+                    <span class="card-subtitle text-muted float-start">Status: <span class="${order.status != 'Delivered' ? 'text-danger' : 'text-success'}">${order.status}</span></span>
+                    <span class="card-subtitle text-muted float-end">Order ID: ${order.id} at ${order.timeStamp}</span>
                 </div>
-            </nav>
-
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-3 py-2" style="min-height: calc(100vh - 40px);">
-                <h4>Past Orders:</h4>
-                <div id="pastOrders"></div>
-                <script>
-                	const uId = 1;
-                	// Fetch and display pastOrders
-                    const url = `http://localhost:8080/getorders/user/${uId}`;
-					const pastOrdersElem = document.getElementById('pastOrders');
-                    fetch(url).then(async res => {
-                        const responseJSON = await res.json();
-                        console.log(responseJSON);
-                        responseJSON.forEach((order) => {
-                            const orderElement = document.createElement("div");
-                            orderElement.innerHTML = `
-                                <div class="card">
-                                <div class="card-header">
-                                    <span class="card-subtitle text-muted float-start">Status: <span class="${order.status != 'Delivered' ? 'text-danger' : 'text-success'}">${order.status}</span></span>
-                                    <span class="card-subtitle text-muted float-end">Order ID: ${order.id} at ${order.timeStamp}</span>
-                                </div>
-                                <div class="card-body">
-                                    <b>Order Type:</b> ${order.orderType} <br/>
-                                    <b>Items:</b> <br/> 
-                                    ${order.items.length === 0 ? "None" : order.items.join(", ")} <br/>
-                                    <b>Feedback:</b> ${order.feedBack ?? "N/A"}
-                                </div>
-                                </div>
-                            `;
-                            pastOrdersElem.appendChild(orderElement);
-                        });
-                    }).catch((e)  => {
-						console.error(e);
-						pastOrdersElem.innerHTML = `Failed to fetch orders of the user id ${uId}`;
-					});
-                </script>
-            </main>
-        </div>
-    </div>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</body>
-
-</html>
+                <div class="card-body">
+                    <b>Order Type:</b> ${order.orderType} <br/>
+                    <b>Items:</b> <br/> 
+                    ${order.items.length === 0 ? "None" : order.items.join(", ")} <br/>
+                    <b>Feedback:</b> ${order.feedBack ?? "N/A"}
+                </div>
+                </div>
+            `;
+            pastOrdersElem.appendChild(orderElement);
+        });
+    }).catch((e)  => {
+        console.error(e);
+        pastOrdersElem.innerHTML = `Failed to fetch orders of the user id ${uId}`;
+    });
+</script>
