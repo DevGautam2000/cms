@@ -58,6 +58,12 @@ public class Route {
 		
 		String addToCart = "addtocart";
 		String getCart = "getcart";
+
+		String updateQuantity = "updatequantity";
+
+		String remove = "remove";
+
+		String clear = "clear";
 	}
 
 	public interface CartItem {

@@ -40,44 +40,22 @@ public class CartService implements Validator {
 
 			List<CartItem> items = cartItemService.getCartItems(reqs);
 
-			List<CartItem> exItems = cart.getItems();	
+			List<CartItem> exItems = cart.getItems();
 
-			if (!items.isEmpty()) { // added to cart items
-				cartItemService.saveItems(items);
-			}
-			
-			//filter out the items if already in exItems
-			List<CartItem> filteredItems = new ArrayList<>();
-			
-			exItems.forEach(exItem ->{
-				
-				items.forEach(item -> {
-					
-					if(item.getName().strip().equalsIgnoreCase(exItem.getName().strip())  ) {
-						
-						exItem.increaseOne();
-						filteredItems.add(item);
-						
-					}
-					
-				});
-				
-			});
-			
-			
-			if(!filteredItems.isEmpty())
-				items.removeAll(filteredItems);
-			
-			
-			//add the items to exItems
-			exItems.addAll(items);
-			
-			if(!exItems.isEmpty())
+			// TODO: filter duplicates in items
+
+			try {
+				exItems.addAll(items);
 				cartItemService.saveItems(exItems);
-			
-			
-			cart.setItems(exItems);
-			this.saveCart(cart);
+				this.saveCart(cart);
+
+			} catch (Exception e) {
+
+				System.out.println("Duplicate Entry.");
+				cart = null;
+
+			}
+
 		}
 
 		return cart;

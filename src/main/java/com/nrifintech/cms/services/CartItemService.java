@@ -24,7 +24,7 @@ public class CartItemService implements Validator {
 	public CartItem addItem(CartItem item) {
 		return cartItemRepo.save(item);
 	}
-	
+
 	public List<CartItem> saveItems(List<CartItem> items) {
 		return cartItemRepo.saveAll(items);
 	}
@@ -72,15 +72,16 @@ public class CartItemService implements Validator {
 
 	public List<CartItem> getCartItems(List<CartItemUpdateRequest> reqs) {
 		List<Item> allItems = itemService.getItems();
-		
+
 		List<Integer> itemIds = reqs.stream().map(r -> Integer.valueOf(r.getItemId())).collect(Collectors.toList());
 
 		List<Item> items = allItems.stream().filter(item -> itemIds.contains(item.getId()))
 				.collect(Collectors.toList());
-		
-		List<CartItem> cartItems = items.stream().map(item -> 
-		new CartItem(item , Integer.valueOf(reqs.get( items.indexOf(item) ).getQuantity()) )).collect(Collectors.toList());
-		
+
+		List<CartItem> cartItems = items.stream()
+				.map(item -> new CartItem(item, Integer.valueOf(reqs.get(items.indexOf(item)).getQuantity())))
+				.collect(Collectors.toList());
+
 		return cartItems;
 	}
 }
