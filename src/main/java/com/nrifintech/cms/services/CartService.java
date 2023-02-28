@@ -20,7 +20,7 @@ public class CartService implements Validator {
 	private CartRepo cartRepo;
 
 	@Autowired
-	private ItemService itemService;
+	private CartItemService cartItemService;
 
 	public Cart saveCart(Cart cart) {
 		return cartRepo.save(cart);
@@ -37,19 +37,16 @@ public class CartService implements Validator {
 	public Cart addToCart(List<CartItemUpdateRequest> reqs, Cart cart) {
 
 		if (isNotNull(cart)) {
-			
 
-			List<Integer> itemIds = reqs.stream().map( r -> Integer.valueOf(r.getItemId())).collect(Collectors.toList());
-			
-			List<CartItem> items = itemService.getCartItems(itemIds);
+			List<CartItem> items = cartItemService.getCartItems(reqs);
 
-			List<CartItem> exItems = cart.getItems();
+			List<CartItem> exItems = cart.getItems();	
 
-			if (isNotNull(exItems))
-				items.removeAll(exItems);
-			
-			if (isNull(exItems))
-				exItems = new ArrayList<>();
+//			items.removeAll(exItems);
+
+			if (!items.isEmpty()) { // added to cart items
+				cartItemService.saveItems(items);
+			}
 
 			exItems.addAll(items);
 			this.saveCart(cart);

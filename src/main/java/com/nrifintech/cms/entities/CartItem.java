@@ -21,27 +21,43 @@ import lombok.ToString;
 @Entity
 public class CartItem {
 
-	
 	@Id
 	@GeneratedValue
 	private Integer id;
+
+	private Integer sourceId;
 
 	private Integer quantity;
 	private Double price;
 	private ItemType itemType;
 	private String imagePath = "";
-	
+
+	@Column(unique = true)
 	private String name = "";
-	
-	
+
 	public CartItem(Item item, Integer quantity) {
-		id = item.getId();
 		this.quantity = quantity;
 		price = item.getPrice();
+		sourceId = item.getId();
 		itemType = item.getItemType();
 		imagePath = item.getImagePath();
 		name = item.getName();
 	}
 
-	
+	public void increaseOne() {
+		this.setQuantity(quantity + 1);
+	}
+
+	public void increaseBy(Integer factor) {
+		this.setQuantity(quantity + factor);
+	}
+
+	public void decreaseOne() {
+		this.setQuantity(quantity - 1);
+	}
+
+	public void decreaseBy(Integer factor) {
+		this.setQuantity(quantity - factor);
+	}
+
 }

@@ -42,9 +42,7 @@ public class ItemService implements Validator {
 		return itemRepo.findAll();
 	}
 
-	public List<CartItem> getCartItems() {
-		return cartItemRepo.findAll();
-	}
+	
 	
 	public List<Item> getItems(List<String> itemIds) {
 		List<Item> allItems = this.getItems();
@@ -54,12 +52,6 @@ public class ItemService implements Validator {
 		return items;
 	}
 	
-	public List<CartItem> getCartItems(List<Integer> itemIds) {
-		List<CartItem> allItems = this.getCartItems();
-		List<CartItem> items = allItems.stream().filter(item -> itemIds.contains(item.getId()))
-				.collect(Collectors.toList());
-
-		return items;
-	}
+	
 
 }

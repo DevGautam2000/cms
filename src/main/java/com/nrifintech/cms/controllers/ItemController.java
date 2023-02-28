@@ -36,7 +36,7 @@ public class ItemController {
 		if (itemService.isNotNull(item))
 			return Response.set(item, HttpStatus.OK);
 
-		return Response.set("Item with id(" + itemId + ") not found.", HttpStatus.BAD_REQUEST);
+		return Response.set("Item not found.", HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping(Route.Item.addItem)
