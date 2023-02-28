@@ -42,13 +42,41 @@ public class CartService implements Validator {
 
 			List<CartItem> exItems = cart.getItems();	
 
-//			items.removeAll(exItems);
-
 			if (!items.isEmpty()) { // added to cart items
 				cartItemService.saveItems(items);
 			}
-
+			
+			//filter out the items if already in exItems
+			List<CartItem> filteredItems = new ArrayList<>();
+			
+			exItems.forEach(exItem ->{
+				
+				items.forEach(item -> {
+					
+					if(item.getName().strip().equalsIgnoreCase(exItem.getName().strip())  ) {
+						
+						exItem.increaseOne();
+						filteredItems.add(item);
+						
+					}
+					
+				});
+				
+			});
+			
+			
+			if(!filteredItems.isEmpty())
+				items.removeAll(filteredItems);
+			
+			
+			//add the items to exItems
 			exItems.addAll(items);
+			
+			if(!exItems.isEmpty())
+				cartItemService.saveItems(exItems);
+			
+			
+			cart.setItems(exItems);
 			this.saveCart(cart);
 		}
 
