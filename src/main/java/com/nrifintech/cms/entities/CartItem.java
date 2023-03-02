@@ -32,7 +32,6 @@ public class CartItem {
 	private ItemType itemType;
 	private String imagePath = "";
 
-	@Column(unique = true)
 	private String name = "";
 
 	public CartItem(Item item, Integer quantity) {

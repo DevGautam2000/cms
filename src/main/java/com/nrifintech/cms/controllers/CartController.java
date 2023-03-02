@@ -54,6 +54,9 @@ public class CartController {
 				cart = cartService.addToCart(reqs, cart);
 
 				if (cartService.isNotNull(cart)) {
+					//save the cart 
+					cartService.saveCart(cart);
+					
 					user.setCart(cart);
 					userService.saveUser(user);
 

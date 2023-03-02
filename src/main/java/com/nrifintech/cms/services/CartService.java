@@ -44,17 +44,24 @@ public class CartService implements Validator {
 
 			// TODO: filter duplicates in items
 
-			try {
+			if (isNull(exItems))
+				exItems = new ArrayList<>();
+			
+			
 				exItems.addAll(items);
 				cartItemService.saveItems(exItems);
-				this.saveCart(cart);
-
-			} catch (Exception e) {
-
-				System.out.println("Duplicate Entry.");
-				cart = null;
-
-			}
+			
+//			try {
+//				exItems.addAll(items);
+//				cartItemService.saveItems(exItems);
+//				this.saveCart(cart);
+//
+//			} catch (Exception e) {
+//
+//				System.out.println("Duplicate Entry.");
+//				cart = null;
+//
+//			}
 
 		}
 
