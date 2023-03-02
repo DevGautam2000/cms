@@ -1,7 +1,5 @@
 package com.nrifintech.cms.services;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +10,7 @@ import com.nrifintech.cms.utils.Validator;
 @Service
 public class UserService implements Validator {
 
-	@Autowired
+	@Autowired 
 	UserRepo userRepo;
 
 	public User getuser(String email) {
@@ -54,5 +52,5 @@ public class UserService implements Validator {
 	public User saveUser(User user) {
 		return userRepo.save(user);
 	}
-
+	
 }

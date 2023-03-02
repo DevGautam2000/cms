@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.CartItem;
@@ -11,6 +12,7 @@ import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.repositories.CartItemRepo;
 import com.nrifintech.cms.utils.Validator;
 
+@Service
 public class CartItemService implements Validator {
 
 	@Autowired
