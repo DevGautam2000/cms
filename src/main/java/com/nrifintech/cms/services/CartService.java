@@ -46,24 +46,24 @@ public class CartService implements Validator {
 
 			if (isNull(exItems))
 				exItems = new ArrayList<>();
-			
-			
-				exItems.addAll(items);
-				cartItemService.saveItems(exItems);
-			
-//			try {
-//				exItems.addAll(items);
-//				cartItemService.saveItems(exItems);
-//				this.saveCart(cart);
-//
-//			} catch (Exception e) {
-//
-//				System.out.println("Duplicate Entry.");
-//				cart = null;
-//
-//			}
 
+			exItems.addAll(items);
+			cartItemService.saveItems(exItems);
+			
+			cart.setItems(exItems);
 		}
+
+		return cart;
+	}
+
+	public Cart clearCart(Cart cart) {
+		List<CartItem> cartItems = cart.getItems();
+
+		List<Integer> ids = cartItems.stream().map(i -> i.getId()).collect(Collectors.toList());
+
+		cartItems.clear();
+
+		ids.forEach(id -> cartItemService.deleteItem(id));
 
 		return cart;
 	}

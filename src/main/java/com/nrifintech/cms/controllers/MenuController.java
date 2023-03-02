@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,6 +103,7 @@ public class MenuController {
 		return Response.set("Error adding item to menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
+	
 
 	@PostMapping(Route.Item.addItems + "tomenu/{menuId}/{itemIds}")
 	public Response addItemsToMenu(@PathVariable Integer menuId, @PathVariable List<String> itemIds) {
@@ -123,6 +125,17 @@ public class MenuController {
 		}
 
 		return Response.set("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@GetMapping(Route.Menu.getByDate + "/{date}")
+	public Response getMenuByDate(@PathVariable Date date) {
+		
+		List<Menu> menus = menuService.getMenuByDate(date);
+		
+		if(!menus.isEmpty())
+			return Response.set(menus, HttpStatus.OK);
+		
+		return Response.set("Menu(s) with particular date not found.", HttpStatus.BAD_REQUEST);
 	}
 
 }

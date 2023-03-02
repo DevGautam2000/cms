@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
+import com.nrifintech.cms.entities.TimeStamp;
 import com.nrifintech.cms.repositories.OrderRepo;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.utils.Validator;
@@ -29,6 +31,11 @@ public class OrderService implements Validator {
 	public List<Order> addOrders(List<Order> orders) {
 
 		return orderRepo.saveAll(orders);
+	}
+
+	public Order saveOrder(Order order) {
+
+		return orderRepo.save(order);
 	}
 
 	public Order addNewOrder(MealType orderType) {

@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nrifintech.cms.dtos.UserDto;
 import com.nrifintech.cms.dtos.UserDto.Privileged;
 import com.nrifintech.cms.dtos.UserDto.Unprivileged;
+import com.nrifintech.cms.entities.Cart;
+import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.routes.Route;
+import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
-
 
 @CrossOrigin
 @RestController
@@ -37,6 +40,9 @@ public class UserController {
 	@Autowired
 	private OrderService orderService;
 
+	@Autowired
+	private CartService cartService;
+
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
 	public Response addUser(@RequestBody User user) {
@@ -47,8 +53,17 @@ public class UserController {
 
 		return Response.set("User added.", HttpStatus.OK);
 	}
-	
-	
+
+	@GetMapping(Route.User.getUsers)
+	public Response addUser() {
+		List<User> users = userService.getUsers();
+
+		if (!users.isEmpty())
+			return Response.set(users, HttpStatus.OK);
+
+		return Response.set("No users found.", HttpStatus.BAD_REQUEST);
+	}
+
 	@GetMapping(Route.User.getUser)
 	public Response getUser(@RequestBody User user) {
 
@@ -58,26 +73,23 @@ public class UserController {
 
 			// check password
 			if (userService.checkPassword(user, exUser)) {
-				
-				if(exUser.getRole().equals(Role.User)) {
-					
+
+				if (exUser.getRole().equals(Role.User)) {
+
 					Unprivileged userDto = new UserDto.Unprivileged(exUser);
-					return Response.set( userDto, HttpStatus.OK);
-					
+					return Response.set(userDto, HttpStatus.OK);
+
 				}
-				
+
 				Privileged userDto = new UserDto.Privileged(exUser);
-				return Response.set( userDto, HttpStatus.OK);
-			}
-			else
+				return Response.set(userDto, HttpStatus.OK);
+			} else
 				return Response.set("Incorrect Password.", HttpStatus.BAD_REQUEST);
 		}
 
 		return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
 
 	}
-
-	
 
 	@PostMapping(Route.User.removeUser)
 	public Response removeUser(@RequestBody User user) {
@@ -100,39 +112,56 @@ public class UserController {
 			return Response.set("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
 		User user = userService.getuser(userId);
-		
-		
 
 		if (userService.isNotNull(user)) {
-			
+
 			Order order = orderService.addNewOrder(MealType.values()[mealId]);
-			
-			if(orderService.isNotNull(order)) {
+
+			if (orderService.isNotNull(order)) {
+
+				Cart cart = user.getCart();
+
+				if (cartService.isNull(cart))
+					return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
+
+				List<CartItem> cartItems = cart.getItems();
+
+				if (orderService.isNull(cartItems) || cartItems.isEmpty())
+					return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
+
+				order.setCartItems(new ArrayList<>(cartItems));
+				orderService.saveOrder(order);
+
 				user.getRecords().add(order);
-				User exUser = userService.saveUser(user);
-				
-				if(userService.isNotNull(exUser))
+				user = userService.saveUser(user);
+
+				// clear the cart after placing the order
+				if (userService.isNotNull(user)) {
+
+					user.getCart().setItems(null);
+					user = userService.saveUser(user);
+
 					return Response.set("Added new order for user.", HttpStatus.OK);
+				}
+
 			}
-				
-			
+
 		}
 
 		return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
-	
-	@GetMapping(Route.Order.getOrders+"/user/{userId}")
+
+	@GetMapping(Route.Order.getOrders + "/user/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
-		
+
 		User user = userService.getuser(userId);
 		List<Order> orders = user.getRecords();
-		
-		if(!orders.isEmpty())
-			return Response.set(orders , HttpStatus.OK); 
-		
+
+		if (!orders.isEmpty())
+			return Response.set(orders, HttpStatus.OK);
+
 		return Response.set("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
-		
+
 	}
 
-	
 }

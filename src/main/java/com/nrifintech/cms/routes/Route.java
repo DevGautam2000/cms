@@ -15,6 +15,8 @@ public class Route {
 		String removeUser = "removeuser";
 		String placeOrder = "placeorder";
 
+		String getUsers = "getusers";
+
 	}
 
 	public interface Menu {
@@ -28,6 +30,8 @@ public class Route {
 
 		String removeMenu = "removemenu";
 		String approveMenu = "approvemenu";
+
+		String getByDate = "getbydate";
 	}
 
 	public interface Item {

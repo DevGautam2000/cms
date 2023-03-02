@@ -1,6 +1,7 @@
 package com.nrifintech.cms.entities;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -37,7 +38,9 @@ public class Order {
 
 	private Status status = Status.Pending;
 	private MealType orderType;
-	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+	
+	@ManyToMany
+	private List<TimeStamp> timeStamps= new ArrayList<>();
 	
 	@OneToOne
 	private FeedBack feedBack;

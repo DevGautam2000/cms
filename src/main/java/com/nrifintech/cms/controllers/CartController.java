@@ -46,15 +46,20 @@ public class CartController {
 
 			Cart cart = user.getCart();
 
-			if (cartService.isNull(cart))
+			if (cartService.isNull(cart)) 
 				cart = new Cart();
-
+			
 			if (cartService.isNotNull(cart)) {
+				
+				
 
 				cart = cartService.addToCart(reqs, cart);
 
 				if (cartService.isNotNull(cart)) {
-					//save the cart 
+					
+					
+					
+//					//save the cart 
 					cartService.saveCart(cart);
 					
 					user.setCart(cart);
@@ -124,18 +129,15 @@ public class CartController {
 
 		if (cartService.isNotNull(cart)) {
 
-			List<CartItem> cartItems = cart.getItems();
+			cart = cartService.clearCart(cart);
 
-			List<Integer> ids = cartItems.stream().map(i -> i.getId()).collect(Collectors.toList());
+			if (cartItemService.isNull(cart)) {
+				cartService.saveCart(cart);
 
-			cartItems.clear();
+				return Response.set("Cart cleared. ", HttpStatus.OK);
+			}
 
-			ids.forEach(id -> cartItemService.deleteItem(id));
-
-			cartService.saveCart(cart);
-
-			return Response.set("Cart cleared. ", HttpStatus.OK);
-
+			return Response.set("Error clearing cart. ", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		return Response.set("CartItem not found. ", HttpStatus.BAD_REQUEST);
 	}

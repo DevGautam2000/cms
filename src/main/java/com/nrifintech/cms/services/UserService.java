@@ -55,4 +55,8 @@ public class UserService implements Validator {
 		return userRepo.save(user);
 	}
 
+	public List<User> getUsers() {
+		return userRepo.findAll();
+	}
+
 }
