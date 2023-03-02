@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.Role;
 
 
@@ -34,18 +35,36 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     
     @Override
 	protected void configure(HttpSecurity http) throws Exception {
+
+		
 		http
             .csrf().disable()
             .cors().disable()
 			.authorizeHttpRequests()
-			.antMatchers("/hi","/generate-token","/user/").permitAll()
+			.antMatchers(Route.Authentication.prefix+"**").permitAll()
 			.antMatchers(HttpMethod.OPTIONS).permitAll()
-			.antMatchers("/admin","/test").hasAnyAuthority(Role.Admin.toString())// .hasAnyRole("ADMIN",Role.Admin.toString())
+			
+			.antMatchers(HttpMethod.POST,Route.User.prefix+Route.User.addUser,Route.User.prefix+Route.User.removeUser).hasAnyAuthority(Role.Admin.toString())
+			.antMatchers(Route.User.prefix+Route.User.getUser).hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString())
+
+
 			.antMatchers(HttpMethod.POST,"/items").hasAnyRole("ADMIN")
 			.antMatchers("/items").hasAnyRole("ADMIN","USER")
 			.anyRequest().authenticated()
 		     .and()
              .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		// http
+        //     .csrf().disable()
+        //     .cors().disable()
+		// 	.authorizeHttpRequests()
+		// 	.antMatchers("/hi","/generate-token","/user/").permitAll()
+		// 	.antMatchers(HttpMethod.OPTIONS).permitAll()
+		// 	.antMatchers("/admin","/test")/* .hasAnyRole("ADMIN",Role.Admin.toString())   /*/.hasAnyAuthority(Role.Admin.toString())// 
+		// 	.antMatchers(HttpMethod.POST,"/items").hasAnyRole("ADMIN")
+		// 	.antMatchers("/items").hasAnyRole("ADMIN","USER")
+		// 	.anyRequest().authenticated()
+		//      .and()
+        //      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 //			.antMatchers("/auth/**").permitAll()
 //			.antMatchers("/admin").hasRole("ADMIN")
 //			.antMatchers("/**").hasAnyRole("USER","ADMIN")

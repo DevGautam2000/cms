@@ -2,6 +2,7 @@ package com.nrifintech.cms.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.repositories.UserRepo;
 
 
@@ -18,7 +20,7 @@ import com.nrifintech.cms.repositories.UserRepo;
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 	List<User> users=new ArrayList();
-	@Autowired @Lazy
+	@Autowired //@Lazy
     UserRepo userRepo;
 
 	public MyUserDetailsService() {
@@ -42,7 +44,7 @@ public class MyUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// TODO Auto-generated method stub
-		System.out.println(username+"  :::::in loadUserByUsername");
+		// System.out.println(username+"  :::::in loadUserByUsername");
 //		UserDetails us= User//.withDefaultPasswordEncoder()
 //	            .builder()
 //				.username("user")
@@ -58,11 +60,14 @@ public class MyUserDetailsService implements UserDetailsService {
 				return u;
 			}
 		}
-        UserDetails user=(UserDetails)userRepo.findByEmail(username).orElse(null);
-		user.getAuthorities().forEach(System.out::println);
-        System.out.println("DBUSER *********:"+user.getUsername()+" "+user.getPassword());
-        if(user!=null)return user;
-		throw new UsernameNotFoundException("USERNAME NOT FOUnD");
+
+
+        Optional<com.nrifintech.cms.entities.User> user=userRepo.findByEmail(username);
+		//user.getAuthorities().forEach(System.out::println);
+        //System.out.println("DBUSER *********:"+user.get().getUsername()+" "+user.get().getPassword());
+        
+		if(user.isPresent())return user.map(MyUserDetails::new).get();
+		throw new UsernameNotFoundException("USERNAME '"+username+"'' NOT FOUND");
 	}
 
 
