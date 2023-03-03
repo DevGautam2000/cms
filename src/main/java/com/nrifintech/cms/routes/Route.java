@@ -55,6 +55,8 @@ public class Route {
 		
 		String addOrders = "addorders";
 		String getOrders = "getorders";
+
+		String updateStatus = "updatestatus";
 	}
 
 	public interface Cart {

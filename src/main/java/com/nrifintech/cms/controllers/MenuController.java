@@ -29,10 +29,11 @@ public class MenuController {
 	@Autowired
 	private MenuService menuService;
 
+	
 	@PostMapping(Route.Menu.addMenu)
-	public Response newMenu() {
+	public Response newMenu(@RequestBody Menu menu) {
 
-		if (menuService.isNotNull(menuService.addMenu())) {
+		if (menuService.isNotNull(menuService.addMenu(menu))) {
 			return Response.set("Added new menu.", HttpStatus.OK);
 		}
 

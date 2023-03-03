@@ -30,7 +30,7 @@ public class Menu {
 	private Integer id;
 	private Approval approval = Approval.Pending;
 
-	private Date date = new Date(System.currentTimeMillis());
+	private Date date;
 	
 	private MealType menuType;
 

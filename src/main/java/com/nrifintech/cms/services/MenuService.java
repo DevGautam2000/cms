@@ -24,11 +24,10 @@ public class MenuService implements Validator {
 
 	@Autowired
 	private ItemService itemService;
+	
+	public Menu addMenu(Menu menu) {
 
-	public Menu addMenu() {
-
-		Menu m = new Menu();
-		return menuRepo.save(m);
+		return menuRepo.save(menu);
 
 	}
 
