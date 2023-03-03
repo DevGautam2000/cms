@@ -26,6 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     
 	@Autowired  @Lazy
 	JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -48,37 +49,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(Route.User.prefix+Route.User.getUser).hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString())
 
 
-			.antMatchers(HttpMethod.POST,"/items").hasAnyRole("ADMIN")
-			.antMatchers("/items").hasAnyRole("ADMIN","USER")
 			.anyRequest().authenticated()
 		     .and()
              .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		// http
-        //     .csrf().disable()
-        //     .cors().disable()
-		// 	.authorizeHttpRequests()
-		// 	.antMatchers("/hi","/generate-token","/user/").permitAll()
-		// 	.antMatchers(HttpMethod.OPTIONS).permitAll()
-		// 	.antMatchers("/admin","/test")/* .hasAnyRole("ADMIN",Role.Admin.toString())   /*/.hasAnyAuthority(Role.Admin.toString())// 
-		// 	.antMatchers(HttpMethod.POST,"/items").hasAnyRole("ADMIN")
-		// 	.antMatchers("/items").hasAnyRole("ADMIN","USER")
-		// 	.anyRequest().authenticated()
-		//      .and()
-        //      .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//			.antMatchers("/auth/**").permitAll()
-//			.antMatchers("/admin").hasRole("ADMIN")
-//			.antMatchers("/**").hasAnyRole("USER","ADMIN")
-//			.anyRequest().authenticated()
-//			.and()
-//			.formLogin()
-			;
 		http.addFilterBefore(jwtAuthenticationFilter, 
 				UsernamePasswordAuthenticationFilter.class);
 	}
 
     @Bean
 	public PasswordEncoder passwordEncoder() {
-		System.out.println("Fetching Password encoder");
+		// System.out.println("Fetching Password encoder");
 	    return NoOpPasswordEncoder.getInstance();
 	}
 }

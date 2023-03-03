@@ -38,14 +38,20 @@ public class JwtUtils {
 
 	    public String generateToken(UserDetails userDetails) {
 	        Map<String, Object> claims = new HashMap<>();
-	        return createToken(claims, userDetails.getUsername());
+	        return createToken(claims, userDetails.getUsername(),10*60);
 	    }
 
-	    private String createToken(Map<String, Object> claims, String subject) {
+		
+	    public String generateResetToken(UserDetails userDetails) {
+	        Map<String, Object> claims = new HashMap<>();
+	        return createToken(claims, userDetails.getUsername(),10);
+	    }
+
+	    private String createToken(Map<String, Object> claims, String subject,long min) {
 
 	    	System.out.println("s: ");
 	        String s= Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-	                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+	                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * min))//60 * 60 * 10))
 	                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
 	        System.out.println("s: "+s);
 	        return s;

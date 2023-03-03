@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,17 +16,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
-import com.nrifintech.cms.services.UserService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
-//conflict between 2 types of 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
     @Autowired 
     private MyUserDetailsService userDetailsServiceImple;
-    // private UserService userDetailsServiceImple;
     @Autowired
     private JwtUtils jutUtil;
 	@Override
@@ -45,7 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                 username=this.jutUtil.extractUsername(jwtToken);
             }catch(ExpiredJwtException e){
                 e.printStackTrace();
-                System.out.println("jwt token has expired");
+                System.out.println("Jwt token has expired");
             }catch(Exception e){
                 e.printStackTrace();
                 System.out.println("error");

@@ -52,5 +52,15 @@ public class UserService implements Validator {
 	public User saveUser(User user) {
 		return userRepo.save(user);
 	}
+
+	public User updatePassword(User user,String password) {
+		user.setPassword(password);
+		return this.updateUser(user.getId(), user);
+	}
+
+	public User updateUser(int id,User user) {
+		user.setId(id);
+		return userRepo.save(user);
+	}
 	
 }

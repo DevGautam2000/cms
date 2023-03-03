@@ -37,7 +37,7 @@ import lombok.ToString;
 @ToString
 @Data
 @Entity
-public class User {//implements UserDetails {
+public class User {
 
 	@Id
 	@GeneratedValue
@@ -67,36 +67,5 @@ public class User {//implements UserDetails {
 	public String getUsername(){
 		return this.email;
 	}
-	// @Override
-	// public Collection<? extends GrantedAuthority> getAuthorities() {
-	// 	// TODO Auto-generated method stub
-	// 	Set<GrantedAuthority> authorities=new HashSet();
-    //     authorities.add(new SimpleGrantedAuthority(this.role.toString()));
-	// 	return authorities;
-	// }
-
-	// @Override
-	// public boolean isAccountNonExpired() {
-	// 	// TODO Auto-generated method stub
-	// 	return true;
-	// }
-
-	// @Override
-	// public boolean isAccountNonLocked() {
-	// 	// TODO Auto-generated method stub
-	// 	return true;
-	// }
-
-	// @Override
-	// public boolean isCredentialsNonExpired() {
-	// 	// TODO Auto-generated method stub
-	// 	return true;
-	// }
-
-	// @Override
-	// public boolean isEnabled() {
-	// 	// TODO Auto-generated method stub
-	// 	return true;
-	// }
 
 }
