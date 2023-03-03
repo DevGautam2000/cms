@@ -2,8 +2,6 @@ package com.nrifintech.cms.controllers;
 
 import java.util.List;
 
-import javax.net.ssl.SSLEngineResult.Status;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,6 +18,7 @@ import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.Status;
 import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
@@ -107,13 +106,12 @@ public class OrderController {
 		
 		Order order = orderService.getOrder(orderId);
 		
-		//TODO:
-//		if(orderService.isNotNull(order)) {
-//			
-//			order.setStatus(Status.values()[statusId]);
-//			
-//			
-//		}
+		if(orderService.isNotNull(order)) {
+			
+			order.setStatus(Status.values()[statusId]);
+			orderService.saveOrder(order);
+			
+		}
 		
 		
 		return Response.set("Order not found.", HttpStatus.BAD_REQUEST);
