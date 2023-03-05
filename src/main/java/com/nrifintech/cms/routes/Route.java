@@ -13,7 +13,7 @@ public class Route {
 		String getUser = "getuser";
 		String addUser = "adduser";
 		String removeUser = "removeuser";
-		String placeOrder = "placeorder";
+		
 
 		String getUsers = "getusers";
 
@@ -57,6 +57,8 @@ public class Route {
 		String getOrders = "getorders";
 
 		String updateStatus = "updatestatus";
+
+		String placeOrder = "placeorder";
 	}
 
 	public interface Cart {

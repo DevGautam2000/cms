@@ -104,55 +104,6 @@ public class UserController {
 
 	}
 
-	// for Canteen users to add a new order for a normal user
-	@PostMapping(Route.User.placeOrder + "/{userId}/{mealId}")
-	public Response placeOrder(@PathVariable Integer userId, @PathVariable Integer mealId) {
-
-		if (mealId > 1)
-			return Response.set("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
-
-		User user = userService.getuser(userId);
-
-		if (userService.isNotNull(user)) {
-
-			Order order = orderService.addNewOrder(MealType.values()[mealId]);
-
-			if (orderService.isNotNull(order)) {
-
-				Cart cart = user.getCart();
-
-				if (cartService.isNull(cart))
-					return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
-
-				List<CartItem> cartItems = cart.getCartItems();
-
-				if (orderService.isNull(cartItems) || cartItems.isEmpty())
-					return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
-
-				
-				order.setCartItems(new ArrayList<>(cartItems));
-				orderService.saveOrder(order);
-
-				user.getRecords().add(order);
-				user = userService.saveUser(user);
-
-				// clear the cart after placing the order
-				if (userService.isNotNull(user)) {
-
-					//TODO: 
-					user.getCart().getCartItems().clear();
-					user = userService.saveUser(user);
-
-					return Response.set("Added new order for user.", HttpStatus.OK);
-				}
-
-			}
-
-		}
-
-		return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
-	}
-
 	@GetMapping(Route.Order.getOrders + "/user/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
 

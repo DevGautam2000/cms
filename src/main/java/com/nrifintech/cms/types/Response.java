@@ -86,7 +86,6 @@ public class Response extends ResponseEntity<Object> {
 
 	public Response(Object body, HttpStatus status) {
 		super(body, status);
-		// TODO Auto-generated constructor stub
 	}
 
 	public static Response set(Object body, HttpStatus status) {
@@ -96,7 +95,6 @@ public class Response extends ResponseEntity<Object> {
 	
 	public Response(@Nullable Object body, @Nullable MultiValueMap<String, String> headers, HttpStatus status) {
 		super(body, headers, status);
-		// TODO Auto-generated constructor stub
 	}
 
 	public static Response set(@Nullable Object body, @Nullable MultiValueMap<String, String> headers,
