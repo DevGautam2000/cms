@@ -1,6 +1,5 @@
 package com.nrifintech.cms.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nrifintech.cms.dtos.UserDto;
 import com.nrifintech.cms.dtos.UserDto.Privileged;
 import com.nrifintech.cms.dtos.UserDto.Unprivileged;
-import com.nrifintech.cms.entities.Cart;
-import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
-import com.nrifintech.cms.services.CartService;
-import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.UserService;
-import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
+import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
 @CrossOrigin
@@ -37,15 +33,13 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private OrderService orderService;
-
-	@Autowired
-	private CartService cartService;
-
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
 	public Response addUser(@RequestBody User user) {
+		
+		if(user.getRole().ordinal() > Role.values().length)
+			return Response.set("Invalid role for user.", HttpStatus.BAD_REQUEST);
+		
 		User u = userService.addUser(user);
 
 		if (userService.isNotNull(u))
@@ -64,30 +58,26 @@ public class UserController {
 		return Response.set("No users found.", HttpStatus.BAD_REQUEST);
 	}
 
+	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.User.getUser)
 	public Response getUser(@RequestBody User user) {
 
 		User exUser = userService.getuser(user.getEmail());
 
-		if (userService.isNotNull(exUser)) {
+		// check password
+		if (userService.checkPassword(user, exUser)) {
 
-			// check password
-			if (userService.checkPassword(user, exUser)) {
+			if (exUser.getRole().equals(Role.User)) {
 
-				if (exUser.getRole().equals(Role.User)) {
-
-					Unprivileged userDto = new UserDto.Unprivileged(exUser);
-					return Response.set(userDto, HttpStatus.OK);
-
-				}
-
-				Privileged userDto = new UserDto.Privileged(exUser);
+				Unprivileged userDto = new UserDto.Unprivileged(exUser);
 				return Response.set(userDto, HttpStatus.OK);
-			} else
-				return Response.set("Incorrect Password.", HttpStatus.BAD_REQUEST);
-		}
 
-		return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
+			}
+
+			Privileged userDto = new UserDto.Privileged(exUser);
+			return Response.set(userDto, HttpStatus.OK);
+		} else
+			return Response.set("Incorrect Password.", HttpStatus.BAD_REQUEST);
 
 	}
 

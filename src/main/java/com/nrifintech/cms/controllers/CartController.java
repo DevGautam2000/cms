@@ -17,11 +17,13 @@ import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartItemService;
 import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
 @CrossOrigin
 @RestController
@@ -46,22 +48,18 @@ public class CartController {
 
 			Cart cart = user.getCart();
 
-			if (cartService.isNull(cart)) 
+			if (cartService.isNull(cart))
 				cart = new Cart();
-			
+
 			if (cartService.isNotNull(cart)) {
-				
-				
 
 				cart = cartService.addToCart(reqs, cart);
 
 				if (cartService.isNotNull(cart)) {
-					
-					
-					
+
 //					//save the cart 
 					cartService.saveCart(cart);
-					
+
 					user.setCart(cart);
 					userService.saveUser(user);
 
@@ -142,15 +140,13 @@ public class CartController {
 		return Response.set("CartItem not found. ", HttpStatus.BAD_REQUEST);
 	}
 
+	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.Cart.getCart + "/{cartId}")
 	public Response getCart(@PathVariable Integer cartId) {
 
 		Cart cart = cartService.getCart(cartId);
+		return Response.set(cart, HttpStatus.OK);
 
-		if (cartService.isNotNull(cart))
-			return Response.set(cart, HttpStatus.OK);
-
-		return Response.set("Cart not found.", HttpStatus.BAD_REQUEST);
 	}
 
 }

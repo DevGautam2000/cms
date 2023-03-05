@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.entities.Item;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.ItemService;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
 @CrossOrigin
 @RestController
@@ -30,13 +32,14 @@ public class ItemController {
 		return Response.set(itemService.getItems(), HttpStatus.OK);
 	}
 
+	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.Item.getItem + "/{itemId}")
 	public Response getItem(@PathVariable Integer itemId) {
-		Item item = itemService.getItem(itemId);
-		if (itemService.isNotNull(item))
-			return Response.set(item, HttpStatus.OK);
 
-		return Response.set("Item not found.", HttpStatus.BAD_REQUEST);
+		Item item = itemService.getItem(itemId);
+
+		return Response.set(item, HttpStatus.OK);
+
 	}
 
 	@PostMapping(Route.Item.addItem)
@@ -44,16 +47,17 @@ public class ItemController {
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))
 			return Response.set("Item added.", HttpStatus.OK);
-		
+
 		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+
 	@PostMapping(Route.Item.addItems)
 	public Response addItems(@RequestBody List<Item> items) {
 		List<Item> i = itemService.addItems(items);
+		
 		if (!i.isEmpty())
 			return Response.set("Items added.", HttpStatus.OK);
-		
+
 		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 

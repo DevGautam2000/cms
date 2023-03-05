@@ -17,7 +17,7 @@ public class UserService implements Validator {
 	UserRepo userRepo;
 
 	public User getuser(String email) {
-		return userRepo.findByEmail(email).orElse(null);
+		return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User"));
 	}
 
 	public User getuser(Integer id) {

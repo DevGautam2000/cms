@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
@@ -42,13 +44,11 @@ public class MenuController {
 
 	}
 
+	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.Menu.getMenu + "/{id}")
 	public Response getMenu(@PathVariable Integer id) {
-		Optional<Menu> m = Optional.ofNullable(menuService.getMenu(id));
-		if (m.isPresent())
-			return Response.set(m.get(), HttpStatus.OK);
-
-		return Response.set("Menu does not exist.", HttpStatus.BAD_REQUEST);
+		Menu m = menuService.getMenu(id);
+		return Response.set(m, HttpStatus.OK);
 	}
 
 	@GetMapping(Route.Menu.getMonthMenu)
