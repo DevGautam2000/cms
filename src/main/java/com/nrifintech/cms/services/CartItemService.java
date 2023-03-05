@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Item;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.CartItemRepo;
 import com.nrifintech.cms.utils.Validator;
 
@@ -51,7 +52,7 @@ public class CartItemService implements Validator {
 	}
 
 	public CartItem getItem(Integer id) {
-		return cartItemRepo.findById(id).orElse(null);
+		return cartItemRepo.findById(id).orElseThrow(()-> new NotFoundException("CartItem"));
 	}
 
 	public Boolean deleteItem(Integer id) {

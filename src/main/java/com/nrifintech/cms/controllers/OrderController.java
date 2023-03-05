@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,20 +101,32 @@ public class OrderController {
 		return Response.set("Order not found.", HttpStatus.BAD_REQUEST);
 
 	}
-	
+
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
-	public Response updateOrderStatus(@PathVariable Integer orderId,@PathVariable Integer statusId) {
-		
+	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId) {
+
+		Status[] status = Status.values();
+		if (status[statusId].toString().equalsIgnoreCase(Status.Pending.toString()))
+			return Response.set("Operation not allowed.", HttpStatus.BAD_REQUEST);
+
 		Order order = orderService.getOrder(orderId);
-		
-		if(orderService.isNotNull(order)) {
+
+		if (orderService.isNotNull(order)) {
 			
-			order.setStatus(Status.values()[statusId]);
+			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString()) &&
+				status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString())
+					)
+				return Response.set("Operation not allowed.", HttpStatus.BAD_REQUEST);
+
+			if (status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString()))
+				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
+			
+			order.setStatus(status[statusId]);
 			orderService.saveOrder(order);
-			
+
+			return Response.set("Order " + status[statusId].toString()  + ".", HttpStatus.OK);
 		}
-		
-		
+
 		return Response.set("Order not found.", HttpStatus.BAD_REQUEST);
 	}
 

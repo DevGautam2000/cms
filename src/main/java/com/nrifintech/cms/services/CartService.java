@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.CartRepo;
 import com.nrifintech.cms.utils.Validator;
 
@@ -31,7 +32,7 @@ public class CartService implements Validator {
 	}
 
 	public Cart getCart(Integer id) {
-		return cartRepo.findById(id).orElse(null);
+		return cartRepo.findById(id).orElseThrow(()->new NotFoundException("Cart"));
 	}
 
 	public Cart addToCart(List<CartItemUpdateRequest> reqs, Cart cart) {
@@ -40,7 +41,7 @@ public class CartService implements Validator {
 
 			List<CartItem> items = cartItemService.getCartItems(reqs);
 
-			List<CartItem> exItems = cart.getItems();
+			List<CartItem> exItems = cart.getCartItems();
 
 			// TODO: filter duplicates in items
 
@@ -50,14 +51,14 @@ public class CartService implements Validator {
 			exItems.addAll(items);
 			cartItemService.saveItems(exItems);
 			
-			cart.setItems(exItems);
+			cart.setCartItems(exItems);
 		}
 
 		return cart;
 	}
 
 	public Cart clearCart(Cart cart) {
-		List<CartItem> cartItems = cart.getItems();
+		List<CartItem> cartItems = cart.getCartItems();
 
 		List<Integer> ids = cartItems.stream().map(i -> i.getId()).collect(Collectors.toList());
 

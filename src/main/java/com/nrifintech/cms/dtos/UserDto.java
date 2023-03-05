@@ -48,7 +48,7 @@ public class UserDto{
 			
 			if(c != null) {
 				this.cartId = c.getId();
-				this.cartCount = c.getItems().size();
+				this.cartCount = c.getCartItems().size();
 			}
 		}
 	}

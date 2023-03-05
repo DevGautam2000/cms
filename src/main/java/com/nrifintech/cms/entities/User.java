@@ -46,6 +46,11 @@ public class User {
 	@OneToMany(fetch=FetchType.LAZY)
 	private List<Order> records;
 	
+	
+	@Column(unique=true)
+	@OneToMany(fetch=FetchType.LAZY)
+	private List<Bill> bills;
+	
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;
 	

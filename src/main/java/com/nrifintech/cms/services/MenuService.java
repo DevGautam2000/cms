@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.utils.SameRoute;
@@ -33,7 +34,7 @@ public class MenuService implements Validator {
 
 	public Menu getMenu(Integer menuId) {
 
-		Menu m = menuRepo.findById(menuId).orElse(null);
+		Menu m = menuRepo.findById(menuId).orElseThrow(() -> new NotFoundException("Menu"));
 		return m;
 	}
 

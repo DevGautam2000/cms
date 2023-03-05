@@ -112,7 +112,7 @@ public class CartController {
 			CartItem cartItem = cartItemService.getItem(itemId);
 
 			if (cartItemService.isNotNull(cartItem)) {
-				cart.getItems().remove(cart.getItems().indexOf(cartItem));
+				cart.getCartItems().remove(cart.getCartItems().indexOf(cartItem));
 				cartService.saveCart(cart);
 
 				cartItemService.deleteItem(cartItem.getId());

@@ -27,5 +27,5 @@ public class Cart {
 	private Integer id;
 	
 	@ManyToMany(fetch=FetchType.EAGER)
-	private List<CartItem> items;
+	private List<CartItem> cartItems;
 }

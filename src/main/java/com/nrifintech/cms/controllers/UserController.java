@@ -124,11 +124,12 @@ public class UserController {
 				if (cartService.isNull(cart))
 					return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
 
-				List<CartItem> cartItems = cart.getItems();
+				List<CartItem> cartItems = cart.getCartItems();
 
 				if (orderService.isNull(cartItems) || cartItems.isEmpty())
 					return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
 
+				
 				order.setCartItems(new ArrayList<>(cartItems));
 				orderService.saveOrder(order);
 
@@ -138,7 +139,8 @@ public class UserController {
 				// clear the cart after placing the order
 				if (userService.isNotNull(user)) {
 
-					user.getCart().setItems(null);
+					//TODO: 
+					user.getCart().getCartItems().clear();
 					user = userService.saveUser(user);
 
 					return Response.set("Added new order for user.", HttpStatus.OK);
