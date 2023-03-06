@@ -54,6 +54,8 @@ public class AuthenticationService {
         String token = jwtUtils.generateResetToken(new MyUserDetails(user));
         String url="/auth/change-password?token="+token;
         System.out.println(url);
+
+        
     }
 
     public void changePassword(String email,String token,String newPassword){
