@@ -1,5 +1,7 @@
 package com.nrifintech.cms.errorcontroller;
 
+import java.nio.file.AccessDeniedException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.types.Response;
+
+import io.jsonwebtoken.JwtException;
 
 interface Message {
 	String payloadNotFound = "Required payload not found or wrongly passed.";
@@ -61,4 +65,30 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 	}
 
 	
+    @ExceptionHandler({ AccessDeniedException.class })
+    public ResponseEntity<Object> handleAccessDeniedException(
+      Exception ex, WebRequest request) {
+        return new ResponseEntity<Object>(
+          "Access denied message here", 
+          HttpStatus.FORBIDDEN);
+    }
+
+    
+    
+    @ExceptionHandler({ io.jsonwebtoken.ExpiredJwtException.class })
+    public ResponseEntity<Object> expiredJwtException(
+      Exception ex, WebRequest request) {
+        return new ResponseEntity<Object>(
+          "session is terminated", 
+          HttpStatus.REQUEST_TIMEOUT);
+    }
+	
+
+	@ExceptionHandler({ io.jsonwebtoken.JwtException.class })
+    public ResponseEntity<Object> jwtException(
+      Exception ex, WebRequest request) {
+        return new ResponseEntity<Object>(
+          ex.getMessage(), 
+          HttpStatus.FORBIDDEN);
+    }
 }

@@ -27,10 +27,15 @@ import com.nrifintech.cms.config.MyUserDetailsService;
 import com.nrifintech.cms.config.jwt.JwtRequest;
 import com.nrifintech.cms.config.jwt.JwtResponse;
 import com.nrifintech.cms.config.jwt.JwtUtils;
+import com.nrifintech.cms.dtos.UserDto;
+import com.nrifintech.cms.dtos.UserDto.Privileged;
+import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.UserService;
+import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.Role;
 
 @RestController
 @CrossOrigin("*")
@@ -65,8 +70,17 @@ public class AuthenticationController {
 
 
     @GetMapping("current-user")
-    public User getCurrentUser(Principal principal){
-        return userService.getuser(principal.getName());
+    public Response getCurrentUser(Principal principal){
+        User exUser = userService.getuser(principal.getName());
+        if (exUser.getRole().equals(Role.User)) {
+
+            Unprivileged userDto = new UserDto.Unprivileged(exUser);
+            return Response.set(userDto, HttpStatus.OK);
+
+        }
+
+        Privileged userDto = new UserDto.Privileged(exUser);
+        return Response.set(userDto, HttpStatus.OK);
     }
 
     @GetMapping("forgot-password")

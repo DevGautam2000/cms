@@ -19,6 +19,7 @@ import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.ResetPasswordUUID;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.routes.Route;
 
 import eu.bitwalker.useragentutils.UserAgent;
 
@@ -54,16 +55,18 @@ public class AuthenticationService {
 
     public void forgetPassword(String email){
         User user=userService.getuser(email);
+        
         resetPasswordEmail(user);
     }
 
     private void resetPasswordEmail(User user){
         System.out.println(user);
         String token = jwtUtils.generateResetToken(new MyUserDetails(user));
+        //TODO : ** url needs to be changed **
         String url="/auth/change-password?token="+token;
         System.out.println(url);
         //code here
-        url = "http://localhost:8080"+url;
+        url = Route.root+url;
         EmailModel em = new EmailModel(user.getEmail(), "CMS-Pass Reset", null);
         this.smtPservices.forgotPasswordMail(em,url);
     }

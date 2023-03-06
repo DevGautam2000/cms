@@ -49,7 +49,7 @@ public class UserController {
 	}
 
 	@GetMapping(Route.User.getUsers)
-	public Response addUser() {
+	public Response getUsers() {
 		List<User> users = userService.getUsers();
 
 		if (!users.isEmpty())
@@ -58,6 +58,7 @@ public class UserController {
 		return Response.set("No users found.", HttpStatus.BAD_REQUEST);
 	}
 
+	//TODO: redudent
 	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.User.getUser)
 	public Response getUser(@RequestBody User user) {
@@ -94,7 +95,7 @@ public class UserController {
 
 	}
 
-	@GetMapping(Route.Order.getOrders + "/user/{userId}")
+	@GetMapping(Route.User.getOrders + "/user/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
 
 		User user = userService.getuser(userId);

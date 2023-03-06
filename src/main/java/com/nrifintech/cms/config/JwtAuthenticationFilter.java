@@ -16,8 +16,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter{
@@ -28,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     private JwtUtils jutUtil;
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+			throws ServletException, IOException,JwtException {
 		final String requestTokenHeader = request.getHeader("Authorization");
         System.out.println(requestTokenHeader);
         String username=null;
@@ -47,7 +49,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                 System.out.println("error");
             }
         }else{
-            System.out.println("Invalid Token , not start with bearer string");
+            System.out.println("Invalid Token , not start with Bearer string");
+           // throw new JwtException("Invalid Token , not start with Bearer string");
         }
 
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
@@ -62,6 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         else
         {
             System.out.println("Token is not valid!!");
+            // throw new JwtException("Invalid Token");
         }
 
         filterChain.doFilter(request, response);

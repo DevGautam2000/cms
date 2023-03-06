@@ -1,5 +1,7 @@
 package com.nrifintech.cms.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +20,16 @@ public class UserService implements Validator {
 		return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User"));
 	}
 
+	private User getExistingUser(String email) {
+		return userRepo.findByEmail(email).orElse(null);
+	}
+
 	public User getuser(Integer id) {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
 	public User addUser(User user) {
-		User exUser = this.getuser(user.getEmail());
+		User exUser = this.getExistingUser(user.getEmail());
 
 		if (!isNotNull(exUser)) {
 			userRepo.save(user);
