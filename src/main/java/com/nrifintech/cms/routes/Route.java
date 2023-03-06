@@ -82,6 +82,13 @@ public class Route {
 		String getItems = "getitems";
 	}
 
+
+	public interface Authentication{
+		String prefix = "/auth/";
+		
+		String generateToken = "generate-token";
+	}
+
 	public interface Bill {
 		String prefix = "/bill/";
 
@@ -89,5 +96,6 @@ public class Route {
 		String getBill = "getbill";
 		String addBill = "addbill";
 	}
+
 
 }

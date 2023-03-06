@@ -1,7 +1,12 @@
 package com.nrifintech.cms.entities;
 
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +16,11 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.nrifintech.cms.config.Authority;
 import com.nrifintech.cms.types.Role;
 
 import lombok.AllArgsConstructor;
@@ -39,6 +49,7 @@ public class User {
 	private String email;
 	private String password;
 	private String phoneNumber;
+	
 	private Role role = Role.User;
 
 	
@@ -54,6 +65,12 @@ public class User {
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;
 	
+
+
 	
+	// func. impl. left
+	public String getUsername(){
+		return this.email;
+	}
 
 }

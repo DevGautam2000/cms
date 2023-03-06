@@ -36,8 +36,8 @@ public class CartItemController {
 //	public Response addItem(@RequestBody CartItem item) {
 //		CartItem i = cartItemService.addItem(item);
 //		if (cartItemService.isNotNull(i))
-//			return Response.set("Item added.", HttpStatus.OK);
-//		
+//			return Response.set("Item added.", HttpStatus.OK); 
+//
 //		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 //	}
 	
