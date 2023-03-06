@@ -1,7 +1,10 @@
 package com.nrifintech.cms.services;
 
+import java.net.http.HttpRequest;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,9 +15,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
+import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.ResetPasswordUUID;
 import com.nrifintech.cms.entities.User;
+
+import eu.bitwalker.useragentutils.UserAgent;
 
 @Service
 public class AuthenticationService {
@@ -24,6 +30,8 @@ public class AuthenticationService {
     private UserService userService;
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private SMTPservices smtPservices;
     
     public void authenticate(String username,String password) throws Exception{
         try{
@@ -54,8 +62,10 @@ public class AuthenticationService {
         String token = jwtUtils.generateResetToken(new MyUserDetails(user));
         String url="/auth/change-password?token="+token;
         System.out.println(url);
-
-        
+        //code here
+        url = "http://localhost:8080"+url;
+        EmailModel em = new EmailModel(user.getEmail(), "CMS-Pass Reset", null);
+        this.smtPservices.forgotPasswordMail(em,url);
     }
 
     public void changePassword(String email,String token,String newPassword){

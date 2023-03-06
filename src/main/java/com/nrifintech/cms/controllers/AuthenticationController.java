@@ -74,6 +74,8 @@ public class AuthenticationController {
         System.out.println(user);
 
         authService.forgetPassword(user.getUsername());
+
+        //here
         return ResponseEntity.ok("Email sent"); 
 
     }
