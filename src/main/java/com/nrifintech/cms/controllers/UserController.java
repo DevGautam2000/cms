@@ -12,17 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nrifintech.cms.dtos.UserDto;
-import com.nrifintech.cms.dtos.UserDto.Privileged;
-import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
-import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
-import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
 @CrossOrigin
@@ -58,30 +53,7 @@ public class UserController {
 		return Response.set("No users found.", HttpStatus.BAD_REQUEST);
 	}
 
-	//TODO: redudent
-	@ErrorHandlerImplemented(handler = NotFoundException.class)
-	@GetMapping(Route.User.getUser)
-	public Response getUser(@RequestBody User user) {
-
-		User exUser = userService.getuser(user.getEmail());
-
-		// check password
-		if (userService.checkPassword(user, exUser)) {
-
-			if (exUser.getRole().equals(Role.User)) {
-
-				Unprivileged userDto = new UserDto.Unprivileged(exUser);
-				return Response.set(userDto, HttpStatus.OK);
-
-			}
-
-			Privileged userDto = new UserDto.Privileged(exUser);
-			return Response.set(userDto, HttpStatus.OK);
-		} else
-			return Response.set("Incorrect Password.", HttpStatus.BAD_REQUEST);
-
-	}
-
+	
 	@PostMapping(Route.User.removeUser)
 	public Response removeUser(@RequestBody User user) {
 
