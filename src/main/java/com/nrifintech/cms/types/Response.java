@@ -2,6 +2,8 @@ package com.nrifintech.cms.types;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
 
 /*
 100 Continue
@@ -80,16 +82,25 @@ import org.springframework.http.ResponseEntity;
 599 Network Connect Timeout Error
  */
 
+public class Response extends ResponseEntity<Object> {
 
-public class Response extends ResponseEntity<Object>{
-		
 	public Response(Object body, HttpStatus status) {
 		super(body, status);
-		// TODO Auto-generated constructor stub
-	}
-	
-	public static Response set(Object body, HttpStatus status) {
-		return new Response(body,status);
 	}
 
+	public static Response set(Object body, HttpStatus status) {
+		return new Response(body, status);
+	}
+
+	
+	public Response(@Nullable Object body, @Nullable MultiValueMap<String, String> headers, HttpStatus status) {
+		super(body, headers, status);
+	}
+
+	public static Response set(@Nullable Object body, @Nullable MultiValueMap<String, String> headers,
+			HttpStatus status) {
+		return new Response(body,headers, status);
+	}
+
+	
 }

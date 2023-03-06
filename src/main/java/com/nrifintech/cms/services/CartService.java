@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.CartRepo;
 import com.nrifintech.cms.utils.Validator;
 
@@ -20,7 +21,7 @@ public class CartService implements Validator {
 	private CartRepo cartRepo;
 
 	@Autowired
-	private ItemService itemService;
+	private CartItemService cartItemService;
 
 	public Cart saveCart(Cart cart) {
 		return cartRepo.save(cart);
@@ -31,29 +32,39 @@ public class CartService implements Validator {
 	}
 
 	public Cart getCart(Integer id) {
-		return cartRepo.findById(id).orElse(null);
+		return cartRepo.findById(id).orElseThrow(()->new NotFoundException("Cart"));
 	}
 
 	public Cart addToCart(List<CartItemUpdateRequest> reqs, Cart cart) {
 
 		if (isNotNull(cart)) {
-			
 
-			List<Integer> itemIds = reqs.stream().map( r -> Integer.valueOf(r.getItemId())).collect(Collectors.toList());
-			
-			List<CartItem> items = itemService.getCartItems(itemIds);
+			List<CartItem> items = cartItemService.getCartItems(reqs);
 
-			List<CartItem> exItems = cart.getItems();
+			List<CartItem> exItems = cart.getCartItems();
 
-			if (isNotNull(exItems))
-				items.removeAll(exItems);
-			
+			// TODO: filter duplicates in items
+
 			if (isNull(exItems))
 				exItems = new ArrayList<>();
 
 			exItems.addAll(items);
-			this.saveCart(cart);
+			cartItemService.saveItems(exItems);
+			
+			cart.setCartItems(exItems);
 		}
+
+		return cart;
+	}
+
+	public Cart clearCart(Cart cart) {
+		List<CartItem> cartItems = cart.getCartItems();
+
+		List<Integer> ids = cartItems.stream().map(i -> i.getId()).collect(Collectors.toList());
+
+		cartItems.clear();
+
+		ids.forEach(id -> cartItemService.deleteItem(id));
 
 		return cart;
 	}

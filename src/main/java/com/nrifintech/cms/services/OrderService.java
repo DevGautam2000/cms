@@ -10,6 +10,7 @@ import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.OrderRepo;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.utils.Validator;
@@ -31,17 +32,22 @@ public class OrderService implements Validator {
 		return orderRepo.saveAll(orders);
 	}
 
+	public Order saveOrder(Order order) {
+
+		return orderRepo.save(order);
+	}
+
 	public Order addNewOrder(MealType orderType) {
 
 		Order order = new Order();
 		order.setOrderType(orderType);
 
-		return orderRepo.save(order);
+		return order;
 	}
 
 	public Order getOrder(Integer id) {
 
-		return orderRepo.findById(id).orElse(null);
+		return orderRepo.findById(id).orElseThrow( () ->  new NotFoundException("Order"));
 	}
 
 	public List<Order> getOrders() {

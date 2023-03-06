@@ -20,15 +20,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name="orders")
+@Table(name = "orders")
 public class Order {
 
 	@Id
@@ -37,12 +35,15 @@ public class Order {
 
 	private Status status = Status.Pending;
 	private MealType orderType;
-	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-	
+
+	private Timestamp orderPlaced = new Timestamp(System.currentTimeMillis());
+
+	private Timestamp orderDelivered;
+
 	@OneToOne
 	private FeedBack feedBack;
-	
-	@ManyToMany(fetch=FetchType.LAZY)
+
+	@ManyToMany(fetch = FetchType.LAZY)
 	private List<CartItem> cartItems;
 
 }

@@ -42,8 +42,8 @@ public class User {
 	@Id
 	@GeneratedValue
 	private Integer id;
-
-	private String username;
+	
+	private String avatar;
 
 	@Column(unique = true)
 	private String email;
@@ -56,6 +56,11 @@ public class User {
 	@Column(unique=true)
 	@OneToMany(fetch=FetchType.LAZY)
 	private List<Order> records;
+	
+	
+	@Column(unique=true)
+	@OneToMany(fetch=FetchType.LAZY)
+	private List<Bill> bills;
 	
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;

@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.MenuService;
+import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
@@ -29,9 +33,9 @@ public class MenuController {
 	private MenuService menuService;
 
 	@PostMapping(Route.Menu.addMenu)
-	public Response newMenu() {
+	public Response newMenu(@RequestBody Menu menu) {
 
-		if (menuService.isNotNull(menuService.addMenu())) {
+		if (menuService.isNotNull(menuService.addMenu(menu))) {
 			return Response.set("Added new menu.", HttpStatus.OK);
 		}
 
@@ -40,13 +44,11 @@ public class MenuController {
 
 	}
 
+	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.Menu.getMenu + "/{id}")
 	public Response getMenu(@PathVariable Integer id) {
-		Optional<Menu> m = Optional.ofNullable(menuService.getMenu(id));
-		if (m.isPresent())
-			return Response.set(m.get(), HttpStatus.OK);
-
-		return Response.set("Menu does not exist.", HttpStatus.BAD_REQUEST);
+		Menu m = menuService.getMenu(id);
+		return Response.set(m, HttpStatus.OK);
 	}
 
 	@GetMapping(Route.Menu.getMonthMenu)
@@ -68,15 +70,24 @@ public class MenuController {
 
 	}
 
-	@PostMapping(Route.Menu.approveMenu + "/{menuId}")
-	public Response approveMenu(@PathVariable Integer menuId) {
+	@PostMapping(Route.Menu.approveMenu + "/{menuId}/{approvalStatusId}")
+	public Response approveMenu(@PathVariable Integer menuId, @PathVariable Integer approvalStatusId) {
 
-		Menu m = menuService.approveMenu(menuId);
+		Menu m = menuService.getMenu(menuId);
 
-		if (menuService.isNotNull(m))
-			return Response.set("Menu approved.", HttpStatus.OK);
+		if (menuService.isNotNull(m)) {
 
-		return Response.set("Menu already approved.", HttpStatus.BAD_REQUEST);
+			String menuStatus = m.getApproval().toString();
+			if (!menuStatus.equalsIgnoreCase(Approval.Pending.toString()))
+				return Response.set("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
+
+			if (menuService.approveMenu(m, approvalStatusId))
+				return Response.set("Menu " + Approval.values()[approvalStatusId].toString().toLowerCase() + ".",
+						HttpStatus.OK);
+
+		}
+
+		return Response.set("Menu does not exist.", HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -123,6 +134,17 @@ public class MenuController {
 		}
 
 		return Response.set("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@GetMapping(Route.Menu.getByDate + "/{date}")
+	public Response getMenuByDate(@PathVariable Date date) {
+
+		List<Menu> menus = menuService.getMenuByDate(date);
+
+		if (!menus.isEmpty())
+			return Response.set(menus, HttpStatus.OK);
+
+		return Response.set("Menu(s) with particular date not found.", HttpStatus.BAD_REQUEST);
 	}
 
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Item;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.CartItemRepo;
 import com.nrifintech.cms.repositories.ItemRepo;
 import com.nrifintech.cms.utils.Validator;
@@ -29,7 +30,7 @@ public class ItemService implements Validator {
 
 	// get a food
 	public Item getItem(Integer id) {
-		return itemRepo.findById(id).orElse(null);
+		return itemRepo.findById(id).orElseThrow(() -> new NotFoundException("Item"));
 	}
 
 	// add foods
@@ -42,9 +43,7 @@ public class ItemService implements Validator {
 		return itemRepo.findAll();
 	}
 
-	public List<CartItem> getCartItems() {
-		return cartItemRepo.findAll();
-	}
+	
 	
 	public List<Item> getItems(List<String> itemIds) {
 		List<Item> allItems = this.getItems();
@@ -54,12 +53,6 @@ public class ItemService implements Validator {
 		return items;
 	}
 	
-	public List<CartItem> getCartItems(List<Integer> itemIds) {
-		List<CartItem> allItems = this.getCartItems();
-		List<CartItem> items = allItems.stream().filter(item -> itemIds.contains(item.getId()))
-				.collect(Collectors.toList());
-
-		return items;
-	}
+	
 
 }

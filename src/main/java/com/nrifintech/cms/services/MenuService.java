@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.utils.SameRoute;
@@ -24,16 +26,15 @@ public class MenuService implements Validator {
 	@Autowired
 	private ItemService itemService;
 
-	public Menu addMenu() {
+	public Menu addMenu(Menu menu) {
 
-		Menu m = new Menu();
-		return menuRepo.save(m);
+		return menuRepo.save(menu);
 
 	}
 
 	public Menu getMenu(Integer menuId) {
 
-		Menu m = menuRepo.findById(menuId).orElse(null);
+		Menu m = menuRepo.findById(menuId).orElseThrow(() -> new NotFoundException("Menu"));
 		return m;
 	}
 
@@ -52,21 +53,16 @@ public class MenuService implements Validator {
 		return m;
 	}
 
-	public Menu approveMenu(Integer menuId) {
+	public boolean approveMenu(Menu m, Integer approvalStatusId) {
 
+		if (m.getApproval().equals(Approval.Pending)) {
 
-		Menu m = this.getMenu(menuId);
+			m.setApproval(Approval.values()[approvalStatusId]);
+			menuRepo.save(m);
+			return true;
 
-		if (isNotNull(m)) {
-			if (m.getApproval().equals(Approval.Pending)) {
-				
-				m.setApproval(Approval.Approved);
-				menuRepo.save(m);
-				
-			}else m = null;
 		}
-
-		return m;
+		return false;
 	}
 
 	public Menu addItemToMenu(Integer menuId, Integer itemId) {
@@ -144,7 +140,7 @@ public class MenuService implements Validator {
 		Menu m = menuRepo.findById(menuId).orElse(null);
 
 		if (isNotNull(m)) {
-			
+
 			List<Item> exItems = m.getItems();
 			List<Item> items = new ArrayList<>();
 
@@ -152,7 +148,7 @@ public class MenuService implements Validator {
 				Item item = itemService.getItem(Integer.valueOf(itemId));
 
 				if (isNotNull(item) && !exItems.contains(item))
-						items.add(item);
+					items.add(item);
 
 			});
 
@@ -163,6 +159,10 @@ public class MenuService implements Validator {
 
 		return m;
 
+	}
+
+	public List<Menu> getMenuByDate(Date date) {
+		return menuRepo.findMenuByDate(date);
 	}
 
 }

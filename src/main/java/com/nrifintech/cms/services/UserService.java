@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.utils.Validator;
 
@@ -14,20 +15,20 @@ public class UserService implements Validator {
 	UserRepo userRepo;
 
 	public User getuser(String email) {
-		return userRepo.findByEmail(email).orElse(null);
+		return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User"));
 	}
-	
+
 	public User getuser(Integer id) {
-		return userRepo.findById(id).orElse(null);
+		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
 	public User addUser(User user) {
-		User exUser  = this.getuser(user.getEmail());
-		
-		if(!isNotNull(exUser)) {
+		User exUser = this.getuser(user.getEmail());
+
+		if (!isNotNull(exUser)) {
 			userRepo.save(user);
 		}
-		
+
 		return exUser;
 	}
 
@@ -40,15 +41,15 @@ public class UserService implements Validator {
 	}
 
 	public User removeUser(String email) {
-		
+
 		User exUser = this.getuser(email);
-		if(isNotNull(exUser)) {
+		if (isNotNull(exUser)) {
 			userRepo.delete(exUser);
 		}
-		
+
 		return exUser;
 	}
-	
+
 	public User saveUser(User user) {
 		return userRepo.save(user);
 	}
@@ -63,4 +64,8 @@ public class UserService implements Validator {
 		return userRepo.save(user);
 	}
 	
+	public List<User> getUsers() {
+		return userRepo.findAll();
+	}
+
 }
