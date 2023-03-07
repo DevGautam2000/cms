@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
-import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -55,7 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
-            if(!userDetails.isEnabled())throw new JwtException("InActive User");
+            
+            if(!userDetails.isEnabled())
+                throw new UserIsDisabledException("InActive User");
+
             if(this.jutUtil.validateToken(jwtToken, userDetails)){// && userDetails.isEnabled()){
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

@@ -22,6 +22,7 @@ import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.ResetPasswordUUID;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.UserStatus;
@@ -63,7 +64,10 @@ public class AuthenticationService {
 
     public void forgetPassword(String email) throws Exception{
         User user=userService.getuser(email);
-        if(!(user.getStatus()==UserStatus.Active))throw new Exception("InActive User");
+
+        if(!(user.getStatus().equals(UserStatus.Active)))
+            throw new UserIsDisabledException();
+            
         resetPasswordEmail(user);
     }
 
@@ -97,7 +101,10 @@ public class AuthenticationService {
     public void changePassword(String email,String token,String newPassword) throws Exception{
 
         User user = userService.getuser(email);
-        if(!(user.getStatus()==UserStatus.Active))throw new Exception("InActive User");
+
+        if(!(user.getStatus().equals(UserStatus.Active)))
+            throw new UserIsDisabledException();
+
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
             throw new UsernameNotFoundException("token: "+token+" is not valid");
         }
