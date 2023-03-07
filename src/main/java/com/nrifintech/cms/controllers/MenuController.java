@@ -91,29 +91,6 @@ public class MenuController {
 
 	}
 
-	@PostMapping(Route.Menu.addToMenu + "/{menuId}/{itemId}")
-	public Response addToMenu(@PathVariable Integer menuId, @PathVariable Integer itemId) {
-
-		Menu m = menuService.addItemToMenu(menuId, itemId);
-		if (menuService.isNotNull(m))
-			return Response.set("Added new item to menu( id : " + menuId + " )", HttpStatus.OK);
-
-		return Response.set("Error adding item to menu.", HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
-
-	@SameRoute
-	@PostMapping(Route.Menu.addToMenu)
-	public Response addToMenu(@RequestBody MenuUpdateRequest updateRequest) {
-
-		Menu m = menuService.addItemToMenu(updateRequest);
-		if (menuService.isNotNull(m))
-			return Response.set("Added new item to menu( id : " + updateRequest.getMenuId() + " )", HttpStatus.OK);
-
-		return Response.set("Error adding item to menu.", HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
-
 	@PostMapping(Route.Item.addItems + "tomenu/{menuId}/{itemIds}")
 	public Response addItemsToMenu(@PathVariable Integer menuId, @PathVariable List<String> itemIds) {
 
