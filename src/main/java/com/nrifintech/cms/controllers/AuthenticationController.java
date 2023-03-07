@@ -41,68 +41,66 @@ import com.nrifintech.cms.types.Role;
 @CrossOrigin("*")
 @RequestMapping(Route.Authentication.prefix)
 public class AuthenticationController {
-    @Autowired
-    private AuthenticationService authService;
-    @Autowired @Lazy
-    private MyUserDetailsService userDetailsServiceImple;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private JwtUtils jwtUtils;
+	@Autowired
+	private AuthenticationService authService;
+	@Autowired
+	@Lazy
+	private MyUserDetailsService userDetailsServiceImple;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private JwtUtils jwtUtils;
 
-    @PostMapping("/generate-token")
-    public ResponseEntity<?> generateToken(@RequestBody JwtRequest jwtRequest) throws Exception{
-            authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
-       
-        UserDetails userDetails=this.userDetailsServiceImple.loadUserByUsername(jwtRequest.getUsername());
-         String token=this.jwtUtils.generateToken(userDetails);
-       
-        return ResponseEntity.ok(new JwtResponse(token)); 
-    }
+	@PostMapping("/generate-token")
+	public Response generateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
+		authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
+		UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(jwtRequest.getUsername());
+		String token = this.jwtUtils.generateToken(userDetails);
 
-    @GetMapping("current-user")
-    public Response getCurrentUser(Principal principal){
-    	
-    	System.out.println("PRINCIPAL: " + principal);
-    	
-        User exUser = userService.getuser(principal.getName());
-        if (exUser.getRole().equals(Role.User)) {
+		return Response.set(new JwtResponse(token), HttpStatus.OK);
+	}
 
-            Unprivileged userDto = new UserDto.Unprivileged(exUser);
-            return Response.set(userDto, HttpStatus.OK);
+	@GetMapping("current-user")
+	public Response getCurrentUser(Principal principal) {
 
-        }
+		System.out.println("PRINCIPAL: " + principal);
 
-        Privileged userDto = new UserDto.Privileged(exUser);
-        return Response.set(userDto, HttpStatus.OK);
-    }
+		User exUser = userService.getuser(principal.getName());
+		if (exUser.getRole().equals(Role.User)) {
 
-    @GetMapping("forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody JwtRequest user){
-        System.out.println(user);
+			Unprivileged userDto = new UserDto.Unprivileged(exUser);
+			return Response.set(userDto, HttpStatus.OK);
 
-        authService.forgetPassword(user.getUsername());
+		}
 
-        //here
-        return ResponseEntity.ok("Email sent"); 
+		Privileged userDto = new UserDto.Privileged(exUser);
+		return Response.set(userDto, HttpStatus.OK);
+	}
 
-    }
+	@GetMapping("forgot-password")
+	public Response forgotPassword(@RequestBody JwtRequest user) {
+		System.out.println(user);
 
-    @PostMapping("change-password")
-    public ResponseEntity<?> changePassword(@RequestParam String token,
-        @RequestBody JwtRequest userInfo){
-        authService.changePassword(userInfo.getUsername(), token, userInfo.getPassword());                    
-        return ResponseEntity.ok("Password changed Successfully"); 
-    }
+		authService.forgetPassword(user.getUsername());
 
-    
-    @GetMapping("/hi")
-    public String hi(){
-        return "hi";
-    }
-    @GetMapping("/test")
-    public String test(){
-        return "only admin";
-    }
+		return Response.set("Email sent.", HttpStatus.OK);
+
+	}
+
+	@PostMapping("change-password")
+	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
+		authService.changePassword(userInfo.getUsername(), token, userInfo.getPassword());
+		return Response.set("Password changed Successfully", HttpStatus.OK);
+	}
+
+//	@GetMapping("/hi")
+//	public String hi() {
+//		return "hi";
+//	}
+//
+//	@GetMapping("/test")
+//	public String test() {
+//		return "only admin";
+//	}
 }
