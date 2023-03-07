@@ -11,6 +11,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.nrifintech.cms.types.Role;
+import com.nrifintech.cms.types.UserStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +41,8 @@ public class User {
 	private String phoneNumber;
 	
 	private Role role = Role.User;
-
+	
+	private UserStatus status = UserStatus.Active;
 	
 	@Column(unique=true)
 	@OneToMany(fetch=FetchType.LAZY)

@@ -11,12 +11,13 @@ public class Route {
 	public interface User {
 		String prefix = "/user/";
 
-		String getUser = "getuser";//na
 		String addUser = "adduser";
 		String removeUser = "removeuser";
 
 		String getUsers = "getusers";
 		String getOrders = "getorders";
+
+		String updateStatus = "updatestatus";
 
 
 	}
@@ -26,7 +27,6 @@ public class Route {
 
 		String getMenu = "getmenu";
 		String addMenu = "addmenu";
-		String addToMenu = "addtomenu";//na
 		String removeFromMenu = "removefrommenu";
 		String getMonthMenu = "getmonthmenu";
 

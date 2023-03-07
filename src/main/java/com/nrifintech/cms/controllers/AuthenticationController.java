@@ -5,13 +5,6 @@ import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.config.MyUserDetailsService;
@@ -36,6 +28,7 @@ import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
+import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
 @RestController
 @CrossOrigin("*")
@@ -43,14 +36,18 @@ import com.nrifintech.cms.types.Role;
 public class AuthenticationController {
 	@Autowired
 	private AuthenticationService authService;
+
 	@Autowired
 	@Lazy
 	private MyUserDetailsService userDetailsServiceImple;
+
 	@Autowired
 	private UserService userService;
+
 	@Autowired
 	private JwtUtils jwtUtils;
 
+	@ErrorHandlerImplemented(handler = UsernameNotFoundException.class)
 	@PostMapping("/generate-token")
 	public Response generateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
 		authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());

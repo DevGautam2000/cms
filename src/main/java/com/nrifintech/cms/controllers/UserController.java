@@ -18,6 +18,7 @@ import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
+import com.nrifintech.cms.types.UserStatus;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
 @CrossOrigin
@@ -31,10 +32,10 @@ public class UserController {
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
 	public Response addUser(@RequestBody User user) {
-		
-		if(user.getRole().ordinal() > Role.values().length)
+
+		if (user.getRole().ordinal() > Role.values().length)
 			return Response.set("Invalid role for user.", HttpStatus.BAD_REQUEST);
-		
+
 		User u = userService.addUser(user);
 
 		if (userService.isNotNull(u))
@@ -53,7 +54,6 @@ public class UserController {
 		return Response.set("No users found.", HttpStatus.BAD_REQUEST);
 	}
 
-	
 	@PostMapping(Route.User.removeUser)
 	public Response removeUser(@RequestBody User user) {
 
@@ -67,7 +67,7 @@ public class UserController {
 
 	}
 
-	@GetMapping(Route.User.getOrders + "/user/{userId}")
+	@GetMapping(Route.User.getOrders + "/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
 
 		User user = userService.getuser(userId);
@@ -78,6 +78,25 @@ public class UserController {
 
 		return Response.set("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
+	}
+
+	@PostMapping(Route.User.updateStatus + "/{userId}/{statusId}")
+	public Response updateUserStatus(@PathVariable Integer userId, @PathVariable Integer statusId) {
+
+		if(statusId > 1) 
+			return Response.set("Invalid status code.",HttpStatus.BAD_REQUEST);
+		
+		User user = userService.getuser(userId);
+
+		if (userService.isNotNull(user)) {
+
+			user.setStatus(UserStatus.values()[statusId]);
+			userService.saveUser(user);
+			
+		}
+		
+		return Response.set("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
+				HttpStatus.OK);
 	}
 
 }
