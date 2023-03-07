@@ -49,9 +49,9 @@ public class AuthenticationService {
             
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         }
-        catch(DisabledException e){
-            throw new Exception("USER DISABLED "+e.getMessage());
-        }
+        // catch(DisabledException e){
+        //     throw new Exception("USER DISABLED "+e.getMessage());
+        // }
         catch(BadCredentialsException e){
             // throw new Exception("Invalid Credentials "+e.getMessage());
             throw new UsernameNotFoundException("Invalid Credentials "+e.getMessage());
@@ -62,7 +62,7 @@ public class AuthenticationService {
     }
 
 
-    public void forgetPassword(String email) throws Exception{
+    public void forgetPassword(String email){
         User user=userService.getuser(email);
 
         if(!(user.getStatus().equals(UserStatus.Active)))
@@ -98,7 +98,7 @@ public class AuthenticationService {
         applicationEventPublisher.publishEvent(new ForgotPasswordEvent(email));
     }
 
-    public void changePassword(String email,String token,String newPassword) throws Exception{
+    public void changePassword(String email,String token,String newPassword) {
 
         User user = userService.getuser(email);
 
