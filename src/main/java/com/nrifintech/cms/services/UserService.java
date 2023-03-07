@@ -13,6 +13,7 @@ import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.events.AddedNewUserEvent;
+import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.utils.Validator;
 
@@ -68,6 +69,7 @@ public class UserService implements Validator {
 	}
 
 	public User saveUser(User user) {
+		this.applicationEventPublisher.publishEvent(new UpdateUserStatusEvent(user));
 		return userRepo.save(user);
 	}
 

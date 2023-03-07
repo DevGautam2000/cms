@@ -11,10 +11,10 @@
   <h2>Hi, ${name} </h2> <br>
 	Welcome to Canteen Management System.
     <br>
-    Create your password at ${password} for your login.
+    Admin revoked your access to the system.
     <br>
     sent at ${time}
     <br>
-    Please reset 
+    Extra details....
   </body>
 </html>

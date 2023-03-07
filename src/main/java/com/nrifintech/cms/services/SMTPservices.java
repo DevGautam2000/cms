@@ -59,6 +59,35 @@ public class SMTPservices {
 		return(flag);
     }
 
+    public boolean statusMail(EmailModel mail, String templateName){
+		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
+		boolean flag = false;
+
+		Map<String,String> m = new HashMap<>();
+		m.put("password", mail.getBody());
+        m.put("name",mail.getTo());
+        m.put("time",mail.getTime());
+        m.put("support_url","https://www.nrifintech.com/contact.html");
+
+        try {
+ 
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+ 
+            mimeMessageHelper.setSubject(mail.getSubject());
+            mimeMessageHelper.setFrom(mail.getFrom());
+            mimeMessageHelper.setTo(mail.getTo());
+            mail.setBody(getContentFromTemplate(m,templateName));
+            mimeMessageHelper.setText(mail.getBody(), true);
+ 
+            javaMailSender.send(mimeMessageHelper.getMimeMessage());
+			flag = true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+			flag = false;
+        }
+		return(flag);
+    }
+
     public boolean welcomeMail(EmailModel mail){
 		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
 		boolean flag = false;
