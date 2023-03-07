@@ -24,6 +24,7 @@ import com.nrifintech.cms.entities.ResetPasswordUUID;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.routes.Route;
+import com.nrifintech.cms.types.UserStatus;
 
 import eu.bitwalker.useragentutils.UserAgent;
 
@@ -60,15 +61,31 @@ public class AuthenticationService {
     }
 
 
-    public void forgetPassword(String email){
+    public void forgetPassword(String email) throws Exception{
         User user=userService.getuser(email);
-        
+        if(!(user.getStatus()==UserStatus.Active))throw new Exception("InActive User");
         resetPasswordEmail(user);
     }
 
+    // public void setNewPassword(String email){
+    //     User user=userService.getuser(email);
+        
+    //     setNewPasswordEmail(user);
+    // }
+
+    // public void setNewPasswordEmail(User user){
+    //     System.out.println(user);
+    //     String token = jwtUtils.generateNewPasswordToken(new MyUserDetails(user));
+    //     //TODO : ** url needs to be changed **
+    //     String url="/auth/set-new-password?token="+token;
+    //     System.out.println(url);
+    //     //code here
+    // }
+
     private void resetPasswordEmail(User user){
         System.out.println(user);
-        String token = jwtUtils.generateResetToken(new MyUserDetails(user));
+        MyUserDetails myUser = new MyUserDetails(user);
+        String token = jwtUtils.generateResetToken(myUser);
         //TODO : ** url needs to be changed **
         String url="/auth/change-password?token="+token;
         System.out.println(url);
@@ -77,9 +94,10 @@ public class AuthenticationService {
         applicationEventPublisher.publishEvent(new ForgotPasswordEvent(email));
     }
 
-    public void changePassword(String email,String token,String newPassword){
+    public void changePassword(String email,String token,String newPassword) throws Exception{
 
         User user = userService.getuser(email);
+        if(!(user.getStatus()==UserStatus.Active))throw new Exception("InActive User");
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
             throw new UsernameNotFoundException("token: "+token+" is not valid");
         }

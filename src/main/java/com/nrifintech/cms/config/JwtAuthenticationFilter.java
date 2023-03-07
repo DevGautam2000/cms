@@ -55,7 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
             final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
-            if(this.jutUtil.validateToken(jwtToken, userDetails)){
+            if(!userDetails.isEnabled())throw new JwtException("InActive User");
+            if(this.jutUtil.validateToken(jwtToken, userDetails)){// && userDetails.isEnabled()){
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

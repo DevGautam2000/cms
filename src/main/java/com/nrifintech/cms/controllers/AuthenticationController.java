@@ -76,7 +76,7 @@ public class AuthenticationController {
 	}
 
 	@GetMapping("forgot-password")
-	public Response forgotPassword(@RequestBody JwtRequest user) {
+	public Response forgotPassword(@RequestBody JwtRequest user) throws Exception {
 		System.out.println(user);
 
 		authService.forgetPassword(user.getUsername());
@@ -86,7 +86,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("change-password")
-	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
+	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) throws Exception {
 		authService.changePassword(userInfo.getUsername(), token, userInfo.getPassword());
 		return Response.set("Password changed Successfully", HttpStatus.OK);
 	}
