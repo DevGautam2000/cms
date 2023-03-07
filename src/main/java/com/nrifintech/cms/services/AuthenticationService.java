@@ -1,11 +1,15 @@
 package com.nrifintech.cms.services;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -18,6 +22,7 @@ import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.ResetPasswordUUID;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.routes.Route;
 
 import eu.bitwalker.useragentutils.UserAgent;
@@ -31,7 +36,7 @@ public class AuthenticationService {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private SMTPservices smtPservices;
+    private ApplicationEventPublisher applicationEventPublisher;
     
     
     //TODO: check password
@@ -68,9 +73,8 @@ public class AuthenticationService {
         String url="/auth/change-password?token="+token;
         System.out.println(url);
         //code here
-        url = Route.root+url;
-        EmailModel em = new EmailModel(user.getEmail(), "CMS-Pass Reset", null);
-        this.smtPservices.forgotPasswordMail(em,url);
+        EmailModel email = new EmailModel(user.getEmail(), "Canteen Password Reset", "forgot pass link",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(email));
     }
 
     public void changePassword(String email,String token,String newPassword){
@@ -82,7 +86,6 @@ public class AuthenticationService {
 
         System.out.println("Password updated");
         userService.updatePassword(user,newPassword);
-
 
     }
 }

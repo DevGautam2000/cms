@@ -4,10 +4,12 @@ import java.util.Date;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.nrifintech.cms.utils.Calender;
 
 @SpringBootApplication
+@EnableAsync
 public class CmsApplication {
 
 	public static void main(String[] args) {
