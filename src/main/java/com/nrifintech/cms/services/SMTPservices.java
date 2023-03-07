@@ -30,14 +30,14 @@ public class SMTPservices {
     Configuration fmConfiguration;
 
     
-    public boolean forgotPasswordMail(EmailModel mail,String url){
+    public boolean forgotPasswordMail(EmailModel mail){
 		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
 		boolean flag = false;
 
 		Map<String,String> m = new HashMap<>();
-		m.put("action_url", url);
+		m.put("action_url", mail.getBody());
         m.put("name",mail.getTo());
-        m.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        m.put("timestamp",mail.getTime());
         m.put("support_url","https://www.nrifintech.com/contact.html");
 
         try {
@@ -47,7 +47,36 @@ public class SMTPservices {
             mimeMessageHelper.setSubject(mail.getSubject());
             mimeMessageHelper.setFrom(mail.getFrom());
             mimeMessageHelper.setTo(mail.getTo());
-            mail.setBody(getContentFromTemplate(m));
+            mail.setBody(getContentFromTemplate(m,"forgot-password.flth"));
+            mimeMessageHelper.setText(mail.getBody(), true);
+ 
+            javaMailSender.send(mimeMessageHelper.getMimeMessage());
+			flag = true;
+        } catch (MessagingException e) {
+            e.printStackTrace();
+			flag = false;
+        }
+		return(flag);
+    }
+
+    public boolean welcomeMail(EmailModel mail){
+		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
+		boolean flag = false;
+
+		Map<String,String> m = new HashMap<>();
+		m.put("password", mail.getBody());
+        m.put("name",mail.getTo());
+        m.put("time",mail.getTime());
+        m.put("support_url","https://www.nrifintech.com/contact.html");
+
+        try {
+ 
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+ 
+            mimeMessageHelper.setSubject(mail.getSubject());
+            mimeMessageHelper.setFrom(mail.getFrom());
+            mimeMessageHelper.setTo(mail.getTo());
+            mail.setBody(getContentFromTemplate(m,"welcome-email.flth"));
             mimeMessageHelper.setText(mail.getBody(), true);
  
             javaMailSender.send(mimeMessageHelper.getMimeMessage());
@@ -59,11 +88,11 @@ public class SMTPservices {
 		return(flag);
     }
  
-    public String getContentFromTemplate(Map <String, String >model)     { 
+    public String getContentFromTemplate(Map <String, String >model, String templateName)     { 
         StringBuffer content = new StringBuffer();
  
         try {
-            content.append(FreeMarkerTemplateUtils.processTemplateIntoString(fmConfiguration.getTemplate("forgot-password.flth"), model));
+            content.append(FreeMarkerTemplateUtils.processTemplateIntoString(fmConfiguration.getTemplate(templateName), model));
         } catch (Exception e) {
             e.printStackTrace();
         }
