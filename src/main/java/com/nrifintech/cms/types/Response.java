@@ -5,6 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 /*
 100 Continue
 101 Switching Protocols
@@ -83,6 +88,18 @@ import org.springframework.util.MultiValueMap;
  */
 
 public class Response extends ResponseEntity<Object> {
+	
+	@Getter
+	@Setter
+	@ToString
+	@AllArgsConstructor
+	private static class JsonEntity{
+		private Object message;
+		private Integer status=404;
+	}
+	
+	
+	
 
 	public Response(Object body, HttpStatus status) {
 		super(body, status);
@@ -91,7 +108,18 @@ public class Response extends ResponseEntity<Object> {
 	public static Response set(Object body, HttpStatus status) {
 		return new Response(body, status);
 	}
+	
+	public static Response setMsg(Object body, HttpStatus status) {
+		return new Response(new Response.JsonEntity(body,status.value()), status);
+	}
+	
+	public static Response setErr(Object body, HttpStatus status) {
+		return new Response(new Response.JsonEntity(body,status.value()), status);
+	}
 
+	public static Response setErr(@Nullable Object body, @Nullable MultiValueMap<String, String> headers,HttpStatus status) {
+		return new Response(new Response.JsonEntity(body,status.value()), status);
+	}
 	
 	public Response(@Nullable Object body, @Nullable MultiValueMap<String, String> headers, HttpStatus status) {
 		super(body, headers, status);

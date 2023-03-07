@@ -81,14 +81,14 @@ public class AuthenticationController {
 
 		authService.forgetPassword(user.getUsername());
 
-		return Response.set("Email sent.", HttpStatus.OK);
+		return Response.setMsg("Email sent.", HttpStatus.OK);
 
 	}
 
 	@PostMapping("change-password")
 	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
 		authService.changePassword(userInfo.getUsername(), token, userInfo.getPassword());
-		return Response.set("Password changed Successfully", HttpStatus.OK);
+		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 
 //	@GetMapping("/hi")
