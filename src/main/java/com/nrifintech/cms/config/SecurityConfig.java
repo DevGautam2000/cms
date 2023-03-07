@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.removeFromMenu+"/**").hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.approveMenu+"/**").hasAnyAuthority(Role.Admin.toString())
 			.antMatchers(Route.Menu.prefix+Route.Menu.getByDate+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+			.antMatchers(Route.Menu.prefix+Route.Menu.getMonthMenu).hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
 
 			.antMatchers(HttpMethod.POST,Route.Item.prefix+Route.Item.addItem).hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(Route.Item.prefix+Route.Item.getItems).hasAnyAuthority(Role.Canteen.toString(),Role.Admin.toString())

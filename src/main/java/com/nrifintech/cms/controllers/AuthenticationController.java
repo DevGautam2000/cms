@@ -52,25 +52,20 @@ public class AuthenticationController {
 
     @PostMapping("/generate-token")
     public ResponseEntity<?> generateToken(@RequestBody JwtRequest jwtRequest) throws Exception{
-        try{
             authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
-        }catch(UsernameNotFoundException e){
-            // e.printStackTrace();
-            return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
-            // throw new Exception("User not Found!!");
-        }
-
        
         UserDetails userDetails=this.userDetailsServiceImple.loadUserByUsername(jwtRequest.getUsername());
          String token=this.jwtUtils.generateToken(userDetails);
-        //  System.out.println("outside2 ***");
-        
+       
         return ResponseEntity.ok(new JwtResponse(token)); 
     }
 
 
     @GetMapping("current-user")
     public Response getCurrentUser(Principal principal){
+    	
+    	System.out.println("PRINCIPAL: " + principal);
+    	
         User exUser = userService.getuser(principal.getName());
         if (exUser.getRole().equals(Role.User)) {
 

@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -90,5 +91,13 @@ public class ErrorController extends ResponseEntityExceptionHandler {
         return new ResponseEntity<Object>(
           ex.getMessage(), 
           HttpStatus.FORBIDDEN);
+    }
+	
+	@ExceptionHandler({ UsernameNotFoundException.class })
+    public ResponseEntity<Object> userNameNotFoundException(
+      Exception ex, WebRequest request) {
+        return new ResponseEntity<Object>(
+          ex.getMessage(), 
+          HttpStatus.UNAUTHORIZED);
     }
 }

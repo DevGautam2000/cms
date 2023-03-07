@@ -1,6 +1,5 @@
 package com.nrifintech.cms.services;
 
-import java.net.http.HttpRequest;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +33,9 @@ public class AuthenticationService {
     @Autowired
     private SMTPservices smtPservices;
     
+    
+    //TODO: check password
+    //return user
     public void authenticate(String username,String password) throws Exception{
         try{
 
