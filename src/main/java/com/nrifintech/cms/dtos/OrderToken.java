@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class PlacedOrderToken {
+public class OrderToken {
     String username;
     Order order;
 }
