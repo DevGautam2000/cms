@@ -10,7 +10,7 @@
   <body>
   <h2>Hi, ${username} </h2> <br>
 	Welcome to Canteen Management System,<br>
-    You placed an order at ${timestamp}
+    Your order delivered at ${timestamp}
   <ul>
   <li> username : ${username}</li>
   <li> time : ${timestamp}</li>
