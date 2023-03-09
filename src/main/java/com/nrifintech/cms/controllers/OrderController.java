@@ -87,7 +87,7 @@ public class OrderController {
 			return Response.set(o, HttpStatus.OK);
 		}
 
-		return Response.setMsg("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
