@@ -1,9 +1,13 @@
 package com.nrifintech.cms.errorcontroller;
 
+import java.nio.file.AccessDeniedException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,7 +18,10 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.types.Response;
+
+import io.jsonwebtoken.JwtException;
 
 interface Message {
 	String payloadNotFound = "Required payload not found or wrongly passed.";
@@ -28,21 +35,21 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
 	public Response handleNotFoundException(NotFoundException ex, WebRequest request) {
-		return Response.set(ex.getMessage(), HttpStatus.NOT_FOUND);
+		return Response.setErr(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	@Override
-	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+	protected Response handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		return new ResponseEntity<Object>(Message.payloadNotFound, headers, status);
+		return Response.setErr(Message.payloadNotFound, headers, status);
 
 	}
 
 	@Override
-	protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
+	protected Response handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-		return new ResponseEntity<Object>(Message.pathVariableNotFound, headers, status);
+		return Response.setErr(Message.pathVariableNotFound, headers, status);
 	}
 
 //	@Override
@@ -53,12 +60,54 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 //	}
 
 	@Override
-	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
+	protected Response handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		
 		super.handleHttpRequestMethodNotSupported(ex, headers, status, request);
-		return Response.set(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
+		return Response.setErr(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	
+    @ExceptionHandler({ AccessDeniedException.class })
+    public Response handleAccessDeniedException(
+      Exception ex, WebRequest request) {
+        return Response.setErr(
+          "Access denied message here", 
+          HttpStatus.FORBIDDEN);
+    }
+
+    
+    
+    @ExceptionHandler({ io.jsonwebtoken.ExpiredJwtException.class })
+    public Response expiredJwtException(
+      Exception ex, WebRequest request) {
+        return Response.setErr(
+          "session is terminated", 
+          HttpStatus.REQUEST_TIMEOUT);
+    }
+	
+
+	@ExceptionHandler({ io.jsonwebtoken.JwtException.class })
+    public Response jwtException(
+      Exception ex, WebRequest request) {
+        return Response.setErr(
+          ex.getMessage(), 
+          HttpStatus.FORBIDDEN);
+    }
+	
+	@ExceptionHandler({ UsernameNotFoundException.class })
+    public Response userNameNotFoundException(
+      Exception ex, WebRequest request) {
+        return Response.setErr(
+          ex.getMessage(), 
+          HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({ UserIsDisabledException.class, DisabledException.class })
+    public Response userIsDisabledException(
+      Exception ex, WebRequest request) {
+        return Response.set(
+          ex.getMessage(), 
+          HttpStatus.UNAUTHORIZED);
+    }
 }

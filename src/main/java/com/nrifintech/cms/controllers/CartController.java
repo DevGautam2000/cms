@@ -63,13 +63,13 @@ public class CartController {
 					user.setCart(cart);
 					userService.saveUser(user);
 
-					return Response.set("Added to cart.", HttpStatus.OK);
+					return Response.setMsg("Added to cart.", HttpStatus.OK);
 				} else
-					return Response.set("Duplicate Entry.", HttpStatus.BAD_REQUEST);
+					return Response.setErr("Duplicate Entry.", HttpStatus.BAD_REQUEST);
 			}
 		}
 
-		return Response.set("User not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("User not found.", HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -81,10 +81,10 @@ public class CartController {
 
 			cartItem.increaseBy(factor);
 			cartItemService.saveItem(cartItem);
-			return Response.set("CartItem quantity updated. ", HttpStatus.OK);
+			return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
 		}
 
-		return Response.set("CartItem not found. ", HttpStatus.BAD_REQUEST);
+		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping(Route.Cart.updateQuantity + "/dec/{itemId}/{factor}")
@@ -96,10 +96,10 @@ public class CartController {
 			cartItem.decreaseBy(factor);
 
 			cartItemService.saveItem(cartItem);
-			return Response.set("CartItem quantity updated. ", HttpStatus.OK);
+			return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
 		}
 
-		return Response.set("CartItem not found. ", HttpStatus.BAD_REQUEST);
+		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping(Route.Cart.remove + "/{cartId}/{itemId}")
@@ -118,7 +118,7 @@ public class CartController {
 			}
 
 		}
-		return Response.set("CartItem not found. ", HttpStatus.BAD_REQUEST);
+		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping(Route.Cart.clear + "/{cartId}")
@@ -132,12 +132,12 @@ public class CartController {
 			if (cartItemService.isNull(cart)) {
 				cartService.saveCart(cart);
 
-				return Response.set("Cart cleared. ", HttpStatus.OK);
+				return Response.setMsg("Cart cleared. ", HttpStatus.OK);
 			}
 
-			return Response.set("Error clearing cart. ", HttpStatus.INTERNAL_SERVER_ERROR);
+			return Response.setErr("Error clearing cart. ", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return Response.set("CartItem not found. ", HttpStatus.BAD_REQUEST);
+		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
 	}
 
 	@ErrorHandlerImplemented(handler = NotFoundException.class)

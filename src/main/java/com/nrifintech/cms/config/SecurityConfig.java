@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.nrifintech.cms.errorcontroller.ErrorController;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.Role;
 
@@ -26,6 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     
 	@Autowired  @Lazy
 	JwtAuthenticationFilter jwtAuthenticationFilter;
+	@Autowired
+	private ErrorController handlerExceptionResolver;
 
     @Override
     @Bean
@@ -46,7 +49,42 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(HttpMethod.OPTIONS).permitAll()
 			
 			.antMatchers(HttpMethod.POST,Route.User.prefix+Route.User.addUser,Route.User.prefix+Route.User.removeUser).hasAnyAuthority(Role.Admin.toString())
-			.antMatchers(Route.User.prefix+Route.User.getUser).hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString())
+			.antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+			.antMatchers(Route.User.prefix+Route.User.updateStatus).hasAnyAuthority(Role.Admin.toString())
+			
+			.antMatchers(Route.Menu.prefix+Route.Menu.getMenu+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.addMenu).hasAnyAuthority(Role.Canteen.toString())
+			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.removeFromMenu+"/**").hasAnyAuthority(Role.Canteen.toString())
+			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.approveMenu+"/**").hasAnyAuthority(Role.Admin.toString())
+			.antMatchers(Route.Menu.prefix+Route.Menu.getByDate+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+			.antMatchers(Route.Menu.prefix+Route.Menu.getMonthMenu).hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+
+			.antMatchers(HttpMethod.POST,Route.Item.prefix+Route.Item.addItem).hasAnyAuthority(Role.Canteen.toString())
+			.antMatchers(Route.Item.prefix+Route.Item.getItems).hasAnyAuthority(Role.Canteen.toString(),Role.Admin.toString())
+			.antMatchers(Route.Item.prefix+Route.Item.getItem+"/*").hasAnyAuthority(Role.Canteen.toString(),Role.Admin.toString())
+			.antMatchers(HttpMethod.POST,Route.Item.prefix+Route.Item.addItems).hasAnyAuthority(Role.Canteen.toString())
+
+			.antMatchers(Route.Order.prefix+Route.Order.getOrders+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString())
+			.antMatchers(Route.User.prefix+Route.User.getOrders+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+			.antMatchers(HttpMethod.POST, Route.Order.prefix+Route.Order.updateStatus+"/**").hasAnyAuthority(Role.Canteen.toString())
+			.antMatchers(HttpMethod.POST,Route.Order.prefix+Route.Order.placeOrder+"/**").hasAnyAuthority(Role.User.toString())
+						
+			
+			.antMatchers(Route.Cart.prefix+"/**").hasAnyAuthority(Role.User.toString())
+			.antMatchers(HttpMethod.POST,Route.Cart.prefix+"/**").hasAnyAuthority(Role.User.toString())
+
+
+			.antMatchers(HttpMethod.POST,Route.FeedBack.prefix+"/**").hasAnyAuthority(Role.User.toString())
+
+			// .antMatchers(HttpMethod.POST,Route.Bill.prefix+"/**").hasAnyAuthority(Role.User.toString())
+
+			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
+  			
 
 
 			.anyRequest().authenticated()

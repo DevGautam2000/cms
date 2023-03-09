@@ -1,8 +1,10 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.UserRepo;
@@ -11,11 +13,15 @@ import com.nrifintech.cms.utils.Validator;
 @Service
 public class UserService implements Validator {
 
-	@Autowired 
+	@Autowired
 	UserRepo userRepo;
 
 	public User getuser(String email) {
 		return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User"));
+	}
+
+	private User getExistingUser(String email) {
+		return userRepo.findByEmail(email).orElse(null);
 	}
 
 	public User getuser(Integer id) {
@@ -23,12 +29,11 @@ public class UserService implements Validator {
 	}
 
 	public User addUser(User user) {
-		User exUser = this.getuser(user.getEmail());
+		User exUser = this.getExistingUser(user.getEmail());
 
 		if (!isNotNull(exUser)) {
 			userRepo.save(user);
 		}
-
 		return exUser;
 	}
 
@@ -46,7 +51,6 @@ public class UserService implements Validator {
 		if (isNotNull(exUser)) {
 			userRepo.delete(exUser);
 		}
-
 		return exUser;
 	}
 
@@ -54,18 +58,32 @@ public class UserService implements Validator {
 		return userRepo.save(user);
 	}
 
-	public User updatePassword(User user,String password) {
+	public User updatePassword(User user, String password) {
 		user.setPassword(password);
 		return this.updateUser(user.getId(), user);
 	}
 
-	public User updateUser(int id,User user) {
+	public User updateUser(int id, User user) {
 		user.setId(id);
 		return userRepo.save(user);
 	}
-	
+
 	public List<User> getUsers() {
 		return userRepo.findAll();
+	}
+
+	public List<String> getOrdersByDate(Date date) {
+
+		List<String> usersEmails = userRepo.getUserByOrderDate(date);
+		return usersEmails;
+
+	}
+
+	public String getUserByOrderId(Integer orderId) {
+
+		String userEmail = userRepo.getUserByOrderId(orderId);
+		return userEmail;
+
 	}
 
 }

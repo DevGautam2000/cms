@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.MessagingException;
+import javax.mail.event.StoreListener;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,11 @@ public class SMTPservices {
     Configuration fmConfiguration;
 
     
-    public boolean forgotPasswordMail(EmailModel mail,String url){
+    public boolean sendMail(EmailModel mail){
 		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
 		boolean flag = false;
 
-		Map<String,String> m = new HashMap<>();
-		m.put("action_url", url);
-        m.put("name",mail.getTo());
-        m.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        m.put("support_url","https://www.nrifintech.com/contact.html");
+		Map<String,String> m = mail.getBody();
 
         try {
  
@@ -46,9 +43,11 @@ public class SMTPservices {
  
             mimeMessageHelper.setSubject(mail.getSubject());
             mimeMessageHelper.setFrom(mail.getFrom());
-            mimeMessageHelper.setTo(mail.getTo());
-            mail.setBody(getContentFromTemplate(m));
-            mimeMessageHelper.setText(mail.getBody(), true);
+            String[] strarray = new String[mail.getTo().size()];
+            (mail.getTo()).toArray(strarray);
+            mimeMessageHelper.setTo(strarray);
+            mail.setEmbeddedHTML(getContentFromTemplate(m,mail.getTemplateUsed()));
+            mimeMessageHelper.setText(mail.getEmbeddedHTML(), true);
  
             javaMailSender.send(mimeMessageHelper.getMimeMessage());
 			flag = true;
@@ -59,11 +58,11 @@ public class SMTPservices {
 		return(flag);
     }
  
-    public String getContentFromTemplate(Map <String, String >model)     { 
+    public String getContentFromTemplate(Map <String, String >model, String templateName)     { 
         StringBuffer content = new StringBuffer();
  
         try {
-            content.append(FreeMarkerTemplateUtils.processTemplateIntoString(fmConfiguration.getTemplate("forgot-password.flth"), model));
+            content.append(FreeMarkerTemplateUtils.processTemplateIntoString(fmConfiguration.getTemplate(templateName), model));
         } catch (Exception e) {
             e.printStackTrace();
         }

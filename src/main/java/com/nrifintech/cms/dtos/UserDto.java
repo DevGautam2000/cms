@@ -3,6 +3,7 @@ package com.nrifintech.cms.dtos;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.types.Role;
+import com.nrifintech.cms.types.UserStatus;
 
 import lombok.Data;
 
@@ -17,6 +18,7 @@ public class UserDto{
 		private String email;
 		private String avatar;
 		private Role role;	
+		private UserStatus status;
 		
 		public Privileged(User user) {
 
@@ -24,6 +26,7 @@ public class UserDto{
 			this.email = user.getEmail();
 			this.avatar = user.getAvatar();
 			this.role = user.getRole();
+			this.status = user.getStatus();
 		}
 		
 	}
@@ -34,6 +37,7 @@ public class UserDto{
 		private String email;
 		private String avatar;
 		private Role role;
+		private UserStatus status;
 		private Integer cartCount=0;
 		private Integer cartId;
 		
@@ -43,6 +47,8 @@ public class UserDto{
 			this.email = user.getEmail();
 			this.avatar = user.getAvatar();
 			this.role = user.getRole();
+			this.status = user.getStatus();
+			
 			
 			Cart c = user.getCart();
 			

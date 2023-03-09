@@ -1,6 +1,7 @@
 package com.nrifintech.cms.routes;
 
 public class Route {
+	public static final String root="http://localhost:8080";
 	public interface Admin {
 		String prefix = "/admin/";
 
@@ -10,11 +11,16 @@ public class Route {
 	public interface User {
 		String prefix = "/user/";
 
-		String getUser = "getuser";
 		String addUser = "adduser";
 		String removeUser = "removeuser";
 
 		String getUsers = "getusers";
+		String getOrders = "getorders";
+
+		String updateStatus = "updatestatus";
+		
+		String getAllUsersForOrderByDate = "usersbydate";
+
 
 	}
 
@@ -23,7 +29,6 @@ public class Route {
 
 		String getMenu = "getmenu";
 		String addMenu = "addmenu";
-		String addToMenu = "addtomenu";
 		String removeFromMenu = "removefrommenu";
 		String getMonthMenu = "getmonthmenu";
 
@@ -52,12 +57,14 @@ public class Route {
 	public interface Order {
 		String prefix = "/order/";
 
-		String addOrders = "addorders";
+		String addOrders = "addorders";//na
 		String getOrders = "getorders";
 
 		String updateStatus = "updatestatus";
 
 		String placeOrder = "placeorder";
+
+	
 	}
 
 	public interface Cart {

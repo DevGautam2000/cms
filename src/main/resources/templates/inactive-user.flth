@@ -9,11 +9,10 @@
   </head>
   <body>
   <h2>Hi, ${username} </h2> <br>
-	You requested forgot password.
+	Admin revoked your access
   <ul>
   <li> username : ${username}</li>
-  <li> link : ${link}</li>
-  <li> token : ${token}</li>
+  <li> status : ${status}</li>
   <li> time : ${timestamp}</li>
   </ul>
   </body>
