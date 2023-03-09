@@ -12,10 +12,15 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nrifintech.cms.dtos.EmailModel;
+import com.nrifintech.cms.dtos.PlacedOrderToken;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
+import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.services.SMTPservices;
 import com.nrifintech.cms.types.UserStatus;
@@ -69,7 +74,25 @@ public class Listeners {
         body.put("username",user.getEmail());
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
 
-        EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,template);
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,template);
         this.smtpServices.sendMail(email); 
+    }
+
+    @EventListener
+    @Async
+    public void onPlacedOrder(PlacedOrderEvent placedOrderEvent) throws JsonProcessingException{
+        PlacedOrderToken placedOrderToken = (PlacedOrderToken) placedOrderEvent.getSource();
+        HashMap<String,String> body = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        body.put("username", placedOrderToken.getUsername());
+        body.put("orderid",placedOrderToken.getOrder().getId()+"");
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        String itemDetails = mapper.writeValueAsString(placedOrderToken.getOrder().getCartItems());
+        body.put("items",itemDetails);
+        List<String> recipients = new ArrayList<>();
+        recipients.add(placedOrderToken.getUsername());
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"placed-order.flth");
+        this.smtpServices.sendMail(email);
     }
 }
