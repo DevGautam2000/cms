@@ -3,6 +3,7 @@ package com.nrifintech.cms.services;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -94,8 +95,10 @@ public class AuthenticationService {
         String url="/auth/change-password?token="+token;
         System.out.println(url);
         //code here
-        EmailModel email = new EmailModel(user.getEmail(), "Canteen Password Reset", "forgot pass link",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(email));
+        HashMap<String,String> info = new HashMap<>();
+        info.put("username",user.getEmail());
+        info.put("token",token);
+        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(info));
     }
 
     public void changePassword(String email,String token,String newPassword) {

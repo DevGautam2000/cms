@@ -56,8 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
                 resolver.resolveException(request, response, null,e);
             }
         }else{
-            // System.out.println("Invalid Token , not start with Bearer string");
-            resolver.resolveException(request, response, null,new JwtException("Invalid Token , not start with Bearer string"));
+            System.out.println("Invalid Token , not start with Bearer string");
+            // resolver.resolveException(request, response, null,new JwtException("Invalid Token , not start with Bearer string"));
         }
 
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
@@ -75,8 +75,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         }
         else
         {
-            // System.out.println("Token is not valid!!");
-            resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
+            System.out.println("Token is not valid!!");
+            // resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
         }
 
         filterChain.doFilter(request, response);
