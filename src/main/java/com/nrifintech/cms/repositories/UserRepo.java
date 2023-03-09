@@ -16,4 +16,8 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 	
 	@Query(value ="select email from user where id in (select distinct user_id from user_records where records_id in (select id from orders where date(order_placed) = :date))",nativeQuery = true)
 	List<String> getUserByOrderDate(@Param("date") Date date);
+	
+	
+	@Query(value="select email from user where id = (select user_id from user_records where records_id = :orderId)",nativeQuery = true)
+	String getUserByOrderId(@Param("orderId") Integer orderId);
 }
