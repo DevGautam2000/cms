@@ -115,6 +115,16 @@ public class UserController {
 //		
 //		
 //	}
+	
+//	@GetMapping("uboi/{oId}")
+//	public Response getAllUsersForOrderByDate(@PathVariable Integer oId){
+//		
+//		String userEmail = userService.getUserByOrderId(oId);
+//		return Response.setMsg(userEmail, HttpStatus.OK);
+//		
+//		
+//	}
+
 
 
 }
