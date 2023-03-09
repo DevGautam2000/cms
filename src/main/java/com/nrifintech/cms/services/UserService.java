@@ -71,4 +71,11 @@ public class UserService implements Validator {
 		return userRepo.findAll();
 	}
 
+	public List<String> getOrdersByDate(Date date) {
+		
+		List<String> usersEmails = userRepo.getUserByOrderDate(date);
+		return usersEmails;
+		
+	}
+
 }

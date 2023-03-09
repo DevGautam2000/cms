@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +57,10 @@ public class OrderController {
 		List<Order> o = orderService.addOrders(orders);
 
 		if (orderService.isNotNull(o)) {
-			return Response.set("Orders added.", HttpStatus.OK);
+			return Response.setMsg("Orders added.", HttpStatus.OK);
 		}
 
-		return Response.set("Error adding orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error adding orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -71,7 +72,7 @@ public class OrderController {
 			return Response.set(o, HttpStatus.OK);
 		}
 
-		return Response.set("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -85,7 +86,7 @@ public class OrderController {
 			return Response.set(o, HttpStatus.OK);
 		}
 
-		return Response.set("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setMsg("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -95,13 +96,13 @@ public class OrderController {
 		Object obj = orderService.addFeedBackToOrder(orderId, feedBack);
 
 		if (orderService.isNotNull(obj) && obj instanceof FeedBack)
-			return Response.set("Feedback already exists.", HttpStatus.BAD_REQUEST);
+			return Response.setErr("Feedback already exists.", HttpStatus.BAD_REQUEST);
 
 		if (orderService.isNotNull(obj)) {
-			return Response.set("Feedback added.", HttpStatus.OK);
+			return Response.setMsg("Feedback added.", HttpStatus.OK);
 		}
 
-		return Response.set("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -112,13 +113,13 @@ public class OrderController {
 		Object obj = orderService.addItemsToOrder(orderId, itemIds, quantities);
 
 		if (orderService.isNotNull(obj) && obj instanceof Item)
-			return Response.set("Items already exist.", HttpStatus.BAD_REQUEST);
+			return Response.setErr("Items already exist.", HttpStatus.BAD_REQUEST);
 
 		if (orderService.isNotNull(obj)) {
-			return Response.set("Items added.", HttpStatus.OK);
+			return Response.setMsg("Items added.", HttpStatus.OK);
 		}
 
-		return Response.set("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -127,7 +128,7 @@ public class OrderController {
 
 		Status[] status = Status.values();
 		if (status[statusId].toString().equalsIgnoreCase(Status.Pending.toString()))
-			return Response.set("Operation not allowed.", HttpStatus.BAD_REQUEST);
+			return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
 
 		Order order = orderService.getOrder(orderId);
 
@@ -136,7 +137,7 @@ public class OrderController {
 			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString()) &&
 				status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString())
 					)
-				return Response.set("Operation not allowed.", HttpStatus.BAD_REQUEST);
+				return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
 
 			if (status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString()))
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
@@ -145,10 +146,10 @@ public class OrderController {
 			//Email here
 			orderService.saveOrder(order);
 
-			return Response.set("Order " + status[statusId].toString()  + ".", HttpStatus.OK);
+			return Response.setMsg("Order " + status[statusId].toString()  + ".", HttpStatus.OK);
 		}
 
-		return Response.set("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 	}
 	
 	// for Canteen users to add a new order for a normal user
@@ -156,7 +157,7 @@ public class OrderController {
 		public Response placeOrder(@PathVariable Integer userId, @PathVariable Integer mealId) {
 
 			if (mealId > 1)
-				return Response.set("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
+				return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
 			User user = userService.getuser(userId);
 
@@ -169,12 +170,12 @@ public class OrderController {
 					Cart cart = user.getCart();
 
 					if (cartService.isNull(cart))
-						return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
+						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
 					List<CartItem> cartItems = cart.getCartItems();
 
 					if (orderService.isNull(cartItems) || cartItems.isEmpty())
-						return Response.set("Empty Cart.", HttpStatus.BAD_REQUEST);
+						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
 					
 					order.setCartItems(new ArrayList<>(cartItems));
@@ -196,8 +197,8 @@ public class OrderController {
 
 			}
 
-			return Response.set("User does not exist.", HttpStatus.BAD_REQUEST);
+			return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 		}
 
-
+		
 }

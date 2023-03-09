@@ -46,9 +46,9 @@ public class ItemController {
 	public Response addItem(@RequestBody Item item) {
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))
-			return Response.set("Item added.", HttpStatus.OK);
+			return Response.setMsg("Item added.", HttpStatus.OK);
 
-		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@PostMapping(Route.Item.addItems)
@@ -56,9 +56,9 @@ public class ItemController {
 		List<Item> i = itemService.addItems(items);
 		
 		if (!i.isEmpty())
-			return Response.set("Items added.", HttpStatus.OK);
+			return Response.setMsg("Items added.", HttpStatus.OK);
 
-		return Response.set("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }
