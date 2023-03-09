@@ -78,6 +78,13 @@ public class UserService implements Validator {
 
 	}
 
+	public List<String> getOrdersByDateAndOrderType(Date date,Integer otype) {
+
+		List<String> usersEmails = userRepo.getUserByOrderDateAndType(date,otype);
+		return usersEmails;
+
+	}
+
 	public String getUserByOrderId(Integer orderId) {
 
 		String userEmail = userRepo.getUserByOrderId(orderId);
