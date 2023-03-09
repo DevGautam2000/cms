@@ -16,9 +16,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nrifintech.cms.dtos.EmailModel;
-import com.nrifintech.cms.dtos.PlacedOrderToken;
+import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
+import com.nrifintech.cms.events.CancelledOrderEvent;
+import com.nrifintech.cms.events.DeliveredOrderEvent;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
@@ -81,7 +83,7 @@ public class Listeners {
     @EventListener
     @Async
     public void onPlacedOrder(PlacedOrderEvent placedOrderEvent) throws JsonProcessingException{
-        PlacedOrderToken placedOrderToken = (PlacedOrderToken) placedOrderEvent.getSource();
+        OrderToken placedOrderToken = (OrderToken) placedOrderEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -92,7 +94,46 @@ public class Listeners {
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(placedOrderToken.getUsername());
+        System.out.println(placedOrderToken.getUsername());
         EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"placed-order.flth");
+        this.smtpServices.sendMail(email);
+    }
+
+    @EventListener
+    @Async
+    public void onCancelledOrder(CancelledOrderEvent cancelledOrderEvent) throws JsonProcessingException{
+        OrderToken cancelledOrderToken = (OrderToken) cancelledOrderEvent.getSource();
+        HashMap<String,String> body = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        body.put("username", cancelledOrderToken.getUsername());
+        body.put("orderid",cancelledOrderToken.getOrder().getId()+"");
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        String itemDetails = mapper.writeValueAsString(cancelledOrderToken.getOrder().getCartItems());
+        body.put("items",itemDetails);
+        List<String> recipients = new ArrayList<>();
+        recipients.add(cancelledOrderToken.getUsername());
+        System.out.println(cancelledOrderToken.getUsername());
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"cancelled-order.flth");
+        this.smtpServices.sendMail(email);
+    }
+
+    @EventListener
+    @Async
+    public void onDeliveredOrder(CancelledOrderEvent deliveredOrderEvent) throws JsonProcessingException{
+        OrderToken deliveredOrderToken = (OrderToken) deliveredOrderEvent.getSource();
+        HashMap<String,String> body = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        body.put("username", deliveredOrderToken.getUsername());
+        body.put("orderid",deliveredOrderToken.getOrder().getId()+"");
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        String itemDetails = mapper.writeValueAsString(deliveredOrderToken.getOrder().getCartItems());
+        body.put("items",itemDetails);
+        List<String> recipients = new ArrayList<>();
+        recipients.add(deliveredOrderToken.getUsername());
+        System.out.println(deliveredOrderToken.getUsername());
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"delivered-order.flth");
         this.smtpServices.sendMail(email);
     }
 }

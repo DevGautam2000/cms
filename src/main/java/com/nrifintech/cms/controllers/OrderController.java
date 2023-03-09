@@ -17,13 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nrifintech.cms.dtos.PlacedOrderToken;
+import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.events.CancelledOrderEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
@@ -143,8 +144,14 @@ public class OrderController {
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
 			
 			order.setStatus(status[statusId]);
-			//Email here
 			orderService.saveOrder(order);
+			//email code
+			if( order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString()) ){
+				//this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(user.getEmail(), order)));
+			}
+			else if( order.getStatus().toString().equalsIgnoreCase(Status.Cancelled.toString()) ){
+				//this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new OrderToken(user.getEmail(), order)));
+			}
 
 			return Response.setMsg("Order " + status[statusId].toString()  + ".", HttpStatus.OK);
 		}
@@ -189,7 +196,7 @@ public class OrderController {
 
 						user.getCart().getCartItems().clear();
 						user = userService.saveUser(user);
-						this.applicationEventPublisher.publishEvent(new PlacedOrderEvent(new PlacedOrderToken(user.getEmail(), order)));
+						this.applicationEventPublisher.publishEvent(new PlacedOrderEvent(new OrderToken(user.getEmail(), order)));
 						return Response.set("Added new order for user.", HttpStatus.OK);
 					}
 
