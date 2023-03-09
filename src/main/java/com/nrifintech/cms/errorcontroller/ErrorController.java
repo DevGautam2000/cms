@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
@@ -98,11 +99,11 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     public Response userNameNotFoundException(
       Exception ex, WebRequest request) {
         return Response.set(
-          "Incorrect Password.", 
+          ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler({ UserIsDisabledException.class })
+    @ExceptionHandler({ UserIsDisabledException.class, DisabledException.class })
     public Response userIsDisabledException(
       Exception ex, WebRequest request) {
         return Response.set(
