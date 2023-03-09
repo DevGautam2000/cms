@@ -1,12 +1,12 @@
 package com.nrifintech.cms.events;
 
+import java.util.HashMap;
+
 import org.springframework.context.ApplicationEvent;
 
-import com.nrifintech.cms.dtos.EmailModel;
-
 public class ForgotPasswordEvent extends ApplicationEvent {
-    public ForgotPasswordEvent(EmailModel source){
-        super(source);
+    public ForgotPasswordEvent(HashMap<String,String> info){
+        super(info);
     }
     
 }
