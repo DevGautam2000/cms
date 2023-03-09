@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,5 +99,15 @@ public class UserController {
 		return Response.setMsg("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
 				HttpStatus.OK);
 	}
+	
+//	@GetMapping(Route.User.getAllUsersForOrderByDate + "/{date}")
+//	public List<String> getAllUsersForOrderByDate(@PathVariable Date date){
+//		
+//		List<String> users = userService.getOrdersByDate(date);
+//		return users;
+//		
+//		
+//	}
+
 
 }

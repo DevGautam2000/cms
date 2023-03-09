@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Date;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -83,6 +84,13 @@ public class UserService implements Validator {
 	
 	public List<User> getUsers() {
 		return userRepo.findAll();
+	}
+
+	public List<String> getOrdersByDate(Date date) {
+		
+		List<String> usersEmails = userRepo.getUserByOrderDate(date);
+		return usersEmails;
+		
 	}
 
 }
