@@ -45,6 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
             .csrf().disable()
             .cors().disable()
 			.authorizeHttpRequests()
+			.antMatchers(HttpMethod.POST,Route.Authentication.prefix+"set-new-password*").hasAnyAuthority(Role.Admin.toString())
 			.antMatchers(Route.Authentication.prefix+"**").permitAll()
 			.antMatchers(HttpMethod.OPTIONS).permitAll()
 			

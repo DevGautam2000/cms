@@ -91,6 +91,22 @@ public class AuthenticationController {
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 
+	
+	@PostMapping("set-new-password")
+	public Response setNewPassword(@RequestBody JwtRequest user) {
+		System.out.println(user);
+
+		authService.setNewPassword(user.getUsername());
+
+		return Response.setMsg("Email sent.", HttpStatus.OK);
+
+	}
+
+	@PostMapping("activate-new-password")
+	public Response setNewPasswordAndActivate(@RequestParam String token, @RequestBody JwtRequest userInfo) {
+		authService.setNewPasswordAndActivate(userInfo.getUsername(), token, userInfo.getPassword());
+		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
+	}
 //	@GetMapping("/hi")
 //	public String hi() {
 //		return "hi";
