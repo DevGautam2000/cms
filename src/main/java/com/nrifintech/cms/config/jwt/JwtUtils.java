@@ -47,6 +47,11 @@ public class JwtUtils {
 	        return createToken(claims, userDetails.getUsername(),10);
 	    }
 
+		public String generateNewPasswordToken(UserDetails userDetails) {
+	        Map<String, Object> claims = new HashMap<>();
+	        return createToken(claims, userDetails.getUsername(),60*24);
+	    }
+
 	    private String createToken(Map<String, Object> claims, String subject,long min) {
 
 	    	System.out.println("s: ");

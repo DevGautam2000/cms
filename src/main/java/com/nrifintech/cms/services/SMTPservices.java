@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.MessagingException;
+import javax.mail.event.StoreListener;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,11 @@ public class SMTPservices {
     Configuration fmConfiguration;
 
     
-    public boolean forgotPasswordMail(EmailModel mail){
+    public boolean sendMail(EmailModel mail){
 		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
 		boolean flag = false;
 
-		Map<String,String> m = new HashMap<>();
-		m.put("action_url", mail.getBody());
-        m.put("name",mail.getTo());
-        m.put("timestamp",mail.getTime());
-        m.put("support_url","https://www.nrifintech.com/contact.html");
+		Map<String,String> m = mail.getBody();
 
         try {
  
@@ -46,38 +43,11 @@ public class SMTPservices {
  
             mimeMessageHelper.setSubject(mail.getSubject());
             mimeMessageHelper.setFrom(mail.getFrom());
-            mimeMessageHelper.setTo(mail.getTo());
-            mail.setBody(getContentFromTemplate(m,"forgot-password.flth"));
-            mimeMessageHelper.setText(mail.getBody(), true);
- 
-            javaMailSender.send(mimeMessageHelper.getMimeMessage());
-			flag = true;
-        } catch (MessagingException e) {
-            e.printStackTrace();
-			flag = false;
-        }
-		return(flag);
-    }
-
-    public boolean welcomeMail(EmailModel mail){
-		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
-		boolean flag = false;
-
-		Map<String,String> m = new HashMap<>();
-		m.put("password", mail.getBody());
-        m.put("name",mail.getTo());
-        m.put("time",mail.getTime());
-        m.put("support_url","https://www.nrifintech.com/contact.html");
-
-        try {
- 
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
- 
-            mimeMessageHelper.setSubject(mail.getSubject());
-            mimeMessageHelper.setFrom(mail.getFrom());
-            mimeMessageHelper.setTo(mail.getTo());
-            mail.setBody(getContentFromTemplate(m,"welcome-email.flth"));
-            mimeMessageHelper.setText(mail.getBody(), true);
+            String[] strarray = new String[mail.getTo().size()];
+            (mail.getTo()).toArray(strarray);
+            mimeMessageHelper.setTo(strarray);
+            mail.setEmbeddedHTML(getContentFromTemplate(m,mail.getTemplateUsed()));
+            mimeMessageHelper.setText(mail.getEmbeddedHTML(), true);
  
             javaMailSender.send(mimeMessageHelper.getMimeMessage());
 			flag = true;

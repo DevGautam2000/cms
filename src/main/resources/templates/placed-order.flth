@@ -9,11 +9,14 @@
   </head>
   <body>
   <h2>Hi, ${username} </h2> <br>
-	Welcome to Canteen Management System,
+	Welcome to Canteen Management System,<br>
+    You placed an order at ${timestamp}
   <ul>
   <li> username : ${username}</li>
   <li> link : ${link}</li>
   <li> time : ${timestamp}</li>
+  <li> orderid : ${orderid}</li>
+  <li> items : ${items}</li>
   </ul>
   </body>
 </html>

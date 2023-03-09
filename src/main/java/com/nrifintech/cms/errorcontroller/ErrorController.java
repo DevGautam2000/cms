@@ -17,6 +17,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.types.Response;
 
 import io.jsonwebtoken.JwtException;
@@ -98,6 +99,14 @@ public class ErrorController extends ResponseEntityExceptionHandler {
       Exception ex, WebRequest request) {
         return Response.setErr(
           "Incorrect Password.", 
+          HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({ UserIsDisabledException.class })
+    public Response userIsDisabledException(
+      Exception ex, WebRequest request) {
+        return Response.set(
+          ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
 }

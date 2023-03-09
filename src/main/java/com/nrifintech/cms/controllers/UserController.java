@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.events.AddedNewUserEvent;
+import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
+
+import eu.bitwalker.useragentutils.Application;
 
 @CrossOrigin
 @RestController
@@ -29,6 +34,8 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
@@ -41,8 +48,8 @@ public class UserController {
 
 		if (userService.isNotNull(u))
 			return Response.setErr("User already exists.", HttpStatus.BAD_REQUEST);
-
-		return Response.setMsg("User added.", HttpStatus.OK);
+		this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
+		return Response.set("User added.", HttpStatus.OK);
 	}
 
 	@GetMapping(Route.User.getUsers)
@@ -95,8 +102,8 @@ public class UserController {
 			userService.saveUser(user);
 			
 		}
-		
-		return Response.setMsg("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
+		this.applicationEventPublisher.publishEvent(new UpdateUserStatusEvent(user));
+		return Response.set("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
 				HttpStatus.OK);
 	}
 	

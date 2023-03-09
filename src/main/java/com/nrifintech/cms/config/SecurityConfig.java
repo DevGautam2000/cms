@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.nrifintech.cms.errorcontroller.ErrorController;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.Role;
 
@@ -26,6 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     
 	@Autowired  @Lazy
 	JwtAuthenticationFilter jwtAuthenticationFilter;
+	@Autowired
+	private ErrorController handlerExceptionResolver;
 
     @Override
     @Bean

@@ -1,15 +1,13 @@
 package com.nrifintech.cms;
 
-import java.util.Date;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
-
-import com.nrifintech.cms.utils.Calender;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableAsync
+@EnableScheduling
 public class CmsApplication {
 
 	public static void main(String[] args) {

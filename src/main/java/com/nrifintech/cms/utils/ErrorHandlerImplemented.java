@@ -5,15 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)  
-@Target(ElementType.METHOD)  
-public @interface ErrorHandlerImplemented{  
-	Class<?> handler();  
-	
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ErrorHandlerImplemented {
+	Class<? extends Throwable> handler() default Exception.class;
+	Class<? extends Throwable>[] handlers() default {};
+
 	/*
 	 
 	 This annotation states that a error handler has been written for an 
 	 entity if not found at : basepackage.errorhandler
 	 
 	 */
-}  
+}
+

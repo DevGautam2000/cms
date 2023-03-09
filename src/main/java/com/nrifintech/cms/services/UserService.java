@@ -1,31 +1,19 @@
 package com.nrifintech.cms.services;
-
-import java.sql.Date;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-
-import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
-import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.utils.Validator;
 
-import eu.bitwalker.useragentutils.Application;
 
 @Service
 public class UserService implements Validator {
 
 	@Autowired 
 	UserRepo userRepo;
-	@Autowired
-	ApplicationEventPublisher applicationEventPublisher;
 
 	public User getuser(String email) {
 		return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User"));
@@ -44,8 +32,6 @@ public class UserService implements Validator {
 
 		if (!isNotNull(exUser)) {
 			userRepo.save(user);
-			//email code
-			this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
 		}
 		return exUser;
 	}
@@ -64,7 +50,6 @@ public class UserService implements Validator {
 		if (isNotNull(exUser)) {
 			userRepo.delete(exUser);
 		}
-
 		return exUser;
 	}
 

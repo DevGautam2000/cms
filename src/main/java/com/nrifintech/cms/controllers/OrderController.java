@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.PlacedOrderToken;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.OrderService;
@@ -43,6 +47,9 @@ public class OrderController {
 
 	@Autowired
 	private CartService cartService;
+
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
 	
 	@PostMapping(Route.Order.addOrders)
 	public Response addOrders(@RequestBody List<Order> orders) {
@@ -136,6 +143,7 @@ public class OrderController {
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
 			
 			order.setStatus(status[statusId]);
+			//Email here
 			orderService.saveOrder(order);
 
 			return Response.setMsg("Order " + status[statusId].toString()  + ".", HttpStatus.OK);
@@ -181,8 +189,8 @@ public class OrderController {
 
 						user.getCart().getCartItems().clear();
 						user = userService.saveUser(user);
-
-						return Response.setMsg("Added new order for user.", HttpStatus.OK);
+						this.applicationEventPublisher.publishEvent(new PlacedOrderEvent(new PlacedOrderToken(user.getEmail(), order)));
+						return Response.set("Added new order for user.", HttpStatus.OK);
 					}
 
 				}

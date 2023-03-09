@@ -23,6 +23,7 @@ import com.nrifintech.cms.dtos.UserDto;
 import com.nrifintech.cms.dtos.UserDto.Privileged;
 import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.UserService;
@@ -47,7 +48,8 @@ public class AuthenticationController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
-	@ErrorHandlerImplemented(handler = UsernameNotFoundException.class)
+	@ErrorHandlerImplemented(
+		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
 	@PostMapping("/generate-token")
 	public Response generateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
 		authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
@@ -73,7 +75,7 @@ public class AuthenticationController {
 		return Response.set(userDto, HttpStatus.OK);
 	}
 
-	@GetMapping("forgot-password")
+	@PostMapping("forgot-password")
 	public Response forgotPassword(@RequestBody JwtRequest user) {
 		System.out.println(user);
 

@@ -9,10 +9,10 @@
   </head>
   <body>
   <h2>Hi, ${username} </h2> <br>
-	Welcome to Canteen Management System,
+	Admin gave you access
   <ul>
   <li> username : ${username}</li>
-  <li> link : ${link}</li>
+  <li> status : ${status}</li>
   <li> time : ${timestamp}</li>
   </ul>
   </body>
