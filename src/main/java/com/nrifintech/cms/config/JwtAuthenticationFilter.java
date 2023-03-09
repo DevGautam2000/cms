@@ -76,7 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         else
         {
             // System.out.println("Token is not valid!!");
-            resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
+           resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
         }
 
         filterChain.doFilter(request, response);
