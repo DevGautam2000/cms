@@ -33,7 +33,7 @@ public class BillController {
 		if (billService.isNotNull(bills))
 			return Response.set(bills, HttpStatus.OK);
 
-		return Response.set("Bills not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Bills not found.", HttpStatus.BAD_REQUEST);
 	}
 
 	@ErrorHandlerImplemented(handler = NotFoundException.class)

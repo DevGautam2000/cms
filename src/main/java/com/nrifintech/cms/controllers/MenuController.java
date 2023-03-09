@@ -36,11 +36,11 @@ public class MenuController {
 	public Response newMenu(@RequestBody Menu menu) {
 
 		if (menuService.isNotNull(menuService.addMenu(menu))) {
-			return Response.set("Added new menu.", HttpStatus.OK);
+			return Response.setMsg("Added new menu.", HttpStatus.OK);
 		}
 
 		else
-			return Response.set("Error creating menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+			return Response.setErr("Error creating menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -64,9 +64,9 @@ public class MenuController {
 		Optional<Menu> m = menuService.removeMenu(menuId);
 
 		if (m.isPresent())
-			return Response.set("Menu removed.", HttpStatus.OK);
+			return Response.setMsg("Menu removed.", HttpStatus.OK);
 
-		return Response.set("Error removing menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error removing menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -79,15 +79,15 @@ public class MenuController {
 
 			String menuStatus = m.getApproval().toString();
 			if (!menuStatus.equalsIgnoreCase(Approval.Pending.toString()))
-				return Response.set("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
+				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
 			if (menuService.approveMenu(m, approvalStatusId))
-				return Response.set("Menu " + Approval.values()[approvalStatusId].toString().toLowerCase() + ".",
+				return Response.setMsg("Menu " + Approval.values()[approvalStatusId].toString().toLowerCase() + ".",
 						HttpStatus.OK);
 
 		}
 
-		return Response.set("Menu does not exist.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Menu does not exist.", HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -96,9 +96,9 @@ public class MenuController {
 
 		Menu m = menuService.addItemsToMenu(menuId, itemIds);
 		if (menuService.isNotNull(m))
-			return Response.set("Added items to menu.", HttpStatus.OK);
+			return Response.setMsg("Added items to menu.", HttpStatus.OK);
 
-		return Response.set("Error adding items to menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error adding items to menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -107,10 +107,10 @@ public class MenuController {
 		Menu m = menuService.removeItemFromMenu(menuId, itemId);
 
 		if (menuService.isNotNull(m)) {
-			return Response.set("Item removed from menu.", HttpStatus.OK);
+			return Response.setMsg("Item removed from menu.", HttpStatus.OK);
 		}
 
-		return Response.set("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@GetMapping(Route.Menu.getByDate + "/{date}")
@@ -121,7 +121,7 @@ public class MenuController {
 		if (!menus.isEmpty())
 			return Response.set(menus, HttpStatus.OK);
 
-		return Response.set("Menu(s) with particular date not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Menu(s) with particular date not found.", HttpStatus.BAD_REQUEST);
 	}
 
 }

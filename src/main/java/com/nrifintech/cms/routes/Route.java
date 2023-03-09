@@ -18,6 +18,8 @@ public class Route {
 		String getOrders = "getorders";
 
 		String updateStatus = "updatestatus";
+		
+		String getAllUsersForOrderByDate = "usersbydate";
 
 
 	}
@@ -61,6 +63,8 @@ public class Route {
 		String updateStatus = "updatestatus";
 
 		String placeOrder = "placeorder";
+
+	
 	}
 
 	public interface Cart {

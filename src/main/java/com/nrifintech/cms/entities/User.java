@@ -1,7 +1,9 @@
 package com.nrifintech.cms.entities;
 
 
+import java.sql.Timestamp;
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -43,6 +45,7 @@ public class User {
 	private Role role = Role.User;
 	
 	private UserStatus status = UserStatus.Active;
+	private Timestamp created = new Timestamp(System.currentTimeMillis());
 	
 	@Column(unique=true)
 	@OneToMany(fetch=FetchType.LAZY)
@@ -55,9 +58,6 @@ public class User {
 	
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;
-	
-
-
 	
 	// func. impl. left
 	public String getUsername(){

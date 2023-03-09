@@ -35,21 +35,21 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
 	public Response handleNotFoundException(NotFoundException ex, WebRequest request) {
-		return Response.set(ex.getMessage(), HttpStatus.NOT_FOUND);
+		return Response.setErr(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
 	@Override
-	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+	protected Response handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		return new ResponseEntity<Object>(Message.payloadNotFound, headers, status);
+		return Response.setErr(Message.payloadNotFound, headers, status);
 
 	}
 
 	@Override
-	protected ResponseEntity<Object> handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
+	protected Response handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-		return new ResponseEntity<Object>(Message.pathVariableNotFound, headers, status);
+		return Response.setErr(Message.pathVariableNotFound, headers, status);
 	}
 
 //	@Override
@@ -64,14 +64,14 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		
 		super.handleHttpRequestMethodNotSupported(ex, headers, status, request);
-		return Response.set(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
+		return Response.setErr(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
 	
     @ExceptionHandler({ AccessDeniedException.class })
-    public ResponseEntity<Object> handleAccessDeniedException(
+    public Response handleAccessDeniedException(
       Exception ex, WebRequest request) {
-        return Response.set(
+        return Response.setErr(
           "Access denied message here", 
           HttpStatus.FORBIDDEN);
     }
@@ -79,9 +79,9 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     
     
     @ExceptionHandler({ io.jsonwebtoken.ExpiredJwtException.class })
-    public ResponseEntity<Object> expiredJwtException(
+    public Response expiredJwtException(
       Exception ex, WebRequest request) {
-        return Response.set(
+        return Response.setErr(
           "session is terminated", 
           HttpStatus.REQUEST_TIMEOUT);
     }
@@ -90,7 +90,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({ io.jsonwebtoken.JwtException.class })
     public Response jwtException(
       Exception ex, WebRequest request) {
-        return Response.set(
+        return Response.setErr(
           ex.getMessage(), 
           HttpStatus.FORBIDDEN);
     }
@@ -98,7 +98,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({ UsernameNotFoundException.class })
     public Response userNameNotFoundException(
       Exception ex, WebRequest request) {
-        return Response.set(
+        return Response.setErr(
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
