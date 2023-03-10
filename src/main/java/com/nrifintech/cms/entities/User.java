@@ -44,7 +44,7 @@ public class User {
 	
 	private Role role = Role.User;
 	
-	private UserStatus status = UserStatus.Active;
+	private UserStatus status = UserStatus.InActive;
 	private Timestamp created = new Timestamp(System.currentTimeMillis());
 	
 	@Column(unique=true)
