@@ -1,17 +1,19 @@
 package com.nrifintech.cms.Scheduler;
 
-import java.util.ArrayList;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.nrifintech.cms.events.BreakfastStartEvent;
-import com.nrifintech.cms.repositories.UserRepo;
+import com.nrifintech.cms.events.LunchStartEvent;
 import com.nrifintech.cms.services.UserService;
+import com.nrifintech.cms.types.MealType;
 
 
 @Component
@@ -25,14 +27,21 @@ public class Tasks {
 
     @Scheduled(fixedDelay = 10000)
     public void BreakfastStart(){
-        //List<String> recipients = userService.getOrdersByDateAndOrderType("date", "ordertype");
-        List<String> recipients = new ArrayList<>();
-        recipients.add("sagnik938@gmail.com");
-        recipients.add("mayukhbarmanray3@gmail.com");
-
-        applicationEventPublisher.publishEvent(new BreakfastStartEvent(recipients));
-        System.out.println("mails sent");
-
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        LocalDateTime now = LocalDateTime.now();  
+        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Breakfast.ordinal());
+        if(recipients.size()>0){
+            applicationEventPublisher.publishEvent(new BreakfastStartEvent(recipients));
+        } 
+    }
+    @Scheduled(fixedDelay = 10000)
+    public void LunchStart(){
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        LocalDateTime now = LocalDateTime.now();  
+        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Lunch.ordinal());
+        if( recipients.size()>0 ){
+            applicationEventPublisher.publishEvent(new LunchStartEvent(recipients));
+        } 
     }
     
 }

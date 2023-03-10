@@ -27,17 +27,17 @@ public class SMTPTesting {
     ApplicationEventPublisher publisher;
     
     //for smtp testing
-    @Scheduled(fixedDelay = 10000)
-    public void test(){
-        CartItem cartItem1 = new CartItem(400,0,56,780.90,ItemType.Veg,"","Veg Pizza");
-        CartItem cartItem2 = new CartItem(401,0,50,789.90,ItemType.Veg,"","Paneer Pizza");
-        List<CartItem> ls = new ArrayList<>();
-        ls.add(cartItem1);
-        ls.add(cartItem2);
+    // @Scheduled(fixedDelay = 10000)
+    // public void test(){
+    //     CartItem cartItem1 = new CartItem(400,0,56,780.90,ItemType.Veg,"","Veg Pizza");
+    //     CartItem cartItem2 = new CartItem(401,0,50,789.90,ItemType.Veg,"","Paneer Pizza");
+    //     List<CartItem> ls = new ArrayList<>();
+    //     ls.add(cartItem1);
+    //     ls.add(cartItem2);
 
-        Order order = new Order(100, Status.Pending, MealType.Breakfast, null, null, null, ls);
-        //publisher.publishEvent(new PlacedOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
-        //publisher.publishEvent(new CancelledOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
-        //publisher.publishEvent(new DeliveredOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
-    }
+    //     Order order = new Order(100, Status.Pending, MealType.Breakfast, null, null, null, ls);
+    //     //publisher.publishEvent(new PlacedOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
+    //     //publisher.publishEvent(new CancelledOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
+    //     //publisher.publishEvent(new DeliveredOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
+    // }
 }

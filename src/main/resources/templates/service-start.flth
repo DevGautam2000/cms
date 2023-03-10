@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-  <h2>Hi, ${username} </h2> <br>
 	Welcome to Canteen Management System,
   <ul>
   <li> content : ${content}</li>
