@@ -1,15 +1,17 @@
 package com.nrifintech.cms.errorcontroller;
 
-import java.nio.file.AccessDeniedException;
+
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
@@ -27,6 +29,7 @@ interface Message {
 	String pathVariableNotFound = "Required path variable not found.";
 }
 
+@CrossOrigin
 @ControllerAdvice
 @RestController
 public class ErrorController extends ResponseEntityExceptionHandler {
@@ -68,9 +71,11 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 	
     @ExceptionHandler({ AccessDeniedException.class })
     public Response handleAccessDeniedException(
-      Exception ex, WebRequest request) {
+      Exception ex) {
+    	
+    	System.out.println("this was printed");
         return Response.setErr(
-          "Access denied message here", 
+          "Access denied", 
           HttpStatus.FORBIDDEN);
     }
 

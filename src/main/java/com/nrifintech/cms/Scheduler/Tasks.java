@@ -37,7 +37,7 @@ public class Tasks {
 
         Order order = new Order(100, Status.Pending, MealType.Breakfast, null, null, null, ls);
         //publisher.publishEvent(new PlacedOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
-        publisher.publishEvent(new CancelledOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
-        publisher.publishEvent(new DeliveredOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
+//        publisher.publishEvent(new CancelledOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
+//        publisher.publishEvent(new DeliveredOrderEvent(new OrderToken("sagnik938@gmail.com", order)));
     }
 }

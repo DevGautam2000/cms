@@ -80,10 +80,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             // resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
         }
         try {
+        	System.out.println("coming try here");
         filterChain.doFilter(request, response);
         }catch(AccessDeniedException e) {
+        	System.out.println("coming here");
         	resolver.resolveException(request, response, null,e);
 	    }catch(Exception e){
+	    	System.out.println("coming hereeeee");
 	        resolver.resolveException(request, response, null,e);
 	    }
 	}

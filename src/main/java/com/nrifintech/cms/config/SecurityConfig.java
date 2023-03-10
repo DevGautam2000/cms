@@ -14,9 +14,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.nrifintech.cms.errorcontroller.ErrorController;
+import com.nrifintech.cms.errorhandler.ForbiddenAccessHandler;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.Role;
 
@@ -37,13 +39,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         return super.authenticationManagerBean();
     }
     
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return new ForbiddenAccessHandler();
+    }
+    
     @Override
 	protected void configure(HttpSecurity http) throws Exception {
 
 		
 		http
             .csrf().disable()
-            .cors().disable()
+//            .cors().disable()
+            .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
 			.authorizeHttpRequests()
 			.antMatchers(Route.Authentication.prefix+"**").permitAll()
 			.antMatchers(HttpMethod.OPTIONS).permitAll()
