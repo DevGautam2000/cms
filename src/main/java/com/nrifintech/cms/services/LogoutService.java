@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler{
+    @Autowired
     private TokenBlacklistRepo tokenRepository;
 
     @Override
@@ -33,8 +35,7 @@ public class LogoutService implements LogoutHandler{
             return;
         
         jwt = authHeader.substring(7);
-        Optional<TokenBlacklist> storedToken = tokenRepository.findById(jwt);
-//          .orElse(null);
+        TokenBlacklist storedToken = tokenRepository.findById(jwt).orElse(null);
         
         if(storedToken == null) {
             tokenRepository.save(new TokenBlacklist(jwt));

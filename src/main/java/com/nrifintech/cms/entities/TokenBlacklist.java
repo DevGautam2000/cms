@@ -10,6 +10,7 @@ import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class TokenBlacklist {
     @Id
