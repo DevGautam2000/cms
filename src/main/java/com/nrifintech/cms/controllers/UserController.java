@@ -125,6 +125,18 @@ public class UserController {
 		return Response.set("User " + user.getEmailStatus().toString().toLowerCase() + " ",
 				HttpStatus.OK);
 	}
+
+	@GetMapping(Route.User.getEmailStatus + "/{userId}")
+	public Response getEmailStatus(@PathVariable Integer userId) {
+
+		User user = userService.getuser(userId);
+
+		if (userService.isNotNull(user)) {
+			return Response.set(user, HttpStatus.OK);
+		}
+
+		return Response.setErr("Invalid user", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 //	@GetMapping(Route.User.getAllUsersForOrderByDate + "/{date}")
 //	public List<String> getAllUsersForOrderByDate(@PathVariable Date date){

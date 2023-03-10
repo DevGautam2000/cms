@@ -21,6 +21,7 @@ public class Route {
 		
 		String getAllUsersForOrderByDate = "usersbydate";
 		String subscriptionToggler = "subscriptiontoggle";
+		String getEmailStatus = "getemailstatus";
 
 
 	}
