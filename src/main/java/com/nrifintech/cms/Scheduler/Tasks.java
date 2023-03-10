@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.nrifintech.cms.events.BreakfastStartEvent;
 import com.nrifintech.cms.events.LunchStartEvent;
+import com.nrifintech.cms.events.PromotionalEvent;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.MealType;
 
@@ -24,6 +25,14 @@ public class Tasks {
 
     @Autowired
     UserService userService;
+
+    @Scheduled( fixedDelay = 10000)
+    public void promotionalEvent(){
+        List<String> recipients = userService.getAllConsumers();
+        if( recipients.size()!=0 ){
+            applicationEventPublisher.publishEvent(new PromotionalEvent(recipients));
+        }
+    }
 
     @Scheduled(fixedDelay = 10000)
     public void BreakfastStart(){

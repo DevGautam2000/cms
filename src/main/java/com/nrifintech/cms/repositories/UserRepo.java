@@ -17,9 +17,12 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 	@Query(value ="select email from user where id in (select distinct user_id from user_records where records_id in (select id from orders where date(order_placed) = :date))",nativeQuery = true)
 	List<String> getUserByOrderDate(@Param("date") Date date);
 
-	@Query(value ="select email from user where id in (select distinct user_id from user_records where records_id in (select id from orders where date(order_placed) = :date and order_type = :otype))",nativeQuery = true)
+	@Query(value ="select email from user where id in (select distinct user_id from user_records where records_id in (select id from orders where date(order_placed) = :date and order_type = :otype) and email_status = 0)",nativeQuery = true)
 	List<String> getUserByOrderDateAndType(@Param("date") Date date,@Param("otype") Integer otype);
 	
 	@Query(value="select email from user where id = (select user_id from user_records where records_id = :orderId)",nativeQuery = true)
 	String getUserByOrderId(@Param("orderId") Integer orderId);
+
+	@Query(value ="select email from user where role = 2 and email_status = 0",nativeQuery = true)
+	Optional<List<String>> getAllConsumers();
 }
