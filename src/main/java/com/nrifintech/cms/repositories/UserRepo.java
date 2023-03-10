@@ -19,9 +19,6 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 
 	@Query(value ="select email from user where id in (select distinct user_id from user_records where records_id in (select id from orders where date(order_placed) = :date and order_type = :otype))",nativeQuery = true)
 	List<String> getUserByOrderDateAndType(@Param("date") Date date,@Param("otype") Integer otype);
-
-	@Query(value ="update user set email_status = :status where id = :id",nativeQuery = true)
-	Integer subsciptionToggler(@Param("status") Integer status,@Param("id") Integer id);
 	
 	@Query(value="select email from user where id = (select user_id from user_records where records_id = :orderId)",nativeQuery = true)
 	String getUserByOrderId(@Param("orderId") Integer orderId);

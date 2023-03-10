@@ -111,13 +111,19 @@ public class UserController {
 
 	@GetMapping(Route.User.subscriptionToggler + "/{id}/{subStatusId}")
 	public Response subsciptionToggler(@PathVariable int id, @PathVariable int subStatusId){
-		int res = userService.subsciptionToggler(id, subStatusId);
-		if( res > 0 ){
-			return Response.set("Updated to" + EmailStatus.values()[subStatusId], HttpStatus.OK);
+		if(subStatusId > 1) 
+			return Response.setErr("Invalid status code.",HttpStatus.BAD_REQUEST);
+		
+		User user = userService.getuser(id);
+
+		if (userService.isNotNull(user)) {
+
+			user.setEmailStatus(EmailStatus.values()[subStatusId]);
+			userService.saveUser(user);
+			
 		}
-		else{
-			return Response.set("Sorry...", HttpStatus.BAD_REQUEST);
-		}
+		return Response.set("User " + user.getEmailStatus().toString().toLowerCase() + " ",
+				HttpStatus.OK);
 	}
 	
 //	@GetMapping(Route.User.getAllUsersForOrderByDate + "/{date}")
