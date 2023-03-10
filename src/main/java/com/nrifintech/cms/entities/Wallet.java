@@ -1,27 +1,24 @@
 package com.nrifintech.cms.entities;
 
-import java.sql.Date;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
-public class Bill {
+public class Wallet {
 
 	@Id
 	@GeneratedValue
 	private Integer id;
-	
-	private Double due;
-	private Double totalExpenditure;
-	private Date nextCycle;
-	
+
+	private Double balance = 0.0;
 }

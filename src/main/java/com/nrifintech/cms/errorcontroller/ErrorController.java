@@ -4,7 +4,6 @@ import java.nio.file.AccessDeniedException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,14 +13,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.types.Response;
 
-import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.ExpiredJwtException;
 
 interface Message {
 	String payloadNotFound = "Required payload not found or wrongly passed.";
@@ -95,6 +93,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
           HttpStatus.FORBIDDEN);
     }
 	
+	
 	@ExceptionHandler({ UsernameNotFoundException.class })
     public Response userNameNotFoundException(
       Exception ex, WebRequest request) {
@@ -102,6 +101,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
+	
 
     @ExceptionHandler({ UserIsDisabledException.class, DisabledException.class })
     public Response userIsDisabledException(

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -78,8 +79,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             System.out.println("Token is not valid!!");
             // resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
         }
-
+        try {
         filterChain.doFilter(request, response);
-		
+        }catch(AccessDeniedException e) {
+        	resolver.resolveException(request, response, null,e);
+	    }catch(Exception e){
+	        resolver.resolveException(request, response, null,e);
+	    }
 	}
 }
