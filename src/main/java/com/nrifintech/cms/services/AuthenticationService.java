@@ -21,14 +21,17 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.config.jwt.JwtUtils;
 import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
+import com.nrifintech.cms.entities.TokenBlacklist;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.errorhandler.UserIsEnabledException;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
+import com.nrifintech.cms.repositories.TokenBlacklistRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.UserStatus;
 
 import eu.bitwalker.useragentutils.UserAgent;
+import io.jsonwebtoken.JwtException;
 
 @Service
 public class AuthenticationService {
@@ -40,6 +43,8 @@ public class AuthenticationService {
     private JwtUtils jwtUtils;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private TokenBlacklistRepo tokenRepo;
     
     
     //TODO: check password
@@ -97,6 +102,9 @@ public class AuthenticationService {
             throw new UsernameNotFoundException("token: "+token+" is not valid");
         }
 
+        if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
+        tokenRepo.save(new TokenBlacklist(token));
+
         System.out.println("Password updated");
         userService.updatePassword(user,newPassword);
 
@@ -132,9 +140,11 @@ public class AuthenticationService {
             throw new UsernameNotFoundException("token: "+token+" is not valid");
         }
 
+        if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
+        tokenRepo.save(new TokenBlacklist(token));
+
 		user.setStatus(UserStatus.values()[statusIdEnabled]);
 		userService.saveUser(user);
-
         System.out.println("User Activated & Password updated");
         
         userService.updatePassword(user,newPassword);
