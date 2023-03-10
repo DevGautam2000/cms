@@ -11,17 +11,9 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @Entity
-public class ResetPasswordUUID {
-    private String username;
+public class TokenBlacklist {
     @Id
-    private String uuid;
+    private String token;
 
-
-    
-    @Override
-    public String toString() {
-        return "ResetPasswordUUID [username=" + username + ", uuid=" + uuid + "]";
-    }
-
-    
+        
 }

@@ -62,7 +62,7 @@ public class AuthenticationController {
 
 	@GetMapping("current-user")
 	public Response getCurrentUser(Principal principal) {
-
+		
 		User exUser = userService.getuser(principal.getName());
 		if (exUser.getRole().equals(Role.User)) {
 

@@ -12,9 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import com.nrifintech.cms.errorcontroller.ErrorController;
 import com.nrifintech.cms.routes.Route;
@@ -29,6 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	JwtAuthenticationFilter jwtAuthenticationFilter;
 	@Autowired
 	private ErrorController handlerExceptionResolver;
+	@Autowired
+	private LogoutHandler logoutHandler;
 
     @Override
     @Bean
@@ -91,8 +95,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.anyRequest().authenticated()
 		     .and()
              .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.addFilterBefore(jwtAuthenticationFilter, 
-				UsernamePasswordAuthenticationFilter.class);
+		http
+		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+		.logout()
+        .logoutUrl("/auth/logout")
+        .addLogoutHandler(logoutHandler)
+        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
 	}
 
     @Bean

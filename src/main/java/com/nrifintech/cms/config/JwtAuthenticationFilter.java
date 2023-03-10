@@ -19,6 +19,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.repositories.TokenBlacklistRepo;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -33,6 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
     @Autowired
     @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver resolver;
+    @Autowired
+    private TokenBlacklistRepo blacklistRepo;
+
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		    throws ServletException, IOException,JwtException,UserIsDisabledException {
@@ -60,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             // resolver.resolveException(request, response, null,new JwtException("Invalid Token , not start with Bearer string"));
         }
 
-        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
+        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null && blacklistRepo.findById(jwtToken)!=null){
             final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
             
             if(!userDetails.isEnabled())

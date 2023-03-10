@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.config.jwt.JwtUtils;
 import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
-import com.nrifintech.cms.entities.ResetPasswordUUID;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.errorhandler.UserIsEnabledException;
@@ -141,4 +140,5 @@ public class AuthenticationService {
         userService.updatePassword(user,newPassword);
 
     }
+
 }
