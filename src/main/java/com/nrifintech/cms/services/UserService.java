@@ -36,6 +36,13 @@ public class UserService implements Validator {
 		return exUser;
 	}
 
+	public Integer subsciptionToggler(Integer id, Integer status){
+		if(status>1){
+			return(-1);
+		}
+		return( userRepo.subsciptionToggler(status, id));
+	}
+
 	public boolean checkPassword(User... users) {
 		if (users[0].getPassword().equals(users[1].getPassword())) {
 			return true;

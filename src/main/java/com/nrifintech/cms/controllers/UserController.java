@@ -18,8 +18,10 @@ import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
+import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
+import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
@@ -105,6 +107,17 @@ public class UserController {
 		this.applicationEventPublisher.publishEvent(new UpdateUserStatusEvent(user));
 		return Response.set("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
 				HttpStatus.OK);
+	}
+
+	@GetMapping(Route.User.subscriptionToggler + "/{id}/{subStatusId}")
+	public Response subsciptionToggler(@PathVariable int id, @PathVariable int subStatusId){
+		int res = userService.subsciptionToggler(id, subStatusId);
+		if( res > 0 ){
+			return Response.set("Updated to" + EmailStatus.values()[subStatusId], HttpStatus.OK);
+		}
+		else{
+			return Response.set("Sorry...", HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 //	@GetMapping(Route.User.getAllUsersForOrderByDate + "/{date}")

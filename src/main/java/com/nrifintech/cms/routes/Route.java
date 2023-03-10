@@ -20,6 +20,7 @@ public class Route {
 		String updateStatus = "updatestatus";
 		
 		String getAllUsersForOrderByDate = "usersbydate";
+		String subscriptionToggler = "subscriptiontoggle";
 
 
 	}

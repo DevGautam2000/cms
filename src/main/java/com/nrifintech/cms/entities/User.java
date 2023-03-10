@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -45,6 +46,7 @@ public class User {
 	private Role role = Role.User;
 	
 	private UserStatus status = UserStatus.Active;
+	private EmailStatus emailStatus = EmailStatus.subscribed;
 	private Timestamp created = new Timestamp(System.currentTimeMillis());
 	
 	@Column(unique=true)

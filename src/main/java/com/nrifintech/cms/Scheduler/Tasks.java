@@ -16,7 +16,7 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.MealType;
 
 
-@Component
+//@Component
 public class Tasks {
 
     @Autowired
