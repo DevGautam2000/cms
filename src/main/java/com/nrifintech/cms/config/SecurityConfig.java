@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
@@ -15,9 +16,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import com.nrifintech.cms.config.guard.AccessDecisionManagerAuthorizationManagerAdapter;
 import com.nrifintech.cms.errorcontroller.ErrorController;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.Role;
@@ -34,6 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private LogoutHandler logoutHandler;
 
+	@Autowired
+	private AccessDecisionManagerAuthorizationManagerAdapter aManagerAdapter;
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -70,7 +75,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(HttpMethod.POST,Route.Item.prefix+Route.Item.addItems).hasAnyAuthority(Role.Canteen.toString())
 
 			.antMatchers(Route.Order.prefix+Route.Order.getOrders+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString())
-			.antMatchers(Route.User.prefix+Route.User.getOrders+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+			.antMatchers(Route.User.prefix+Route.User.getOrders+"/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object,Role.Admin.toString(),Role.Canteen.toString()))
+			//.hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
 			.antMatchers(HttpMethod.POST, Route.Order.prefix+Route.Order.updateStatus+"/**").hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(HttpMethod.POST,Route.Order.prefix+Route.Order.placeOrder+"/**").hasAnyAuthority(Role.User.toString())
 						
