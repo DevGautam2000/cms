@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             // resolver.resolveException(request, response, null,new JwtException("Invalid Token , not start with Bearer string"));
         }
 
-        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null && blacklistRepo.findById(jwtToken)!=null){
+        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null && blacklistRepo.findById(jwtToken).orElse(null)==null){
             final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
             
             if(!userDetails.isEnabled())

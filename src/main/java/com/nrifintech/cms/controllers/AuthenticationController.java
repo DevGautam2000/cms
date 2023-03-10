@@ -31,6 +31,8 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
+import io.jsonwebtoken.JwtException;
+
 @RestController
 @CrossOrigin("*")
 @RequestMapping(Route.Authentication.prefix)
@@ -62,7 +64,7 @@ public class AuthenticationController {
 
 	@GetMapping("current-user")
 	public Response getCurrentUser(Principal principal) {
-		
+		if(principal==null)throw new JwtException("Invalid Token");
 		User exUser = userService.getuser(principal.getName());
 		if (exUser.getRole().equals(Role.User)) {
 
@@ -107,13 +109,5 @@ public class AuthenticationController {
 		authService.setNewPasswordAndActivate(userInfo.getUsername(), token, userInfo.getPassword());
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
-//	@GetMapping("/hi")
-//	public String hi() {
-//		return "hi";
-//	}
-//
-//	@GetMapping("/test")
-//	public String test() {
-//		return "only admin";
-//	}
+	
 }
