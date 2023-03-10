@@ -33,7 +33,9 @@ public class CRONListeners {
         List<String> recipients = (List<String>) event.getSource();
         HashMap<String,String> body = new HashMap<>();
         body.put("content", "Have you ordered for tomorrow");
+        body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         EmailModel emailModel = new EmailModel(recipients,"Canteen Management System",body,"promotion.flth");
+        this.smtpServices.sendMail(emailModel);
     }
 
     /*fix this recipients null */
