@@ -2,8 +2,6 @@ package com.nrifintech.cms.errorcontroller;
 
 
 
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,6 +21,9 @@ import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.types.Response;
 
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+
 interface Message {
 	String payloadNotFound = "Required payload not found or wrongly passed.";
 	String pageNotFound = "Required page not found.";
@@ -31,7 +32,6 @@ interface Message {
 
 @CrossOrigin
 @ControllerAdvice
-@Order(Ordered.LOWEST_PRECEDENCE)
 @RestController
 public class ErrorController extends ResponseEntityExceptionHandler {
 
@@ -80,11 +80,10 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     
     
     @ExceptionHandler({ io.jsonwebtoken.ExpiredJwtException.class })
-    public Response expiredJwtException(
+    public void expiredJwtException(
       Exception ex, WebRequest request) {
-        return Response.setErr(
-          "session is terminated", 
-          HttpStatus.REQUEST_TIMEOUT);
+        Response.setErr("session is terminated", HttpStatus.REQUEST_TIMEOUT);
+        //handle the error to bypass and do not send any response
     }
 	
 
@@ -112,6 +111,13 @@ public class ErrorController extends ResponseEntityExceptionHandler {
         return Response.setErr(
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
+    }
+    
+    @ExceptionHandler({ MalformedJwtException.class, SignatureException.class })
+    public void malformedToken(
+      Exception ex, WebRequest request) {
+    	Response.setErr("Invalid token.", HttpStatus.BAD_REQUEST);
+        //handle the error to bypass and do not send any response
     }
     
 }

@@ -58,6 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 		} else {
 			System.out.println("Invalid Token , not start with Bearer string");
+			resolver.resolveException(request, response, null, new AccessDeniedException("Access Denied."));
+
+			return; // ------> this line stops the further code run
+
 			// resolver.resolveException(request, response, null,new JwtException("Invalid
 			// Token , not start with Bearer string"));
 		}
@@ -78,18 +82,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 		} else {
 			System.out.println("Token is not valid!!");
-			// resolver.resolveException(request, response, null,new JwtException("Invalid
-			// Token"));
+			resolver.resolveException(request, response, null, new AccessDeniedException("Access Denied."));
+			return; // ------> this line stops the further code run
 		}
+
 		try {
 			filterChain.doFilter(request, response);
 		} catch (AccessDeniedException e) {
 
-			resolver.resolveException(request, response, new AccessDeniedException(""), e);
-			// System.out.println("Jwt token has expired");
+			resolver.resolveException(request, response, null, e);
 		} catch (Exception e) {
-			// e.printStackTrace();
-			// System.out.println("error");
 			resolver.resolveException(request, response, null, e);
 		}
 	}

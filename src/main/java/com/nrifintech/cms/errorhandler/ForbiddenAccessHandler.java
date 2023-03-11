@@ -23,5 +23,9 @@ public class ForbiddenAccessHandler implements AccessDeniedHandler {
         Authentication auth 
           = SecurityContextHolder.getContext().getAuthentication();
         
+        if(auth != null) {
+        	throw new AccessDeniedException("Access denied.");
+        }
+        
     }
 }

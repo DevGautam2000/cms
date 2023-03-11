@@ -66,7 +66,7 @@ public class CartService implements Validator {
 
 		ids.forEach(id -> cartItemService.deleteItem(id));
 		cart.getCartItems().clear();
-		this.saveCart(cart);
+		cart = this.saveCart(cart);
 		return cart;
 	}
 
