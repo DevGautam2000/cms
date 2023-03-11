@@ -78,6 +78,9 @@ public class UserController {
 
 	@GetMapping(Route.User.getOrders + "/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
+		
+		boolean i = userService.hasUserCartitem("aniket@3.com", 27);
+		System.out.println(i);
 
 		User user = userService.getuser(userId);
 		List<Order> orders = user.getRecords();

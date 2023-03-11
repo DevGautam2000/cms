@@ -2,6 +2,7 @@ package com.nrifintech.cms.dtos;
 
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -40,6 +41,7 @@ public class UserDto{
 		private UserStatus status;
 		private Integer cartCount=0;
 		private Integer cartId;
+		private Integer walletId;
 		
 		public Unprivileged(User user) {
 
@@ -55,6 +57,12 @@ public class UserDto{
 			if(c != null) {
 				this.cartId = c.getId();
 				this.cartCount = c.getCartItems().size();
+			}
+			
+			Wallet w = user.getWallet();
+			
+			if(w != null) {
+				this.walletId = w.getId();
 			}
 		}
 	}

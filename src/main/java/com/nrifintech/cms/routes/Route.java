@@ -96,12 +96,10 @@ public class Route {
 		String generateToken = "generate-token";
 	}
 
-	public interface Bill {
-		String prefix = "/bill/";
-
-		String getBills = "getbills";
-		String getBill = "getbill";
-		String addBill = "addbill";
+	public interface Wallet {
+		String prefix = "/wallet/";
+		String getWallet = "getwallet";
+		String addMoney = "addmoney";
 	}
 
 
