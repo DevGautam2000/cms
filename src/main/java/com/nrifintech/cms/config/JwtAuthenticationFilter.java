@@ -25,69 +25,72 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter{
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired 
-    private MyUserDetailsService userDetailsServiceImple;
-    @Autowired
-    private JwtUtils jutUtil;
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver resolver;
+	@Autowired
+	private MyUserDetailsService userDetailsServiceImple;
+	@Autowired
+	private JwtUtils jutUtil;
+	@Autowired
+	@Qualifier("handlerExceptionResolver")
+	private HandlerExceptionResolver resolver;
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-		    throws ServletException, IOException,JwtException,UserIsDisabledException {
+			throws ServletException, IOException, JwtException, UserIsDisabledException {
 		final String requestTokenHeader = request.getHeader("Authorization");
-        System.out.println(requestTokenHeader);
-        String username=null;
-        String jwtToken=null;
+		System.out.println(requestTokenHeader);
+		String username = null;
+		String jwtToken = null;
 
-        if(requestTokenHeader!=null && requestTokenHeader.startsWith("Bearer ")){
-            try
-            {
-                jwtToken=requestTokenHeader.substring(7);
-                username=this.jutUtil.extractUsername(jwtToken);
-            }catch(ExpiredJwtException e){
-                // e.printStackTrace();
-                resolver.resolveException(request, response, null,e);
-                // System.out.println("Jwt token has expired");
-            }catch(Exception e){
-                // e.printStackTrace();
-                // System.out.println("error");
-                resolver.resolveException(request, response, null,e);
-            }
-        }else{
-            System.out.println("Invalid Token , not start with Bearer string");
-            // resolver.resolveException(request, response, null,new JwtException("Invalid Token , not start with Bearer string"));
-        }
+		if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+			try {
+				jwtToken = requestTokenHeader.substring(7);
+				username = this.jutUtil.extractUsername(jwtToken);
+			} catch (ExpiredJwtException e) {
+				// e.printStackTrace();
+				resolver.resolveException(request, response, null, e);
+				// System.out.println("Jwt token has expired");
+			} catch (Exception e) {
+				// e.printStackTrace();
+				// System.out.println("error");
+				resolver.resolveException(request, response, null, e);
+			}
+		} else {
+			System.out.println("Invalid Token , not start with Bearer string");
+			// resolver.resolveException(request, response, null,new JwtException("Invalid
+			// Token , not start with Bearer string"));
+		}
 
-        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null){
-            final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
-            
-            if(!userDetails.isEnabled())
-                resolver.resolveException(request, response, null, new UserIsDisabledException("InActive User"));
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			final UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(username);
 
-            else if(this.jutUtil.validateToken(jwtToken, userDetails)){
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			if (!userDetails.isEnabled())
+				resolver.resolveException(request, response, null, new UserIsDisabledException("InActive User"));
 
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        }
-        else
-        {
-            System.out.println("Token is not valid!!");
-            // resolver.resolveException(request, response, null,new JwtException("Invalid Token"));
-        }
-        try {
-        	System.out.println("coming try here");
-        filterChain.doFilter(request, response);
-        }catch(AccessDeniedException e) {
-        	System.out.println("coming here");
-        	resolver.resolveException(request, response, null,e);
-	    }catch(Exception e){
-	    	System.out.println("coming hereeeee");
-	        resolver.resolveException(request, response, null,e);
-	    }
+			else if (this.jutUtil.validateToken(jwtToken, userDetails)) {
+				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+						userDetails, null, userDetails.getAuthorities());
+				usernamePasswordAuthenticationToken
+						.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			}
+		} else {
+			System.out.println("Token is not valid!!");
+			// resolver.resolveException(request, response, null,new JwtException("Invalid
+			// Token"));
+		}
+		try {
+			filterChain.doFilter(request, response);
+		} catch (AccessDeniedException e) {
+
+			resolver.resolveException(request, response, new AccessDeniedException(""), e);
+			// System.out.println("Jwt token has expired");
+		} catch (Exception e) {
+			// e.printStackTrace();
+			// System.out.println("error");
+			resolver.resolveException(request, response, null, e);
+		}
 	}
 }

@@ -2,6 +2,8 @@ package com.nrifintech.cms.errorcontroller;
 
 
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,8 +23,6 @@ import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.types.Response;
 
-import io.jsonwebtoken.ExpiredJwtException;
-
 interface Message {
 	String payloadNotFound = "Required payload not found or wrongly passed.";
 	String pageNotFound = "Required page not found.";
@@ -31,6 +31,7 @@ interface Message {
 
 @CrossOrigin
 @ControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 @RestController
 public class ErrorController extends ResponseEntityExceptionHandler {
 
@@ -68,14 +69,11 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 		return Response.setErr(ex.getMessage(), HttpStatus.METHOD_NOT_ALLOWED);
 	}
 
-	
     @ExceptionHandler({ AccessDeniedException.class })
     public Response handleAccessDeniedException(
       Exception ex) {
-    	
-    	System.out.println("this was printed");
         return Response.setErr(
-          "Access denied", 
+          ex.getMessage(), 
           HttpStatus.FORBIDDEN);
     }
 
@@ -115,4 +113,5 @@ public class ErrorController extends ResponseEntityExceptionHandler {
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
+    
 }

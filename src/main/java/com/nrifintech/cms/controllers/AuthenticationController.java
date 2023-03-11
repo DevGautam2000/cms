@@ -32,7 +32,7 @@ import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin
 @RequestMapping(Route.Authentication.prefix)
 public class AuthenticationController {
 	@Autowired
