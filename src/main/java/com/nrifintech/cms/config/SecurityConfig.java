@@ -62,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
 			.antMatchers(Route.User.prefix+Route.User.updateStatus).hasAnyAuthority(Role.Admin.toString())
 			
-			.antMatchers(Route.Menu.prefix+Route.Menu.getMenu+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
+			.antMatchers(Route.Menu.prefix+Route.Menu.getMenu+"/{id}").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
 			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.addMenu).hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.removeFromMenu+"/**").hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(HttpMethod.POST,Route.Menu.prefix+Route.Menu.approveMenu+"/**").hasAnyAuthority(Role.Admin.toString())
@@ -78,15 +78,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(Route.User.prefix+Route.User.getOrders+"/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object,Role.Admin.toString(),Role.Canteen.toString()))
 			//.hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
 			.antMatchers(HttpMethod.POST, Route.Order.prefix+Route.Order.updateStatus+"/**").hasAnyAuthority(Role.Canteen.toString())
-			.antMatchers(HttpMethod.POST,Route.Order.prefix+Route.Order.placeOrder+"/**").hasAnyAuthority(Role.User.toString())
+			.antMatchers(HttpMethod.POST,Route.Order.prefix+Route.Order.placeOrder+"/{id}/{mealId}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object))
 						
 			
-			.antMatchers(Route.Cart.prefix+"/**").hasAnyAuthority(Role.User.toString())
-			.antMatchers(HttpMethod.POST,Route.Cart.prefix+"/**").hasAnyAuthority(Role.User.toString())
+			.antMatchers(Route.Cart.prefix + Route.Cart.getCart+"/{cartId}").access((authentication, object) -> aManagerAdapter.preCheckUserCartId(authentication, object))
+                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.addToCart + "/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object))
+                // .hasAnyAuthority(Role.User.toString())
+                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/inc/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object)) 
+                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/dec/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object))  
+               // .hasAnyAuthority(Role.User.toString())
+                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.remove + "/**")
+                .hasAnyAuthority(Role.User.toString())
+                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.clear + "/*")
+                .hasAnyAuthority(Role.User.toString())
 
 
-			.antMatchers(HttpMethod.POST,Route.FeedBack.prefix+"/**").hasAnyAuthority(Role.User.toString())
-
+			.antMatchers(HttpMethod.POST,Route.FeedBack.prefix+Route.FeedBack.addFeedback+"/{orderId}").access((authentication, object) -> aManagerAdapter.preCheckUserOrderId(authentication, object)) 
+			
 			// .antMatchers(HttpMethod.POST,Route.Bill.prefix+"/**").hasAnyAuthority(Role.User.toString())
 
 			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())

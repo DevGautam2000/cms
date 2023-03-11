@@ -16,4 +16,8 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 	
 	@Query(value ="select email from user where id in (select distinct user_id from user_records where records_id in (select id from orders where date(order_placed) = :date))",nativeQuery = true)
 	List<String> getUserByOrderDate(@Param("date") Date date);
+
+	@Query(value ="	select (:cartItemId in (select cart_items_id from cart_cart_items where cart_id = (select user.cart_id from user where email=:em) )) as 'val' from dual",nativeQuery = true)
+	Integer hasUserCartitem(@Param("em") String em,@Param("cartItemId") Integer cartItemId);
+
 }

@@ -79,4 +79,9 @@ public class UserService implements Validator {
 		
 	}
 
+	public boolean hasUserCartitem(String email,int cartItemId){
+		return userRepo.hasUserCartitem(email, cartItemId)==1;
+
+	}
+
 }
