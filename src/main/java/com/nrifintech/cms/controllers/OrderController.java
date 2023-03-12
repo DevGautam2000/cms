@@ -201,10 +201,10 @@ public class OrderController {
 
 					order.setCartItems(new ArrayList<>(cartItems));
 					
-					Double orderTotal=0.0;
+					Integer orderTotal=0;
 					
 					for(CartItem item : order.getCartItems()) {
-						Double price = item.getPrice() * item.getQuantity();
+						Integer price = (int) (item.getPrice() * item.getQuantity());
 						orderTotal += price;	
 					};
 					

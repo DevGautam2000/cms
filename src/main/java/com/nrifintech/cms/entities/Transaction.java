@@ -27,13 +27,17 @@ public class Transaction {
 
 	private Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-	private Double amount = 0.0;
+	private Integer amount = 0;
 	
 	private TransactionType type;
 	
-	private String referenceNumber = UUID.randomUUID().toString();
+	private String referenceNumber = "";
 	
-	public Transaction(Double amount,TransactionType type) {
+	private String chargeId = "";
+	
+	private String remarks = "-";
+	
+	public Transaction(Integer amount,TransactionType type) {
 		this.amount = amount;
 		this.type = type;
 	}

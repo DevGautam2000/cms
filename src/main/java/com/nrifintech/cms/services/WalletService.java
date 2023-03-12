@@ -1,11 +1,14 @@
 package com.nrifintech.cms.services;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.payments.service.StripeService;
 import com.nrifintech.cms.repositories.WalletRepo;
 import com.nrifintech.cms.types.TransactionType;
 import com.nrifintech.cms.utils.Validator;
@@ -20,6 +23,9 @@ public class WalletService implements Validator {
 
 	@Autowired
 	private TransactionService transactionService;
+
+	@Autowired
+	private StripeService stripeService;
 
 	private Boolean checkForMinimumLimit(Double currentBalance) {
 
@@ -37,10 +43,12 @@ public class WalletService implements Validator {
 		return walletRepo.save(w);
 	}
 
-	public Wallet updateWallet(Wallet w, Double amount) {
+	public Wallet updateWallet(Wallet w, Integer amount) {
 		w.setBalance(w.getBalance() - amount);
 
 		Transaction t = transactionService.add(new Transaction(amount, TransactionType.Withdrawl));
+		t.setRemarks("ordered food");
+		t.setReferenceNumber(UUID.randomUUID().toString());
 
 		if (transactionService.isNotNull(t)) {
 			w.getTransactions().add(t);
@@ -49,17 +57,48 @@ public class WalletService implements Validator {
 		return w;
 	}
 
-	public Wallet addMoneyToWallet(Wallet w, Double amount) {
+	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token) {
 
 		w.setBalance(w.getBalance() + amount);
 
 		Transaction t = transactionService.add(new Transaction(amount, TransactionType.Deposit));
+		t.setRemarks("deposit to wallet");
+		t.setReferenceNumber(token.split("_")[1]);
+
+		String chargeId = "";
 
 		if (transactionService.isNotNull(t)) {
+
+			chargeId = stripeService.createCharge(email, token, amount);
+			t.setChargeId(chargeId);
+			
+			System.out.println(chargeId);
+			
 			w.getTransactions().add(t);
+			this.save(w);
 		}
 
-		return w;
+		return chargeId;
+	}
+
+	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token, String remarks) {
+
+		w.setBalance(w.getBalance() + amount);
+
+		Transaction t = transactionService.add(new Transaction(amount, TransactionType.Deposit));
+		t.setRemarks(remarks);
+		t.setReferenceNumber(token.split("_")[1]);
+
+		String chargeId = "";
+		if (transactionService.isNotNull(t)) {
+
+			chargeId = stripeService.createCharge(email, token, amount);
+			t.setChargeId(chargeId);
+			w.getTransactions().add(t);
+			this.save(w);
+		}
+
+		return chargeId;
 	}
 
 	public Wallet getWallet(Integer walletId) {
