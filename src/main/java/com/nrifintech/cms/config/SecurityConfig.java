@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import com.nrifintech.cms.errorcontroller.ErrorController;
 import com.nrifintech.cms.errorhandler.ForbiddenAccessHandler;
 import com.nrifintech.cms.routes.Route;
@@ -44,8 +45,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.cors().and().csrf().disable().exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
-				.authorizeHttpRequests().antMatchers(Route.Authentication.prefix + "**").permitAll()
+		
+		
+		 
+		http
+		.cors().and().csrf().disable().exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
+				.authorizeHttpRequests()
+				.antMatchers(Route.Authentication.prefix + "**").permitAll()			
 				.antMatchers(HttpMethod.OPTIONS).permitAll()
 
 				.antMatchers(HttpMethod.POST, Route.User.prefix + Route.User.addUser,
@@ -106,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 				.anyRequest().authenticated().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
 		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
