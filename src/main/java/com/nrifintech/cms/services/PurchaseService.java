@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -25,6 +26,7 @@ public class PurchaseService {
     public Purchase initiateNewPurchase(Purchase purchase)throws IllegalArgumentException{
         Inventory i = purchase.getInventoryRef();
         purchase.setInventoryRef(inventoryRepo.findById(i.getId()).orElse(null));
+        purchase.setTime(new Timestamp(System.currentTimeMillis()));
         Purchase purchaseRef = purchaseRepo.save(purchase);
         inventoryRepo.updateQtyInHand( purchaseRef.getQuantity() , purchaseRef.getInventoryRef().getId() );
         inventoryRepo.updateQtyRequested( (-purchaseRef.getQuantity()) , purchaseRef.getInventoryRef().getId() );

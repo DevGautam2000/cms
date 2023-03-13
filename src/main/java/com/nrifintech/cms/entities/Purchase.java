@@ -2,6 +2,7 @@ package com.nrifintech.cms.entities;
 
 import java.sql.Timestamp;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -25,9 +26,9 @@ public class Purchase {
     private int refId;
     private double quantity;
     private double amount;
-    private Timestamp time = new Timestamp(System.currentTimeMillis());
+    private Timestamp time;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JsonBackReference
     private Inventory inventoryRef;
 }
