@@ -42,6 +42,9 @@ public class Order {
 
 	@OneToOne
 	private FeedBack feedBack;
+	
+	@OneToOne
+	private Transaction transaction ;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	private List<CartItem> cartItems;

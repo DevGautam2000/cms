@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,12 +22,14 @@ import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
+import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.OrderService;
+import com.nrifintech.cms.services.TransactionService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.MealType;
@@ -50,6 +53,9 @@ public class OrderController {
 
 	@Autowired
 	private WalletService walletService;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
@@ -200,14 +206,15 @@ public class OrderController {
 						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
 					order.setCartItems(new ArrayList<>(cartItems));
-					
-					Integer orderTotal=0;
-					
-					for(CartItem item : order.getCartItems()) {
+
+					Integer orderTotal = 0;
+
+					for (CartItem item : order.getCartItems()) {
 						Integer price = (int) (item.getPrice() * item.getQuantity());
-						orderTotal += price;	
-					};
-					
+						orderTotal += price;
+					}
+					;
+
 					orderService.saveOrder(order);
 
 					user.getRecords().add(order);
@@ -219,13 +226,21 @@ public class OrderController {
 						user.getCart().getCartItems().clear();
 						user = userService.saveUser(user);
 
-						wallet = walletService.updateWallet(wallet,orderTotal);
+						List<Object> orderObjects = walletService.updateWallet(wallet, orderTotal);
 
-						if (walletService.isNotNull(wallet)) {
+						wallet = (Wallet) orderObjects.get(0);
+						Transaction transaction = (Transaction) orderObjects.get(1);
+
+						if (walletService.isNotNull(wallet) && transactionService.isNotNull(transaction)) {
+
+							order.setTransaction(transaction);
+							orderService.saveOrder(order);
+
 							walletService.save(wallet);
+
 							this.applicationEventPublisher
 									.publishEvent(new PlacedOrderEvent(new OrderToken(user.getEmail(), order)));
-							return Response.set("Added new order for user.", HttpStatus.OK);
+							return Response.setMsg("Added new order for user.", HttpStatus.OK);
 						}
 
 						return Response.setErr("Error placing order.", HttpStatus.OK);
@@ -241,4 +256,50 @@ public class OrderController {
 		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
 
+	@PostMapping(Route.Order.cancelOrder + "/{orderId}")
+	public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
+
+		User user = userService.getuser(principal.getName());
+
+		Order order = orderService.getOrder(orderId);
+
+		if (orderService.isNotNull(order)) {
+
+			if (user.getRecords().contains(order)) {
+
+				// refund back to wallet
+				
+				if(order.getStatus().equals(Status.Cancelled))
+					return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+
+				Transaction transaction = order.getTransaction();
+
+				Wallet wallet = user.getWallet();
+
+				if (walletService.isNotNull(wallet)) {
+
+					if (wallet.getTransactions().contains(transaction)) {
+
+						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+
+						// cancle the order
+						order.setStatus(Status.Cancelled);
+						order = orderService.saveOrder(order);
+
+						if (orderService.isNotNull(order))
+							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+					}
+
+				}
+
+				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
+			}
+
+			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
+
+		}
+
+		return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
+
+	}
 }

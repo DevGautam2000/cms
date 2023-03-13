@@ -66,6 +66,8 @@ public class Route {
 
 		String placeOrder = "placeorder";
 
+		String cancelOrder = "cancelorder";
+
 	
 	}
 
