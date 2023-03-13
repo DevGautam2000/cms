@@ -7,6 +7,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,10 +27,8 @@ public class Wallet {
 
 	private Double balance = 0.0;
 	
-	@OneToMany(fetch=FetchType.EAGER)
+	@OneToMany
 	private List<Transaction> transactions;
 	
-	public void transact() {
-		this.balance = this.getBalance() - 100.0;
-	}
+	
 }

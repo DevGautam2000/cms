@@ -129,7 +129,7 @@ public class CartController {
 
 			cart = cartService.clearCart(cart);
 
-			if (cartItemService.isNull(cart)) {
+			if (cart.getCartItems().isEmpty()) {
 				return Response.setMsg("Cart cleared. ", HttpStatus.OK);
 			}
 
