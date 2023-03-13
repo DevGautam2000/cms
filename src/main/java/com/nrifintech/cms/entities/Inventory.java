@@ -2,10 +2,13 @@ package com.nrifintech.cms.entities;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,10 +26,10 @@ public class Inventory {
 	private Integer id;
 	private String name;
 	private Double quantityInHand;
-	private double unitPrice;
-	private String unitDesc;
+	private Double quantityRequested;
 
-	@OneToMany(mappedBy = "inventoryRef")
+	@OneToMany(mappedBy = "inventoryRef",cascade = CascadeType.MERGE)
+	@JsonManagedReference
 	private List<Purchase> purchases;
 	
 }
