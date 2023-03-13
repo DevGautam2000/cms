@@ -42,8 +42,6 @@ public class UserService implements Validator {
 	
 		
 		
-		
-		System.out.println("USER: " + user);
 		if (isNull(exUser)) {
 			Wallet w = new Wallet();
 			w = walletService.save(w);
@@ -51,12 +49,10 @@ public class UserService implements Validator {
 			if(isNotNull(w)) {
 				user.setWallet(w); 
 				userRepo.save(user);
-				System.out.println("EXUSER: " + exUser);
+				
 			}
 		}
 		
-		
-		System.out.println("USER: " + exUser);
 		return exUser;
 	}
 

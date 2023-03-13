@@ -235,7 +235,7 @@ public class OrderController {
 				}
 
 			}
-
+			return Response.setErr("Wallet not found.", HttpStatus.BAD_REQUEST);
 		}
 
 		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
