@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
@@ -56,6 +57,7 @@ public class User {
 	private List<Order> records;
 	
 	@OneToOne(fetch=FetchType.LAZY)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 	private Wallet wallet = new Wallet();
 	
 	@OneToOne(fetch=FetchType.EAGER)

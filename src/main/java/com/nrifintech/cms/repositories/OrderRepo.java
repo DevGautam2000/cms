@@ -12,6 +12,6 @@ import com.nrifintech.cms.entities.Order;
 public interface OrderRepo extends JpaRepository<Order,Integer>{
     @Modifying
     @Transactional
-    @Query(value = "update orders set status = 2 where status = 0 ")
+    @Query(value = "update orders set status = 2 where status = 0 ",nativeQuery = true)
     public void autoArchive();
 }
