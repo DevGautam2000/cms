@@ -18,8 +18,10 @@ import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
+import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
+import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
@@ -109,6 +111,35 @@ public class UserController {
 		this.applicationEventPublisher.publishEvent(new UpdateUserStatusEvent(user));
 		return Response.setMsg("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
 				HttpStatus.OK);
+	}
+
+	@GetMapping(Route.User.subscriptionToggler + "/{id}/{subStatusId}")
+	public Response subsciptionToggler(@PathVariable int id, @PathVariable int subStatusId){
+		if(subStatusId > 1) 
+			return Response.setErr("Invalid status code.",HttpStatus.BAD_REQUEST);
+		
+		User user = userService.getuser(id);
+
+		if (userService.isNotNull(user)) {
+
+			user.setEmailStatus(EmailStatus.values()[subStatusId]);
+			userService.saveUser(user);
+			
+		}
+		return Response.set("User " + user.getEmailStatus().toString().toLowerCase() + " ",
+				HttpStatus.OK);
+	}
+
+	@GetMapping(Route.User.getEmailStatus + "/{userId}")
+	public Response getEmailStatus(@PathVariable Integer userId) {
+
+		User user = userService.getuser(userId);
+
+		if (userService.isNotNull(user)) {
+			return Response.set(user, HttpStatus.OK);
+		}
+
+		return Response.setErr("Invalid user", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 //	@GetMapping(Route.User.getAllUsersForOrderByDate + "/{date}")

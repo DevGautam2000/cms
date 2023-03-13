@@ -1,6 +1,8 @@
 package com.nrifintech.cms.services;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,6 +80,13 @@ public class UserService implements Validator {
 
 	}
 
+	public List<String> getOrdersByDateAndOrderType(Date date,Integer otype) {
+
+		List<String> usersEmails = userRepo.getUserByOrderDateAndType(date,otype);
+		return usersEmails;
+
+	}
+
 	public String getUserByOrderId(Integer orderId) {
 
 		String userEmail = userRepo.getUserByOrderId(orderId);
@@ -89,4 +98,11 @@ public class UserService implements Validator {
         return userRepo.hasUserCartitem(email, cartItemId)==1;
     }
 
+	public List<String> getAllConsumers(){
+		Optional<List<String>> result = userRepo.getAllConsumers();
+		if( result.isPresent()){
+			return(result.get());
+		}
+		return(new ArrayList<>());
+	}
 }
