@@ -1,8 +1,11 @@
 package com.nrifintech.cms.entities;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,10 +21,12 @@ public class Inventory {
 	@Id
 	@GeneratedValue
 	private Integer id;
-	
+	private String name;
 	private Double quantityInHand;
-	private Double quantityRequired;
-	private Double totalExpenditure;
-	private Double monthlyExpenditure;
+	private double unitPrice;
+	private String unitDesc;
+
+	@OneToMany(mappedBy = "inventoryRef")
+	private List<Purchase> purchases;
 	
 }
