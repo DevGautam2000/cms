@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.nrifintech.cms.entities.User;
@@ -29,12 +31,21 @@ public class UserService implements Validator {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
+	@Transactional
 	public User addUser(User user) {
 		User exUser = this.getExistingUser(user.getEmail());
 
-		if (!isNotNull(exUser)) {
-			userRepo.save(user);
+		
+		
+		System.out.println("USER: " + user);
+		if (isNull(exUser)) {
+			
+			exUser = userRepo.save(user);
+			System.out.println("EXUSER: " + exUser);
 		}
+		
+		
+		System.out.println("USER: " + exUser);
 		return exUser;
 	}
 

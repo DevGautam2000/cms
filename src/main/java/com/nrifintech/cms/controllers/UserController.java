@@ -46,11 +46,15 @@ public class UserController {
 		if (user.getRole().ordinal() > Role.values().length)
 			return Response.setErr("Invalid role for user.", HttpStatus.BAD_REQUEST);
 
+		
 		User u = userService.addUser(user);
+	
 
 		if (userService.isNotNull(u))
 			return Response.setErr("User already exists.", HttpStatus.BAD_REQUEST);
 		this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
+		
+		
 		
 		return Response.setMsg("User added.", HttpStatus.OK);
 	}

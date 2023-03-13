@@ -225,7 +225,7 @@ public class OrderController {
 							walletService.save(wallet);
 							this.applicationEventPublisher
 									.publishEvent(new PlacedOrderEvent(new OrderToken(user.getEmail(), order)));
-							return Response.set("Added new order for user.", HttpStatus.OK);
+							return Response.setMsg("Added new order for user.", HttpStatus.OK);
 						}
 
 						return Response.setErr("Error placing order.", HttpStatus.OK);

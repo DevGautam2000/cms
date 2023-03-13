@@ -54,8 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(Route.Authentication.prefix + "**").permitAll()			
 				.antMatchers(HttpMethod.OPTIONS).permitAll()
 
-				.antMatchers(HttpMethod.POST, Route.User.prefix + Route.User.addUser,
-						Route.User.prefix + Route.User.removeUser)
+				.antMatchers(HttpMethod.POST, Route.User.prefix + Route.User.addUser,Route.User.prefix + Route.User.removeUser)
 				.hasAnyAuthority(Role.Admin.toString()).antMatchers(Route.User.prefix + Route.User.getUsers)
 				.hasAnyAuthority(Role.Admin.toString()).antMatchers(Route.User.prefix + Route.User.updateStatus)
 				.hasAnyAuthority(Role.Admin.toString())
