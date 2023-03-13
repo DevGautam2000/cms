@@ -1,7 +1,9 @@
 package com.nrifintech.cms.controllers;
 
 import java.security.Principal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -255,6 +257,8 @@ public class OrderController {
 
 		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
+	
+	
 
 	@PostMapping(Route.Order.cancelOrder + "/{orderId}")
 	public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
@@ -265,37 +269,47 @@ public class OrderController {
 
 		if (orderService.isNotNull(order)) {
 
-			if (user.getRecords().contains(order)) {
+			Timestamp prevTimestamp = order.getOrderPlaced();
+			Timestamp currTimestamp = new Timestamp(System.currentTimeMillis());
 
-				// refund back to wallet
-				
-				if(order.getStatus().equals(Status.Cancelled))
-					return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+			Boolean isServicable = orderService.getServerEpoch(prevTimestamp, currTimestamp);
 
-				Transaction transaction = order.getTransaction();
+			if (isServicable) {
+				if (user.getRecords().contains(order)) {
 
-				Wallet wallet = user.getWallet();
+					// refund back to wallet
 
-				if (walletService.isNotNull(wallet)) {
+					if (order.getStatus().equals(Status.Cancelled))
+						return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
 
-					if (wallet.getTransactions().contains(transaction)) {
+					Transaction transaction = order.getTransaction();
 
-						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+					Wallet wallet = user.getWallet();
 
-						// cancle the order
-						order.setStatus(Status.Cancelled);
-						order = orderService.saveOrder(order);
+					if (walletService.isNotNull(wallet)) {
 
-						if (orderService.isNotNull(order))
-							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+						if (wallet.getTransactions().contains(transaction)) {
+
+							wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+
+							// cancle the order
+							order.setStatus(Status.Cancelled);
+							order = orderService.saveOrder(order);
+
+							if (orderService.isNotNull(order))
+								return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+						}
+
 					}
 
+					return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
 				}
 
-				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
+				return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
+
 			}
 
-			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
+			return Response.setErr("Order cannot be cancelled.", HttpStatus.NOT_ACCEPTABLE);
 
 		}
 

@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ import com.nrifintech.cms.utils.Validator;
 
 @Service
 public class OrderService implements Validator {
+
+	private static final Integer SERVER_LIMIT_MILLIS = 86400000;
 
 	@Autowired
 	private OrderRepo orderRepo;
@@ -48,7 +51,7 @@ public class OrderService implements Validator {
 
 	public Order getOrder(Integer id) {
 
-		return orderRepo.findById(id).orElseThrow( () ->  new NotFoundException("Order"));
+		return orderRepo.findById(id).orElseThrow(() -> new NotFoundException("Order"));
 	}
 
 	public List<Order> getOrders() {
@@ -126,8 +129,17 @@ public class OrderService implements Validator {
 		return order;
 	}
 
-	public void autoArchive(){
+	public void autoArchive() {
 		orderRepo.autoArchive();
+	}
+
+	public Boolean getServerEpoch(Timestamp prev, Timestamp curr) {
+
+//		Timestamp curr = Timestamp.valueOf("2023-03-13 12:00:00");
+//		Timestamp prev = Timestamp.valueOf("2023-03-12 12:00:00");
+
+		return curr.getTime() - prev.getTime() <= SERVER_LIMIT_MILLIS;
+
 	}
 
 }
