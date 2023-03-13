@@ -51,7 +51,8 @@ public class UserController {
 		if (userService.isNotNull(u))
 			return Response.setErr("User already exists.", HttpStatus.BAD_REQUEST);
 		this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
-		return Response.set("User added.", HttpStatus.OK);
+		
+		return Response.setMsg("User added.", HttpStatus.OK);
 	}
 
 	@GetMapping(Route.User.getUsers)
@@ -79,6 +80,9 @@ public class UserController {
 
 	@GetMapping(Route.User.getOrders + "/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
+		
+		boolean i = userService.hasUserCartitem("aniket@3.com", 27);
+		System.out.println(i);
 
 		User user = userService.getuser(userId);
 		List<Order> orders = user.getRecords();
@@ -105,7 +109,7 @@ public class UserController {
 			
 		}
 		this.applicationEventPublisher.publishEvent(new UpdateUserStatusEvent(user));
-		return Response.set("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
+		return Response.setMsg("User status updated to: " + user.getStatus().toString().toLowerCase() + " ",
 				HttpStatus.OK);
 	}
 

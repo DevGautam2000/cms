@@ -23,6 +23,10 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 	@Query(value="select email from user where id = (select user_id from user_records where records_id = :orderId)",nativeQuery = true)
 	String getUserByOrderId(@Param("orderId") Integer orderId);
 
+	
+	@Query(value ="select (:cartItemId in (select cart_items_id from cart_cart_items where cart_id = (select user.cart_id from user where email = :em) )) as 'val' from dual",nativeQuery = true)
+    Integer hasUserCartitem(@Param("em") String em,@Param("cartItemId") Integer cartItemId);
+
 	@Query(value ="select email from user where role = 2 and email_status = 0",nativeQuery = true)
 	Optional<List<String>> getAllConsumers();
 }

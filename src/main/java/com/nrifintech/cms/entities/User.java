@@ -44,24 +44,23 @@ public class User {
 	private String phoneNumber;
 	
 	private Role role = Role.User;
-	
-	private UserStatus status = UserStatus.Active;
+
+	private UserStatus status = UserStatus.InActive;
+
 	private EmailStatus emailStatus = EmailStatus.subscribed;
+  
 	private Timestamp created = new Timestamp(System.currentTimeMillis());
 	
 	@Column(unique=true)
 	@OneToMany(fetch=FetchType.LAZY)
 	private List<Order> records;
 	
-	
-	@Column(unique=true)
-	@OneToMany(fetch=FetchType.LAZY)
-	private List<Bill> bills;
+	@OneToOne(fetch=FetchType.LAZY)
+	private Wallet wallet = new Wallet();
 	
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;
 	
-	// func. impl. left
 	public String getUsername(){
 		return this.email;
 	}

@@ -32,7 +32,7 @@ public class CartService implements Validator {
 	}
 
 	public Cart getCart(Integer id) {
-		return cartRepo.findById(id).orElseThrow(()->new NotFoundException("Cart"));
+		return cartRepo.findById(id).orElseThrow(() -> new NotFoundException("Cart"));
 	}
 
 	public Cart addToCart(List<CartItemUpdateRequest> reqs, Cart cart) {
@@ -50,7 +50,7 @@ public class CartService implements Validator {
 
 			exItems.addAll(items);
 			cartItemService.saveItems(exItems);
-			
+
 			cart.setCartItems(exItems);
 		}
 
@@ -65,7 +65,8 @@ public class CartService implements Validator {
 		cartItems.clear();
 
 		ids.forEach(id -> cartItemService.deleteItem(id));
-
+		cart.getCartItems().clear();
+		cart = this.saveCart(cart);
 		return cart;
 	}
 

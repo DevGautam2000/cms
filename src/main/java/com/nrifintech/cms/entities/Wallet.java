@@ -1,37 +1,35 @@
 package com.nrifintech.cms.entities;
 
-import javax.persistence.Column;
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import com.nrifintech.cms.types.ItemType;
+import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@Getter
+@Setter
 @Entity
-public class Item {
+public class Wallet {
 
 	@Id
 	@GeneratedValue
 	private Integer id;
 
-	private Integer quantity;
-	private Double price;
-	private ItemType itemType;
-	private String imagePath = "";
+	private Double balance = 0.0;
 	
-	private String description = "";
+	@OneToMany(fetch=FetchType.EAGER)
+	private List<Transaction> transactions;
 	
-	@Column(unique=true)
-	private String name = "";
+	public void transact() {
+		this.balance = this.getBalance() - 100.0;
+	}
 }
