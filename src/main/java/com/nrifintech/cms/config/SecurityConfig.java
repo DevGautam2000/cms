@@ -106,7 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
   			
 
-
+			.antMatchers("/content/**").permitAll()
 			.anyRequest().authenticated()
 		     .and()
              .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
@@ -121,7 +121,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Bean
 	public PasswordEncoder passwordEncoder() {
 		// System.out.println("Fetching Password encoder");
-	    // return NoOpPasswordEncoder.getInstance();
 		return new BCryptPasswordEncoder();
 	}
 }
