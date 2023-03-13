@@ -56,9 +56,9 @@ public class User {
 	@OneToMany(fetch=FetchType.LAZY)
 	private List<Order> records;
 	
-	@OneToOne(fetch=FetchType.LAZY)
+	@OneToOne
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private Wallet wallet = new Wallet();
+	private Wallet wallet;
 	
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;

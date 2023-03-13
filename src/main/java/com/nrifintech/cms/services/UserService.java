@@ -7,8 +7,10 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.stereotype.Service;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.utils.Validator;
@@ -17,7 +19,10 @@ import com.nrifintech.cms.utils.Validator;
 public class UserService implements Validator {
 
 	@Autowired
-	UserRepo userRepo;
+	private UserRepo userRepo;
+	
+	@Autowired
+	private WalletService walletService;
 
 	public User getuser(String email) {
 		return userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException("User"));
@@ -31,17 +36,23 @@ public class UserService implements Validator {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
-	@Transactional
 	public User addUser(User user) {
 		User exUser = this.getExistingUser(user.getEmail());
 
+	
+		
 		
 		
 		System.out.println("USER: " + user);
 		if (isNull(exUser)) {
+			Wallet w = new Wallet();
+			w = walletService.save(w);
 			
-			exUser = userRepo.save(user);
-			System.out.println("EXUSER: " + exUser);
+			if(isNotNull(w)) {
+				user.setWallet(w); 
+				userRepo.save(user);
+				System.out.println("EXUSER: " + exUser);
+			}
 		}
 		
 		
