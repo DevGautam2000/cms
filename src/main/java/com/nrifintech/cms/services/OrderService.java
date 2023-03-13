@@ -1,6 +1,7 @@
 package com.nrifintech.cms.services;
 
 import java.sql.Timestamp;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,14 +14,15 @@ import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.OrderRepo;
-import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.utils.Validator;
 
 @Service
 public class OrderService implements Validator {
 
-	private static final Integer SERVER_LIMIT_MILLIS = 86400000;
+	private static final Integer SERVER_LIMIT_MILLIS = 86400000; //difference in millis for 1 day
+	private static final LocalTime SERVING_TIME = LocalTime.parse("07:00");
+	
 
 	@Autowired
 	private OrderRepo orderRepo;

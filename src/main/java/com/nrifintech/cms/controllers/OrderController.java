@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
+import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.TransactionService;
 import com.nrifintech.cms.services.UserService;
@@ -37,6 +39,7 @@ import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
+import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
@@ -46,6 +49,9 @@ public class OrderController {
 
 	@Autowired
 	private OrderService orderService;
+
+	@Autowired
+	private MenuService menuService;
 
 	@Autowired
 	private UserService userService;
@@ -173,12 +179,37 @@ public class OrderController {
 	@PostMapping(Route.Order.placeOrder + "/{userId}/{mealId}")
 	public Response placeOrder(@PathVariable Integer userId, @PathVariable Integer mealId) {
 
+		if (!menuService.isServingToday())
+			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+
+//		String END_TIME_STAMP = "01:00:00";
+//
+//		TODO: ???  PLACE THIS IS ADD ORDER ROUTE
+//
+//		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//
+//		LocalTime END_TIME = LocalTime.parse(END_TIME_STAMP);
+//		LocalTime NOW = LocalTime.parse(timestamp.toGMTString().split(" ")[3].trim());
+//		
+//		boolean yes = NOW.isAfter(END_TIME);
+//		
+//		System.out.println(yes);
+//
+//		return Response.setMsg("nothing", HttpStatus.OK);
+
 		if (mealId > 1)
 			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
+		
+		
+		
+		
 
 		User user = userService.getuser(userId);
 
 		if (userService.isNotNull(user)) {
+			
+			
+			
 
 			// get wallet
 
@@ -257,8 +288,6 @@ public class OrderController {
 
 		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
-	
-	
 
 	@PostMapping(Route.Order.cancelOrder + "/{orderId}")
 	public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
@@ -269,6 +298,7 @@ public class OrderController {
 
 		if (orderService.isNotNull(order)) {
 
+			//TODO : re check the server time stamp
 			Timestamp prevTimestamp = order.getOrderPlaced();
 			Timestamp currTimestamp = new Timestamp(System.currentTimeMillis());
 

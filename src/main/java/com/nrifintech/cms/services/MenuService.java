@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
@@ -14,6 +15,8 @@ import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
+import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 import com.nrifintech.cms.utils.Validator;
 
@@ -163,6 +166,24 @@ public class MenuService implements Validator {
 
 	public List<Menu> getMenuByDate(Date date) {
 		return menuRepo.findMenuByDate(date);
+	}
+
+	public Boolean isServingToday() {
+		Date date = new Date(System.currentTimeMillis());
+
+		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
+			return false;
+		}
+
+		return true;
+	}
+	
+	public Boolean isServingToday(Date date ) {
+		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
+			return false;
+		}
+
+		return true;
 	}
 
 }
