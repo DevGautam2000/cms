@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +51,9 @@ public class AuthenticationController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@ErrorHandlerImplemented(
 		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
 	@PostMapping("/generate-token")
@@ -89,7 +93,7 @@ public class AuthenticationController {
 
 	@PostMapping("change-password")
 	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
-		authService.changePassword(userInfo.getUsername(), token, userInfo.getPassword());
+		authService.changePassword(userInfo.getUsername(), token, passwordEncoder.encode(userInfo.getPassword()));
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 
@@ -106,7 +110,7 @@ public class AuthenticationController {
 
 	@PostMapping("activate-new-password")
 	public Response setNewPasswordAndActivate(@RequestParam String token, @RequestBody JwtRequest userInfo) {
-		authService.setNewPasswordAndActivate(userInfo.getUsername(), token, userInfo.getPassword());
+		authService.setNewPasswordAndActivate(userInfo.getUsername(), token, passwordEncoder.encode(userInfo.getPassword()));
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 	

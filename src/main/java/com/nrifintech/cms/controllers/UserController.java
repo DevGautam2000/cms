@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +37,8 @@ public class UserController {
 	private UserService userService;
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
-
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
 	public Response addUser(@RequestBody User user) {
@@ -44,6 +46,7 @@ public class UserController {
 		if (user.getRole().ordinal() > Role.values().length)
 			return Response.setErr("Invalid role for user.", HttpStatus.BAD_REQUEST);
 
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User u = userService.addUser(user);
 
 		if (userService.isNotNull(u))

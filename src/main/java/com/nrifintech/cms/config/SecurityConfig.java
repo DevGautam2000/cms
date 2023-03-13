@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
@@ -120,6 +121,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     @Bean
 	public PasswordEncoder passwordEncoder() {
 		// System.out.println("Fetching Password encoder");
-	    return NoOpPasswordEncoder.getInstance();
+	    // return NoOpPasswordEncoder.getInstance();
+		return new BCryptPasswordEncoder();
 	}
 }
