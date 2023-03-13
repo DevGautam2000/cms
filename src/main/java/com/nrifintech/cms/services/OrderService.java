@@ -12,6 +12,7 @@ import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.OrderRepo;
+import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.utils.Validator;
 
@@ -123,6 +124,10 @@ public class OrderService implements Validator {
 				return exItems.size() > 0 ? new Item() : null;
 		}
 		return order;
+	}
+
+	public void autoArchive(){
+		orderRepo.autoArchive();
 	}
 
 }

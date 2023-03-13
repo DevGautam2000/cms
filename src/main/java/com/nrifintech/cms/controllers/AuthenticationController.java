@@ -35,7 +35,7 @@ import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 import io.jsonwebtoken.JwtException;
 
 @RestController
-@CrossOrigin("*")
+@CrossOrigin
 @RequestMapping(Route.Authentication.prefix)
 public class AuthenticationController {
 	@Autowired

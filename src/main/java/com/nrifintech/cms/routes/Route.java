@@ -20,6 +20,8 @@ public class Route {
 		String updateStatus = "updatestatus";
 		
 		String getAllUsersForOrderByDate = "usersbydate";
+		String subscriptionToggler = "subscriptiontoggle";
+		String getEmailStatus = "getemailstatus";
 
 
 	}
@@ -96,12 +98,29 @@ public class Route {
 		String generateToken = "generate-token";
 	}
 
-	public interface Bill {
-		String prefix = "/bill/";
+	public interface Wallet {
+		String prefix = "/wallet/";
+		String getWallet = "getwallet";
+		String addMoney = "addmoney";
+	}
 
-		String getBills = "getbills";
-		String getBill = "getbill";
-		String addBill = "addbill";
+	public interface Inventory{
+		String prefix = "/inventory/";
+		String saveOne = "save/one";
+		String saveAll = "save/all";
+		String get = "get/";
+		String getByName = "get/name/";
+		String getById = "get/id/";
+		String remove = "remove/";
+		String updateQtyReq = "update/qtyreq/";
+		String updateQtyInHand = "update/qtyhand/";
+	}
+
+	public interface Purchase {
+		String prefix = "/purchase/";
+		String save = "save";
+		String get = "get/";
+		String rollback = "rollback";
 	}
 
 

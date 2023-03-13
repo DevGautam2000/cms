@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -43,23 +45,24 @@ public class User {
 	private String phoneNumber;
 	
 	private Role role = Role.User;
-	
-	private UserStatus status = UserStatus.Active;
+
+	private UserStatus status = UserStatus.InActive;
+
+	private EmailStatus emailStatus = EmailStatus.subscribed;
+  
 	private Timestamp created = new Timestamp(System.currentTimeMillis());
 	
 	@Column(unique=true)
 	@OneToMany(fetch=FetchType.LAZY)
 	private List<Order> records;
 	
-	
-	@Column(unique=true)
-	@OneToMany(fetch=FetchType.LAZY)
-	private List<Bill> bills;
+	@OneToOne
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private Wallet wallet;
 	
 	@OneToOne(fetch=FetchType.EAGER)
 	private Cart cart;
 	
-	// func. impl. left
 	public String getUsername(){
 		return this.email;
 	}

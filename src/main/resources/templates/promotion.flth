@@ -8,14 +8,10 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-  <h2>Hi, ${username} </h2> <br>
-	Welcome to Canteen Management System,<br>
-    You placed an order at ${timestamp}
+	Welcome to Canteen Management System,
   <ul>
-  <li> username : ${username}</li>
+  <li> content : ${content}</li>
   <li> time : ${timestamp}</li>
-  <li> orderid : ${orderid}</li>
-  <li> items : ${items}</li>
   </ul>
   </body>
 </html>

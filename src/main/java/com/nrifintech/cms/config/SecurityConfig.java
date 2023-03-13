@@ -2,7 +2,6 @@ package com.nrifintech.cms.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
@@ -10,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,26 +16,27 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import com.nrifintech.cms.config.guard.AccessDecisionManagerAuthorizationManagerAdapter;
 import com.nrifintech.cms.errorcontroller.ErrorController;
+import com.nrifintech.cms.errorhandler.ForbiddenAccessHandler;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.Role;
 
-
 @EnableWebSecurity
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
-    
-	@Autowired  @Lazy
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	@Lazy
 	JwtAuthenticationFilter jwtAuthenticationFilter;
 	@Autowired
 	private ErrorController handlerExceptionResolver;
 	@Autowired
 	private LogoutHandler logoutHandler;
-
 	@Autowired
 	private AccessDecisionManagerAuthorizationManagerAdapter aManagerAdapter;
     @Override
@@ -46,14 +45,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         
         return super.authenticationManagerBean();
     }
-    
-    @Override
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		return new ForbiddenAccessHandler();
+	}
+
+	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
 		
+		
+		 
 		http
-            .csrf().disable()
-            .cors().disable()
+			.cors()
+			.and()
+			.csrf().disable()
+
+			.exceptionHandling().accessDeniedHandler(accessDeniedHandler())
+			.and()
+
 			.authorizeHttpRequests()
 			.antMatchers(HttpMethod.POST,Route.Authentication.prefix+"set-new-password*").hasAnyAuthority(Role.Admin.toString())
 			.antMatchers(Route.Authentication.prefix+"**").permitAll()
@@ -70,11 +81,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 			.antMatchers(Route.Menu.prefix+Route.Menu.getByDate+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
 			.antMatchers(Route.Menu.prefix+Route.Menu.getMonthMenu).hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
 
-			.antMatchers(HttpMethod.POST,Route.Item.prefix+Route.Item.addItem).hasAnyAuthority(Role.Canteen.toString())
-			.antMatchers(Route.Item.prefix+Route.Item.getItems).hasAnyAuthority(Role.Canteen.toString(),Role.Admin.toString())
-			.antMatchers(Route.Item.prefix+Route.Item.getItem+"/*").hasAnyAuthority(Role.Canteen.toString(),Role.Admin.toString())
-			.antMatchers(HttpMethod.POST,Route.Item.prefix+Route.Item.addItems).hasAnyAuthority(Role.Canteen.toString())
-
 			.antMatchers(Route.Order.prefix+Route.Order.getOrders+"/*").hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString())
 			.antMatchers(Route.User.prefix+Route.User.getOrders+"/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object,Role.Admin.toString(),Role.Canteen.toString()))
 			//.hasAnyAuthority(Role.Admin.toString(),Role.Canteen.toString(),Role.User.toString())
@@ -83,28 +89,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 						
 			
 			.antMatchers(Route.Cart.prefix + Route.Cart.getCart+"/{cartId}").access((authentication, object) -> aManagerAdapter.preCheckUserCartId(authentication, object))
-                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.addToCart + "/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object))
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.addToCart + "/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object))
                 // .hasAnyAuthority(Role.User.toString())
-                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/inc/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object)) 
-                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/dec/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object))  
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/inc/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object)) 
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/dec/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object))  
                // .hasAnyAuthority(Role.User.toString())
-                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.remove + "/**")
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.remove + "/**")
                 .hasAnyAuthority(Role.User.toString())
-                .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.clear + "/*")
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.clear + "/*")
                 .hasAnyAuthority(Role.User.toString())
 
-
+			.antMatchers(HttpMethod.POST, Route.Item.prefix + Route.Item.addItem)
+				.hasAnyAuthority(Role.Canteen.toString())
+			.antMatchers(Route.Item.prefix + Route.Item.getItems)
+				.hasAnyAuthority(Role.Canteen.toString(), Role.Admin.toString())
+			.antMatchers(Route.Item.prefix + Route.Item.getItem + "/*")
+				.hasAnyAuthority(Role.Canteen.toString(), Role.Admin.toString())
+			.antMatchers(HttpMethod.POST, Route.Item.prefix + Route.Item.addItems)
+				.hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(HttpMethod.POST,Route.FeedBack.prefix+Route.FeedBack.addFeedback+"/{orderId}").access((authentication, object) -> aManagerAdapter.preCheckUserOrderId(authentication, object)) 
-			
-			// .antMatchers(HttpMethod.POST,Route.Bill.prefix+"/**").hasAnyAuthority(Role.User.toString())
 
-			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
-			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
-			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
-			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
-			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
-			// .antMatchers(Route.User.prefix+Route.User.getUsers).hasAnyAuthority(Role.Admin.toString())
-  			
+				// .antMatchers(HttpMethod.POST,Route.Bill.prefix+"/**").hasAnyAuthority(Role.User.toString())
 
 			.antMatchers("/content/**").permitAll()
 			.anyRequest().authenticated()
@@ -118,7 +123,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
 	}
 
-    @Bean
+	@Bean
 	public PasswordEncoder passwordEncoder() {
 		// System.out.println("Fetching Password encoder");
 		return new BCryptPasswordEncoder();

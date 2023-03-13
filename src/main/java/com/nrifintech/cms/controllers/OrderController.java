@@ -1,12 +1,10 @@
 package com.nrifintech.cms.controllers;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,18 +15,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nrifintech.cms.dtos.PlacedOrderToken;
+import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.UserService;
+import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
@@ -41,7 +41,7 @@ public class OrderController {
 
 	@Autowired
 	private OrderService orderService;
-	
+
 	@Autowired
 	private UserService userService;
 
@@ -49,8 +49,11 @@ public class OrderController {
 	private CartService cartService;
 
 	@Autowired
+	private WalletService walletService;
+
+	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
-	
+
 	@PostMapping(Route.Order.addOrders)
 	public Response addOrders(@RequestBody List<Order> orders) {
 
@@ -86,7 +89,7 @@ public class OrderController {
 			return Response.set(o, HttpStatus.OK);
 		}
 
-		return Response.setMsg("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -133,35 +136,54 @@ public class OrderController {
 		Order order = orderService.getOrder(orderId);
 
 		if (orderService.isNotNull(order)) {
-			
-			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString()) &&
-				status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString())
-					)
+
+			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())
+					&& status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString()))
 				return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
 
 			if (status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString()))
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
-			
-			order.setStatus(status[statusId]);
-			//Email here
-			orderService.saveOrder(order);
 
-			return Response.setMsg("Order " + status[statusId].toString()  + ".", HttpStatus.OK);
+			order.setStatus(status[statusId]);
+			orderService.saveOrder(order);
+			// email code
+			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
+				// this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new
+				// OrderToken(user.getEmail(), order)));
+			} else if (order.getStatus().toString().equalsIgnoreCase(Status.Cancelled.toString())) {
+				// this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new
+				// OrderToken(user.getEmail(), order)));
+			}
+
+			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
 		}
 
 		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 	}
-	
+
 	// for Canteen users to add a new order for a normal user
 		@PostMapping(Route.Order.placeOrder + "/{id}/{mealId}")
 		public Response placeOrder(@PathVariable Integer id, @PathVariable Integer mealId) {
 
-			if (mealId > 1)
-				return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
+		if (mealId > 1)
+			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
 			User user = userService.getuser(id);
 
-			if (userService.isNotNull(user)) {
+		if (userService.isNotNull(user)) {
+
+			// get wallet
+
+			Wallet wallet = user.getWallet();
+
+			if (walletService.isNotNull(wallet)) {
+
+				// check sufficient wallet amount
+
+				Boolean isPayable = walletService.checkMinimumAmount(wallet);
+
+				if (!isPayable)
+					return Response.setErr("Low wallet balance.", HttpStatus.PAYMENT_REQUIRED);
 
 				Order order = orderService.addNewOrder(MealType.values()[mealId]);
 
@@ -177,8 +199,15 @@ public class OrderController {
 					if (orderService.isNull(cartItems) || cartItems.isEmpty())
 						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
-					
 					order.setCartItems(new ArrayList<>(cartItems));
+					
+					Integer orderTotal=0;
+					
+					for(CartItem item : order.getCartItems()) {
+						Integer price = (int) (item.getPrice() * item.getQuantity());
+						orderTotal += price;	
+					};
+					
 					orderService.saveOrder(order);
 
 					user.getRecords().add(order);
@@ -189,16 +218,27 @@ public class OrderController {
 
 						user.getCart().getCartItems().clear();
 						user = userService.saveUser(user);
-						this.applicationEventPublisher.publishEvent(new PlacedOrderEvent(new PlacedOrderToken(user.getEmail(), order)));
-						return Response.set("Added new order for user.", HttpStatus.OK);
+
+						wallet = walletService.updateWallet(wallet,orderTotal);
+
+						if (walletService.isNotNull(wallet)) {
+							walletService.save(wallet);
+							this.applicationEventPublisher
+									.publishEvent(new PlacedOrderEvent(new OrderToken(user.getEmail(), order)));
+							return Response.set("Added new order for user.", HttpStatus.OK);
+						}
+
+						return Response.setErr("Error placing order.", HttpStatus.OK);
+
 					}
 
 				}
 
 			}
 
-			return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 		}
 
-		
+		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
+	}
+
 }
