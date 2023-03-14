@@ -56,7 +56,7 @@ public class AuthenticationController {
 
 	@ErrorHandlerImplemented(
 		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
-	@PostMapping("/generate-token")
+	@PostMapping(Route.Authentication.generateToken)
 	public Response generateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
 		authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
@@ -66,10 +66,13 @@ public class AuthenticationController {
 		return Response.set(new JwtResponse(token), HttpStatus.OK);
 	}
 
-	@GetMapping("current-user")
+	@GetMapping(Route.Authentication.currentUser)
 	public Response getCurrentUser(Principal principal) {
+
 		if(principal==null)throw new JwtException("Invalid Token");
+
 		User exUser = userService.getuser(principal.getName());
+
 		if (exUser.getRole().equals(Role.User)) {
 
 			Unprivileged userDto = new UserDto.Unprivileged(exUser);
@@ -81,9 +84,9 @@ public class AuthenticationController {
 		return Response.set(userDto, HttpStatus.OK);
 	}
 
-	@PostMapping("forgot-password")
+	@PostMapping(Route.Authentication.forgotPassword)
 	public Response forgotPassword(@RequestBody JwtRequest user) {
-		System.out.println(user);
+		// System.out.println(user);
 
 		authService.forgetPassword(user.getUsername());
 
@@ -91,16 +94,18 @@ public class AuthenticationController {
 
 	}
 
-	@PostMapping("change-password")
+	@PostMapping(Route.Authentication.changePassword)
 	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
+
 		authService.changePassword(userInfo.getUsername(), token, passwordEncoder.encode(userInfo.getPassword()));
+		
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 
 	
-	@PostMapping("set-new-password")
+	@PostMapping(Route.Authentication.setNewPassword)
 	public Response setNewPassword(@RequestBody JwtRequest user) {
-		System.out.println(user);
+		// System.out.println(user);
 
 		authService.setNewPassword(user.getUsername());
 
@@ -108,9 +113,11 @@ public class AuthenticationController {
 
 	}
 
-	@PostMapping("activate-new-password")
+	@PostMapping(Route.Authentication.activateNewPassword)
 	public Response setNewPasswordAndActivate(@RequestParam String token, @RequestBody JwtRequest userInfo) {
+		
 		authService.setNewPasswordAndActivate(userInfo.getUsername(), token, passwordEncoder.encode(userInfo.getPassword()));
+		
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 	

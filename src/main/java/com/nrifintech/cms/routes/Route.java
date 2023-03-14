@@ -96,6 +96,13 @@ public class Route {
 		String prefix = "/auth/";
 		
 		String generateToken = "generate-token";
+		String currentUser = "current-user";
+		String forgotPassword = "forgot-password";
+		String changePassword = "change-password";
+		String setNewPassword = "set-new-password";
+		String activateNewPassword = "activate-new-password";
+
+
 	}
 
 	public interface Wallet {
