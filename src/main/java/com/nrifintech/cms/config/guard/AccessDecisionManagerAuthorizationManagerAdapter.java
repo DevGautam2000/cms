@@ -18,6 +18,7 @@ import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
@@ -126,6 +127,24 @@ public class AccessDecisionManagerAuthorizationManagerAdapter {//implements Auth
     }
     // @Override
     // public AuthorizationDecision check(Supplier authentication, RequestAuthorizationContext object) {
+
+    public AuthorizationDecision preCheckUserWalletId(Supplier<Authentication> authentication, RequestAuthorizationContext object,String... auths) {
+        boolean flag= false;
+        UsernamePasswordAuthenticationToken upt= (UsernamePasswordAuthenticationToken) authentication.get();
+        //if user has authority of auths
+        for(String i : auths)       
+            if(upt.getAuthorities().stream().anyMatch((e)->e.getAuthority().equals(i)))
+                flag=true;
+
+        String email=upt.getName();
+        int walletId= Integer.parseInt(object.getVariables().get("walletId"));
+        //is walletId is associated with email
+        Wallet wallet = uService.getuser(email).getWallet();
+        if(wallet==null  || wallet.getId()!=walletId)return new AuthorizationDecision(false); 
+     
+        //email in principal & id are same && email is of  Type User || email has authority of auths 
+        return new AuthorizationDecision(/*cart.getId()==cartId &&*/ upt.getAuthorities().stream().anyMatch((e)->e.getAuthority().equals("User")) || flag);
+    }
         
     //     UsernamePasswordAuthenticationToken upt= (UsernamePasswordAuthenticationToken) authentication.get();
     //     System.out.println("hi**********************");
