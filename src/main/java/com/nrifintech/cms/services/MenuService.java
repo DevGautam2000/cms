@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -165,7 +166,12 @@ public class MenuService implements Validator {
 	}
 
 	public List<Menu> getMenuByDate(Date date) {
-		return menuRepo.findMenuByDate(date);
+		List<Menu> menus = menuRepo
+				.findMenuByDate(date)
+				.stream().filter( m ->
+						m.getApproval()
+						.equals(Approval.Approved)).collect(Collectors.toList());
+		return menus;
 	}
 
 	public Boolean isServingToday() {
