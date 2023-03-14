@@ -90,6 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.POST, Route.Order.prefix + Route.FeedBack.addFeedback + "/*")
 				.hasAnyAuthority(Role.User.toString())
 
+				.antMatchers(Route.Cart.prefix + Route.Cart.getCart + "/*").hasAnyAuthority(Role.User.toString())
 				.antMatchers(Route.Cart.prefix + Route.Cart.getCart).hasAnyAuthority(Role.User.toString())
 				.antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.addToCart + "/*")
 				.hasAnyAuthority(Role.User.toString())
