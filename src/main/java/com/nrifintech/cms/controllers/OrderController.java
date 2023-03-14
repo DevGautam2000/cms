@@ -4,7 +4,9 @@ import java.security.Principal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
+import com.nrifintech.cms.types.Global;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.Transaction;
@@ -181,42 +184,36 @@ public class OrderController {
 
 		if (!menuService.isServingToday())
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+//		***********************************************
 
-//		String END_TIME_STAMP = "01:00:00";
-//
-//		TODO: ???  PLACE THIS IS ADD ORDER ROUTE
-//
-//		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//
-//		LocalTime END_TIME = LocalTime.parse(END_TIME_STAMP);
-//		LocalTime NOW = LocalTime.parse(timestamp.toGMTString().split(" ")[3].trim());
-//		
-//		boolean yes = NOW.isAfter(END_TIME);
-//		
-//		System.out.println(yes);
-//
-//		return Response.setMsg("nothing", HttpStatus.OK);
+		// Get the current date and time
+		LocalDateTime currentDateTime = LocalDateTime.now();
+
+		// Get the time at 8:00 PM | 20:00 on the same day
+		LocalDateTime cutoffDateTime = LocalDateTime.of(currentDateTime.toLocalDate(),
+				LocalTime.of(Global.PLACE_ORDER_FREEZE_TIME, 0));
+
+		// Check if the current time is before 8:00 PM on the same day
+		if (!currentDateTime.isBefore(cutoffDateTime)) {
+			return Response.setErr("Order cannot be placed after " + Global.PLACE_ORDER_FREEZE_TIME + ".",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
+//		************************************************
 
 		if (mealId > 1)
 			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
-		
-		
-		
-		
 
 		User user = userService.getuser(userId);
 
 		if (userService.isNotNull(user)) {
-			
-			
-			
 
 			// get wallet
 
 			Wallet wallet = user.getWallet();
 
 			if (walletService.isNotNull(wallet)) {
-
+System.out.println("wallet here");
 				// check sufficient wallet amount
 
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
@@ -296,51 +293,64 @@ public class OrderController {
 
 		Order order = orderService.getOrder(orderId);
 
+		// order cancellation is 12 pm
+
 		if (orderService.isNotNull(order)) {
 
-			//TODO : re check the server time stamp
-			Timestamp prevTimestamp = order.getOrderPlaced();
-			Timestamp currTimestamp = new Timestamp(System.currentTimeMillis());
+			if (user.getRecords().contains(order)) {
 
-			Boolean isServicable = orderService.getServerEpoch(prevTimestamp, currTimestamp);
+				
+				if (order.getStatus().equals(Status.Cancelled))
+					return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+				
+				if (!order.getStatus().equals(Status.Pending))
+					return Response.setErr("Order cannot be cancelled.", HttpStatus.BAD_REQUEST);
 
-			if (isServicable) {
-				if (user.getRecords().contains(order)) {
+//					***********************************************
 
-					// refund back to wallet
+				// Get the creation date and time from the database table or file
+				Timestamp creationDateTime = order.getOrderPlaced();
 
-					if (order.getStatus().equals(Status.Cancelled))
-						return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+				// Get the current date and time
+				LocalDateTime currentDateTime = LocalDateTime.now();
 
-					Transaction transaction = order.getTransaction();
+				// Add one day to the creation date and time and set the time to 12:00 AM
+				LocalDateTime nextDay = creationDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+						.plusDays(1).with(Global.CANCEL_ORDER_FREEZE_TIME);
 
-					Wallet wallet = user.getWallet();
-
-					if (walletService.isNotNull(wallet)) {
-
-						if (wallet.getTransactions().contains(transaction)) {
-
-							wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
-
-							// cancle the order
-							order.setStatus(Status.Cancelled);
-							order = orderService.saveOrder(order);
-
-							if (orderService.isNotNull(order))
-								return Response.setMsg("Order Cancelled.", HttpStatus.OK);
-						}
-
-					}
-
-					return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
+				// Check if the current date and time is after 12:00 AM on the next day
+				if (currentDateTime.isAfter(nextDay)) {
+					return Response.setErr("Order cannot be cancelled.", HttpStatus.NOT_ACCEPTABLE);
 				}
 
-				return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
+//					************************************************
 
+				// refund back to wallet
+
+				Transaction transaction = order.getTransaction();
+
+				Wallet wallet = user.getWallet();
+
+				if (walletService.isNotNull(wallet)) {
+
+					if (wallet.getTransactions().contains(transaction)) {
+
+						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+
+						// cancle the order
+						order.setStatus(Status.Cancelled);
+						order = orderService.saveOrder(order);
+
+						if (orderService.isNotNull(order))
+							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+					}
+
+				}
+
+				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
 			}
 
-			return Response.setErr("Order cannot be cancelled.", HttpStatus.NOT_ACCEPTABLE);
-
+			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
 		}
 
 		return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
