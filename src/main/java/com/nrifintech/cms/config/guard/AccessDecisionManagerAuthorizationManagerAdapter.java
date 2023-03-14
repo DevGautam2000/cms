@@ -2,6 +2,8 @@ package com.nrifintech.cms.config.guard;
 
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,15 +112,15 @@ public class AccessDecisionManagerAuthorizationManagerAdapter {//implements Auth
         String email=upt.getName();
         int cartId= Integer.parseInt(object.getVariables().get("cartId"));
         int cartItemId= Integer.parseInt(object.getVariables().get("itemId"));
-        
+        System.out.println(cartId+"+"+cartItemId);
         //is cartId is associated with email
         Cart cart = uService.getuser(email).getCart();
         if(cart==null  || cart.getId()!=cartId)return new AuthorizationDecision(false); 
-        
+        System.out.println("success-1"+cart);
         //is cartItemId is associated with cart
-        CartItem cartItem = cart.getCartItems().get(cartItemId);
+        CartItem cartItem = cart.getCartItems().stream().filter((e)->e.getId()==cartItemId).findAny().orElse(null);// .collect(Collectors.toList()). ;
         if(cartItem==null || cartItem.getId()!=cartItemId)return new AuthorizationDecision(false);
-        
+        System.out.println("success");
         //email in principal & id are same && email is of  Type User || email has authority of auths 
         return new AuthorizationDecision(/*cart.getId()==cartId &&*/ upt.getAuthorities().stream().anyMatch((e)->e.getAuthority().equals("User")) || flag);
     }
