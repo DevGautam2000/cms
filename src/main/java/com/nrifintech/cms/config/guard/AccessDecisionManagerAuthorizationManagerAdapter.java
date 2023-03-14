@@ -13,6 +13,7 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import org.springframework.stereotype.Component;
 
 import com.nrifintech.cms.entities.Cart;
+import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.repositories.UserRepo;
@@ -50,7 +51,6 @@ public class AccessDecisionManagerAuthorizationManagerAdapter {//implements Auth
 
         String email=upt.getName();
         int id= Integer.parseInt(object.getVariables().get("itemId"));
-        System.out.println("*******************");
 
         //email in principal & id are same && email is of Type User || email has authority of auths 
         return new AuthorizationDecision(uService.hasUserCartitem(email, id) && 
@@ -68,7 +68,7 @@ public class AccessDecisionManagerAuthorizationManagerAdapter {//implements Auth
 
         String email=upt.getName();
         int id= Integer.parseInt(object.getVariables().get("cartId"));
-        System.out.println("*******************");
+
         Cart cart = uService.getuser(email).getCart();
         if(cart==null)return new AuthorizationDecision(false);
         
@@ -87,7 +87,7 @@ public class AccessDecisionManagerAuthorizationManagerAdapter {//implements Auth
 
         String email=upt.getName();
         int id= Integer.parseInt(object.getVariables().get("orderId"));
-        System.out.println("*******************");
+        
         List<Order> rec = uService.getuser(email).getRecords();
         if(rec.isEmpty())return new AuthorizationDecision(false);
         
@@ -97,6 +97,30 @@ public class AccessDecisionManagerAuthorizationManagerAdapter {//implements Auth
         }
         //email in principal & id are same && email is of  Type User || email has authority of auths 
         return new AuthorizationDecision(hasOrder && upt.getAuthorities().stream().anyMatch((e)->e.getAuthority().equals("User")) || flag);
+    }
+
+    public AuthorizationDecision preCheckUserCartIdAndCartItemId(Supplier authentication, RequestAuthorizationContext object,String... auths) {
+        boolean flag= false;
+        UsernamePasswordAuthenticationToken upt= (UsernamePasswordAuthenticationToken) authentication.get();
+        //if user has authority of auths
+        for(String i : auths)       
+            if(upt.getAuthorities().stream().anyMatch((e)->e.getAuthority().equals(i)))
+                flag=true;
+
+        String email=upt.getName();
+        int cartId= Integer.parseInt(object.getVariables().get("cartId"));
+        int cartItemId= Integer.parseInt(object.getVariables().get("itemId"));
+        
+        //is cartId is associated with email
+        Cart cart = uService.getuser(email).getCart();
+        if(cart==null  || cart.getId()!=cartId)return new AuthorizationDecision(false); 
+        
+        //is cartItemId is associated with cart
+        CartItem cartItem = cart.getCartItems().get(cartItemId);
+        if(cartItem==null || cartItem.getId()!=cartItemId)return new AuthorizationDecision(false);
+        
+        //email in principal & id are same && email is of  Type User || email has authority of auths 
+        return new AuthorizationDecision(/*cart.getId()==cartId &&*/ upt.getAuthorities().stream().anyMatch((e)->e.getAuthority().equals("User")) || flag);
     }
     // @Override
     // public AuthorizationDecision check(Supplier authentication, RequestAuthorizationContext object) {

@@ -89,8 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.addToCart + "/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object))
             .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/inc/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object)) 
             .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.updateQuantity + "/dec/{itemId}/{factor}").access((authentication, object) -> aManagerAdapter.preCheckHasUserCartitem(authentication, object))  
-            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.remove + "/{cartId}/{itemId}").hasAnyAuthority(Role.User.toString())//TODO
-            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.clear + "/{cartId}/{itemId}").hasAnyAuthority(Role.User.toString())//TODO
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.remove + "/{cartId}/{itemId}").access((authentication, object) -> aManagerAdapter.preCheckUserCartIdAndCartItemId(authentication, object))//TODO: testing left
+            .antMatchers(HttpMethod.POST, Route.Cart.prefix + Route.Cart.clear + "/{cartId}/{itemId}").access((authentication, object) -> aManagerAdapter.preCheckUserCartIdAndCartItemId(authentication, object))//TODO: testing left
 
 			.antMatchers(HttpMethod.POST, Route.Item.prefix + Route.Item.addItem).hasAnyAuthority(Role.Canteen.toString())
 			.antMatchers(Route.Item.prefix + Route.Item.getItems).hasAnyAuthority(Role.Canteen.toString(), Role.Admin.toString())
