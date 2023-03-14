@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -145,6 +146,21 @@ public class CartController {
 		Cart cart = cartService.getCart(cartId);
 		return Response.set(cart, HttpStatus.OK);
 
+	}
+
+	@GetMapping(Route.Cart.getCart)
+	public Response getCart(Principal principal) {
+
+		User user = userService.getuser(principal.getName());
+
+		if (userService.isNotNull(user.getCart())) {
+
+			Cart cart = user.getCart();
+			return Response.set(cart, HttpStatus.OK);
+
+		}
+
+		return Response.setErr("Cart does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
 	}
 
 }
