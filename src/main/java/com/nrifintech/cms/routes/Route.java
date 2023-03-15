@@ -135,7 +135,11 @@ public class Route {
 	public interface Analytics{
 		String prefix = "/analytics/";
 		String getTotalExp = "totalexp";
-		String getDateWise = "datebydateexp";
+		String getDateWiseExp = "datebydateexp";
+		String getTotalSales = "totalsales";
+		String getDateWiseSales = "datebydatesales";
+		String getBestSeller = "bestseller";
+		String getOrderStats = "orderstats";
 	}
 
 
