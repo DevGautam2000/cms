@@ -39,7 +39,7 @@ public class Route {
 
 		String getByDate = "getbydate";
 
-		String submitMenu = "sumitmenu";
+		String submitMenu = "submitmenu";
 	}
 
 	public interface Item {
