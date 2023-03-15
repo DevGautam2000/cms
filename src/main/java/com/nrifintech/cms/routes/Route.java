@@ -127,7 +127,13 @@ public class Route {
 		String prefix = "/purchase/";
 		String save = "save";
 		String get = "get/";
-		String rollback = "rollback";
+		String rollback = "rollback/";
+	}
+
+	public interface Analytics{
+		String prefix = "/analytics/";
+		String getTotalExp = "totalexp";
+		String getDateWise = "datebydateexp";
 	}
 
 
