@@ -1,6 +1,12 @@
 package com.nrifintech.cms.controllers;
 
+import java.security.Principal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,19 +25,24 @@ import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
+import com.nrifintech.cms.types.Global;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
+import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
+import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.services.OrderService;
+import com.nrifintech.cms.services.TransactionService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
+import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
@@ -43,6 +54,9 @@ public class OrderController {
 	private OrderService orderService;
 
 	@Autowired
+	private MenuService menuService;
+
+	@Autowired
 	private UserService userService;
 
 	@Autowired
@@ -50,6 +64,9 @@ public class OrderController {
 
 	@Autowired
 	private WalletService walletService;
+
+	@Autowired
+	private TransactionService transactionService;
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
@@ -165,6 +182,25 @@ public class OrderController {
 		@PostMapping(Route.Order.placeOrder + "/{id}/{mealId}")
 		public Response placeOrder(@PathVariable Integer id, @PathVariable Integer mealId) {
 
+		if (!menuService.isServingToday())
+			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+//		***********************************************
+
+		// Get the current date and time
+		LocalDateTime currentDateTime = LocalDateTime.now();
+
+		// Get the time at 8:00 PM | 20:00 on the same day
+		LocalDateTime cutoffDateTime = LocalDateTime.of(currentDateTime.toLocalDate(),
+				LocalTime.of(Global.PLACE_ORDER_FREEZE_TIME, 0));
+
+		// Check if the current time is before 8:00 PM on the same day
+		if (!currentDateTime.isBefore(cutoffDateTime)) {
+			return Response.setErr("Order cannot be placed after " + Global.PLACE_ORDER_FREEZE_TIME + ".",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
+//		************************************************
+
 		if (mealId > 1)
 			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
@@ -177,7 +213,7 @@ public class OrderController {
 			Wallet wallet = user.getWallet();
 
 			if (walletService.isNotNull(wallet)) {
-
+System.out.println("wallet here");
 				// check sufficient wallet amount
 
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
@@ -200,14 +236,15 @@ public class OrderController {
 						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
 					order.setCartItems(new ArrayList<>(cartItems));
-					
-					Integer orderTotal=0;
-					
-					for(CartItem item : order.getCartItems()) {
+
+					Integer orderTotal = 0;
+
+					for (CartItem item : order.getCartItems()) {
 						Integer price = (int) (item.getPrice() * item.getQuantity());
-						orderTotal += price;	
-					};
-					
+						orderTotal += price;
+					}
+					;
+
 					orderService.saveOrder(order);
 
 					user.getRecords().add(order);
@@ -219,13 +256,21 @@ public class OrderController {
 						user.getCart().getCartItems().clear();
 						user = userService.saveUser(user);
 
-						wallet = walletService.updateWallet(wallet,orderTotal);
+						List<Object> orderObjects = walletService.updateWallet(wallet, orderTotal);
 
-						if (walletService.isNotNull(wallet)) {
+						wallet = (Wallet) orderObjects.get(0);
+						Transaction transaction = (Transaction) orderObjects.get(1);
+
+						if (walletService.isNotNull(wallet) && transactionService.isNotNull(transaction)) {
+
+							order.setTransaction(transaction);
+							orderService.saveOrder(order);
+
 							walletService.save(wallet);
+
 							this.applicationEventPublisher
 									.publishEvent(new PlacedOrderEvent(new OrderToken(user.getEmail(), order)));
-							return Response.set("Added new order for user.", HttpStatus.OK);
+							return Response.setMsg("Added new order for user.", HttpStatus.OK);
 						}
 
 						return Response.setErr("Error placing order.", HttpStatus.OK);
@@ -235,10 +280,80 @@ public class OrderController {
 				}
 
 			}
-
+			return Response.setErr("Wallet not found.", HttpStatus.BAD_REQUEST);
 		}
 
 		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
 
+	@PostMapping(Route.Order.cancelOrder + "/{orderId}")
+	public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
+
+		User user = userService.getuser(principal.getName());
+
+		Order order = orderService.getOrder(orderId);
+
+		// order cancellation is 12 pm
+
+		if (orderService.isNotNull(order)) {
+
+			if (user.getRecords().contains(order)) {
+
+				
+				if (order.getStatus().equals(Status.Cancelled))
+					return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+				
+				if (!order.getStatus().equals(Status.Pending))
+					return Response.setErr("Order cannot be cancelled.", HttpStatus.BAD_REQUEST);
+
+//					***********************************************
+
+				// Get the creation date and time from the database table or file
+				Timestamp creationDateTime = order.getOrderPlaced();
+
+				// Get the current date and time
+				LocalDateTime currentDateTime = LocalDateTime.now();
+
+				// Add one day to the creation date and time and set the time to 12:00 AM
+				LocalDateTime nextDay = creationDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+						.plusDays(1).with(Global.CANCEL_ORDER_FREEZE_TIME);
+
+				// Check if the current date and time is after 12:00 AM on the next day
+				if (currentDateTime.isAfter(nextDay)) {
+					return Response.setErr("Order cannot be cancelled.", HttpStatus.NOT_ACCEPTABLE);
+				}
+
+//					************************************************
+
+				// refund back to wallet
+
+				Transaction transaction = order.getTransaction();
+
+				Wallet wallet = user.getWallet();
+
+				if (walletService.isNotNull(wallet)) {
+
+					if (wallet.getTransactions().contains(transaction)) {
+
+						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+
+						// cancle the order
+						order.setStatus(Status.Cancelled);
+						order = orderService.saveOrder(order);
+
+						if (orderService.isNotNull(order))
+							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+					}
+
+				}
+
+				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
+			}
+
+			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
+		}
+
+		return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
+
+	}
 }

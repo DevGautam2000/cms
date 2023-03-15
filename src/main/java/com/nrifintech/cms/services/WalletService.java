@@ -1,5 +1,7 @@
 package com.nrifintech.cms.services;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +45,7 @@ public class WalletService implements Validator {
 		return walletRepo.save(w);
 	}
 
-	public Wallet updateWallet(Wallet w, Integer amount) {
+	public List<Object> updateWallet(Wallet w, Integer amount) {
 		w.setBalance(w.getBalance() - amount);
 
 		Transaction t = transactionService.add(new Transaction(amount, TransactionType.Withdrawl));
@@ -54,7 +56,7 @@ public class WalletService implements Validator {
 			w.getTransactions().add(t);
 		}
 
-		return w;
+		return Arrays.asList(w,t);
 	}
 
 	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token) {
@@ -103,6 +105,22 @@ public class WalletService implements Validator {
 
 	public Wallet getWallet(Integer walletId) {
 		return walletRepo.findById(walletId).orElseThrow(() -> new NotFoundException("Wallet"));
+	}
+	
+	
+	public Wallet refundToWallet(Wallet wallet, Integer amount,Integer orderId) {
+		
+		
+		wallet.setBalance(wallet.getBalance() + amount);
+		Transaction t = transactionService.add(new Transaction(amount, TransactionType.Deposit));
+		t.setRemarks("refunded for orderId: " + orderId);
+		t.setReferenceNumber(UUID.randomUUID().toString());
+
+		if (transactionService.isNotNull(t)) {
+			wallet.getTransactions().add(t);
+		}
+		
+		return wallet;
 	}
 
 }

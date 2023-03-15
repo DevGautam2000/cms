@@ -22,8 +22,16 @@ public class ItemService implements Validator {
 	@Autowired
 	private CartItemRepo cartItemRepo;
 	// add a food
-	public Item addItem(Item item) {
-		return itemRepo.save(item);
+	public Item addItem(Item i) {
+		
+		List<Item> items = this.getItems();
+		
+		for(Item item : items) {
+			if(item.getName().trim().equalsIgnoreCase(i.getName().trim()))
+				return null;
+		}
+		
+		return itemRepo.save(i);
 	}
 	
 

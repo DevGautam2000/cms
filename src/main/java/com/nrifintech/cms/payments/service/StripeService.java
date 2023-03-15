@@ -1,6 +1,5 @@
 package com.nrifintech.cms.payments.service;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import com.stripe.Stripe;
 import com.stripe.model.Charge;
 import com.stripe.model.Coupon;
 import com.stripe.model.Customer;
+import com.stripe.model.Refund;
 import com.stripe.model.Subscription;
 
 @Service
@@ -73,22 +73,22 @@ public class StripeService {
 		}
 		return subscriptionId;
 	}
-	
+
 	public boolean cancelSubscription(String subscriptionId) {
-		
+
 		boolean subscriptionStatus;
-		
+
 		try {
 			Subscription subscription = Subscription.retrieve(subscriptionId);
 			subscription.cancel();
-			subscriptionStatus = true;	
+			subscriptionStatus = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 			subscriptionStatus = false;
 		}
 		return subscriptionStatus;
 	}
-	
+
 	public Coupon retriveCoupon(String code) {
 		try {
 			Stripe.apiKey = API_SECET_KEY;
@@ -98,23 +98,23 @@ public class StripeService {
 		}
 		return null;
 	}
-	
+
 	public String createCharge(String email, String token, int amount) {
-		
+
 		String chargeId = null;
-		
+
 		try {
 			Stripe.apiKey = API_SECET_KEY;
-			
+
 			Map<String, Object> chargeParams = new HashMap<>();
-			chargeParams.put("description","Charge for "+email);
-			chargeParams.put("currency","inr");
-			chargeParams.put("amount",amount*100);
-			chargeParams.put("source",token);
-			
+			chargeParams.put("description", "Charge for " + email);
+			chargeParams.put("currency", "inr");
+			chargeParams.put("amount", amount * 100);
+			chargeParams.put("source", token);
+
 			Charge charge = Charge.create(chargeParams);
-			
-		    chargeId = charge.getId();	
+
+			chargeId = charge.getId();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -122,4 +122,3 @@ public class StripeService {
 	}
 
 }
-
