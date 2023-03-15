@@ -49,7 +49,6 @@ public class MenuController {
 
 	}
 
-	// TODO: route for menu submission use principal also add to sec config
 	@PostMapping(Route.Menu.submitMenu + "/{id}")
 	public Response sumitMenu(@PathVariable Integer id, Principal principal) {
 
@@ -60,9 +59,13 @@ public class MenuController {
 			Menu menu = menuService.getMenu(id);
 
 			if (menuService.isNotNull(menu)) {
-				
-				if(!menu.getApproval().equals(Approval.Incomplete))
-					return Response.setErr("Menu already "+menu.getApproval().toString().toLowerCase() + ".", HttpStatus.INTERNAL_SERVER_ERROR);
+
+				if (menu.getItems().isEmpty())
+					return Response.setErr("Menu has no items added.", HttpStatus.BAD_REQUEST);
+
+				if (!menu.getApproval().equals(Approval.Incomplete))
+					return Response.setErr("Menu already " + menu.getApproval().toString().toLowerCase() + ".",
+							HttpStatus.INTERNAL_SERVER_ERROR);
 
 				menu.setApproval(Approval.Pending);
 				menu = menuService.saveMenu(menu);
