@@ -50,7 +50,7 @@ public class MenuController {
 	}
 
 	// TODO: route for menu submission use principal also add to sec config
-	@PostMapping(Route.Menu.sumitMenu + "/{id}")
+	@PostMapping(Route.Menu.submitMenu + "/{id}")
 	public Response sumitMenu(@PathVariable Integer id, Principal principal) {
 
 		User user = userService.getuser(principal.getName());
