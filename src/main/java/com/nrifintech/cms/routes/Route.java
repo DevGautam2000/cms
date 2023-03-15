@@ -98,12 +98,38 @@ public class Route {
 		String prefix = "/auth/";
 		
 		String generateToken = "generate-token";
+		String currentUser = "current-user";
+		String forgotPassword = "forgot-password";
+		String changePassword = "change-password";
+		String setNewPassword = "set-new-password";
+		String activateNewPassword = "activate-new-password";
+
+
 	}
 
 	public interface Wallet {
 		String prefix = "/wallet/";
 		String getWallet = "getwallet";
 		String addMoney = "addmoney";
+	}
+
+	public interface Inventory{
+		String prefix = "/inventory/";
+		String saveOne = "save/one";
+		String saveAll = "save/all";
+		String get = "get/";
+		String getByName = "get/name/";
+		String getById = "get/id/";
+		String remove = "remove/";
+		String updateQtyReq = "update/qtyreq/";
+		String updateQtyInHand = "update/qtyhand/";
+	}
+
+	public interface Purchase {
+		String prefix = "/purchase/";
+		String save = "save";
+		String get = "get/";
+		String rollback = "rollback";
 	}
 
 

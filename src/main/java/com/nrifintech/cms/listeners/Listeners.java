@@ -57,7 +57,7 @@ public class Listeners {
         body.put("username",user.getEmail());
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
 
-        EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome-email.flth");
+        EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome.flth");//"welcome-email.flth");
         this.smtpServices.sendMail(email);
     }
 

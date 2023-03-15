@@ -179,8 +179,8 @@ public class OrderController {
 	}
 
 	// for Canteen users to add a new order for a normal user
-	@PostMapping(Route.Order.placeOrder + "/{userId}/{mealId}")
-	public Response placeOrder(@PathVariable Integer userId, @PathVariable Integer mealId) {
+		@PostMapping(Route.Order.placeOrder + "/{id}/{mealId}")
+		public Response placeOrder(@PathVariable Integer id, @PathVariable Integer mealId) {
 
 		if (!menuService.isServingToday())
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
@@ -204,7 +204,7 @@ public class OrderController {
 		if (mealId > 1)
 			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
-		User user = userService.getuser(userId);
+			User user = userService.getuser(id);
 
 		if (userService.isNotNull(user)) {
 

@@ -32,9 +32,14 @@ public class WalletController {
 	private UserService userService;
 
 	@GetMapping(Route.Wallet.getWallet +"/{walletId}")
-	public Response getWallet(@PathVariable Integer walletId) {
+	public Response getWallet(@PathVariable Integer walletId,Principal principal) {
+		User user = userService.getuser(principal.getName());
 		
+		Wallet wallet = walletService.getWallet(user.getWallet().getId());
 		Wallet w = walletService.getWallet(walletId);
+
+		if(w.getId() != wallet.getId())
+		return Response.setErr("Wallet does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
 		
 		return Response.set(w, HttpStatus.OK);
 	}
@@ -46,8 +51,6 @@ public class WalletController {
 		
 		Wallet w = walletService.getWallet(user.getWallet().getId());
 		
-		System.out.println(w);
-		System.out.println(user);
 		
 		String chargeId = walletService.addMoneyToWallet(user.getEmail(),w,amount,token.getToken());
 		
