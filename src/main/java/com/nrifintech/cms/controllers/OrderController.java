@@ -213,13 +213,13 @@ public class OrderController {
 			Wallet wallet = user.getWallet();
 
 			if (walletService.isNotNull(wallet)) {
-System.out.println("wallet here");
+
 				// check sufficient wallet amount
 
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
 				if (!isPayable)
-					return Response.setErr("Low wallet balance.", HttpStatus.PAYMENT_REQUIRED);
+					return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 
 				Order order = orderService.addNewOrder(MealType.values()[mealId]);
 
@@ -243,7 +243,12 @@ System.out.println("wallet here");
 						Integer price = (int) (item.getPrice() * item.getQuantity());
 						orderTotal += price;
 					}
-					;
+					
+					
+					if(orderTotal < wallet.getBalance()) {
+						return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
+					}
+					
 
 					orderService.saveOrder(order);
 

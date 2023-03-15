@@ -17,6 +17,7 @@ import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.Status;
 import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 import com.nrifintech.cms.utils.Validator;
@@ -31,7 +32,11 @@ public class MenuService implements Validator {
 	private ItemService itemService;
 
 	public Menu addMenu(Menu menu) {
+		return menuRepo.save(menu);
 
+	}
+
+	public Menu saveMenu(Menu menu) {
 		return menuRepo.save(menu);
 
 	}
@@ -43,7 +48,9 @@ public class MenuService implements Validator {
 	}
 
 	public List<Menu> getAllMenu() {
-		return menuRepo.findAll();
+		List<Menu> menus = menuRepo.findAll().stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
+				.collect(Collectors.toList());
+		return menus;
 	}
 
 	public Optional<Menu> removeMenu(Integer menuId) {
@@ -166,11 +173,8 @@ public class MenuService implements Validator {
 	}
 
 	public List<Menu> getMenuByDate(Date date) {
-		List<Menu> menus = menuRepo
-				.findMenuByDate(date)
-				.stream().filter( m ->
-						m.getApproval()
-						.equals(Approval.Approved)).collect(Collectors.toList());
+		List<Menu> menus = menuRepo.findMenuByDate(date).stream().filter(m -> m.getApproval().equals(Approval.Approved))
+				.collect(Collectors.toList());
 		return menus;
 	}
 
@@ -183,8 +187,8 @@ public class MenuService implements Validator {
 
 		return true;
 	}
-	
-	public Boolean isServingToday(Date date ) {
+
+	public Boolean isServingToday(Date date) {
 		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
 			return false;
 		}
