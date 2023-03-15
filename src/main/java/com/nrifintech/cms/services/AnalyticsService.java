@@ -1,5 +1,7 @@
 package com.nrifintech.cms.services;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
@@ -58,14 +60,14 @@ public class AnalyticsService {
      //get bestSeller
      public List<BestSellerResponse> getBestSeller(String date1 , String date2){
         List<Tuple> resTup = ( this.cartItemRepo.getBestSeller(date1, date2) );
-        List<BestSellerResponse> result = resTup.stream().map(t->new BestSellerResponse(t.get(0, String.class), t.get(1, Integer.class))).collect(Collectors.toList());
+        List<BestSellerResponse> result = resTup.stream().map(t->new BestSellerResponse(t.get(0, String.class), t.get(1, BigDecimal.class))).collect(Collectors.toList());
         return( result );
     }
 
     //get order status stats
     public List<OrderStatusReport> getStatusReport(String date1 , String date2){
         List<Tuple> resTup = this.orderRepo.getOrderStats(date1, date2);
-        List<OrderStatusReport> result = resTup.stream().map(t->new OrderStatusReport( Status.values()[t.get(0,Integer.class)] , t.get(1,Integer.class) )).collect(Collectors.toList());
+        List<OrderStatusReport> result = resTup.stream().map(t->new OrderStatusReport( Status.values()[(t.get(0,Integer.class))] , t.get(1,BigInteger.class) )).collect(Collectors.toList());
         return(result);
     }
 
