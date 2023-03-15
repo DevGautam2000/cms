@@ -123,5 +123,11 @@ public class Route {
 		String rollback = "rollback/";
 	}
 
+	public interface Analytics{
+		String prefix = "/analytics/";
+		String getTotalExp = "totalexp";
+		String getDateWise = "datebydateexp";
+	}
+
 
 }
