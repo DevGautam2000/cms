@@ -50,8 +50,7 @@ public class WalletController {
 		User user = userService.getuser(principal.getName());
 		
 		Wallet w = walletService.getWallet(user.getWallet().getId());
-		
-		
+
 		String chargeId = walletService.addMoneyToWallet(user.getEmail(),w,amount,token.getToken());
 		
 		if(chargeId!=null && chargeId.length() > 0) {
