@@ -30,6 +30,8 @@ public class Item {
 	private ItemType itemType;
 	private String imagePath = "";
 	
+	private String description = "";
+	
 	@Column(unique=true)
 	private String name = "";
 }

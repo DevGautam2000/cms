@@ -3,12 +3,12 @@ package com.nrifintech.cms.utils;
 import java.util.HashMap;
 import java.util.Map;
 
-enum WeekDay {
-	Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday
-}
+import com.nrifintech.cms.types.WeekDay;
 
-public class Calender {
 
+public class Calendar {
+
+	public static WeekDay WEEKDAY;
 	public static Map<WeekDay, Integer> days = new HashMap<>();
 
 	static {

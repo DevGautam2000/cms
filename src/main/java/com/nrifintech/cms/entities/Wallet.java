@@ -1,27 +1,34 @@
 package com.nrifintech.cms.entities;
 
-import java.sql.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Entity
-public class Bill {
+public class Wallet {
 
 	@Id
 	@GeneratedValue
 	private Integer id;
+
+	private Double balance = 0.0;
 	
-	private Double due;
-	private Double totalExpenditure;
-	private Date nextCycle;
+	@OneToMany
+	private List<Transaction> transactions;
+	
 	
 }

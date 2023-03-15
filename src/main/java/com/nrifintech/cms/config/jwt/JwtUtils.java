@@ -47,6 +47,11 @@ public class JwtUtils {
 	        return createToken(claims, userDetails.getUsername(),10);
 	    }
 
+		public String generateNewPasswordToken(UserDetails userDetails) {
+	        Map<String, Object> claims = new HashMap<>();
+	        return createToken(claims, userDetails.getUsername(),60*24);
+	    }
+
 	    private String createToken(Map<String, Object> claims, String subject,long min) {
 
 	    	System.out.println("s: ");
@@ -59,7 +64,8 @@ public class JwtUtils {
 
 	    public Boolean validateToken(String token, UserDetails userDetails) {
 	        final String username = extractUsername(token);
-			System.out.println("In validateToken "+userDetails);
+			System.out.println("In validateToken "+userDetails+" =="+(username.equals(userDetails.getUsername()) && !isTokenExpired(token)));
+
 	        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	    }
 }

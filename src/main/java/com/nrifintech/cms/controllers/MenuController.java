@@ -14,15 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
-import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
 @RestController
@@ -113,8 +112,12 @@ public class MenuController {
 		return Response.setErr("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	@SuppressWarnings("deprecation")
 	@GetMapping(Route.Menu.getByDate + "/{date}")
 	public Response getMenuByDate(@PathVariable Date date) {
+
+		if (!menuService.isServingToday(date))
+			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 
 		List<Menu> menus = menuService.getMenuByDate(date);
 

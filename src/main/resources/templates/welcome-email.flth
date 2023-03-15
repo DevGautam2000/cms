@@ -8,13 +8,12 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-  <h2>Hi, ${name} <br>
-	Welcome to Canteen Management System.
-    <br>
-    Use password: ${password} for your login.
-    <br>
-    sent at ${time}
-    <br>
-    Extra details....
+  <h2>Hi, ${username} </h2> <br>
+	Welcome to Canteen Management System,
+  <ul>
+  <li> username : ${username}</li>
+  <li> link : ${link}</li>
+  <li> time : ${timestamp}</li>
+  </ul>
   </body>
 </html>

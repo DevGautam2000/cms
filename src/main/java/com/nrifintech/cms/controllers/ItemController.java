@@ -48,7 +48,7 @@ public class ItemController {
 		if (itemService.isNotNull(i))
 			return Response.setMsg("Item added.", HttpStatus.OK);
 
-		return Response.setErr("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Item exists.", HttpStatus.BAD_REQUEST);
 	}
 
 	@PostMapping(Route.Item.addItems)

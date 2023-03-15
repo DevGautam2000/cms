@@ -18,6 +18,10 @@ public class Route {
 		String getOrders = "getorders";
 
 		String updateStatus = "updatestatus";
+		
+		String getAllUsersForOrderByDate = "usersbydate";
+		String subscriptionToggler = "subscriptiontoggle";
+		String getEmailStatus = "getemailstatus";
 
 
 	}
@@ -61,6 +65,10 @@ public class Route {
 		String updateStatus = "updatestatus";
 
 		String placeOrder = "placeorder";
+
+		String cancelOrder = "cancelorder";
+
+	
 	}
 
 	public interface Cart {
@@ -92,12 +100,10 @@ public class Route {
 		String generateToken = "generate-token";
 	}
 
-	public interface Bill {
-		String prefix = "/bill/";
-
-		String getBills = "getbills";
-		String getBill = "getbill";
-		String addBill = "addbill";
+	public interface Wallet {
+		String prefix = "/wallet/";
+		String getWallet = "getwallet";
+		String addMoney = "addmoney";
 	}
 
 
