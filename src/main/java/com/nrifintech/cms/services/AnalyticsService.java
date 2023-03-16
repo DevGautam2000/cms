@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.dtos.AnalyticsResponseDate;
 import com.nrifintech.cms.dtos.BestSellerResponse;
+import com.nrifintech.cms.dtos.OrderMealtypeReport;
 import com.nrifintech.cms.dtos.OrderStatusReport;
 import com.nrifintech.cms.repositories.CartItemRepo;
 import com.nrifintech.cms.repositories.OrderRepo;
 import com.nrifintech.cms.repositories.PurchaseRepo;
+import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Status;
 
 @Service
@@ -68,6 +70,13 @@ public class AnalyticsService {
     public List<OrderStatusReport> getStatusReport(String date1 , String date2){
         List<Tuple> resTup = this.orderRepo.getOrderStats(date1, date2);
         List<OrderStatusReport> result = resTup.stream().map(t->new OrderStatusReport( Status.values()[(t.get(0,Integer.class))] , t.get(1,BigInteger.class) )).collect(Collectors.toList());
+        return(result);
+    }
+
+    //get breakfast vs lunch stats
+    public List<OrderMealtypeReport> getOrderMealTypeReport(String date1 , String date2){
+        List<Tuple> resTup = this.orderRepo.getBreakfastVsLunchStats(date1, date2);
+        List<OrderMealtypeReport> result = resTup.stream().map(t->new OrderMealtypeReport( MealType.values()[(t.get(0,Integer.class))] , t.get(1,BigInteger.class) )).collect(Collectors.toList());
         return(result);
     }
 

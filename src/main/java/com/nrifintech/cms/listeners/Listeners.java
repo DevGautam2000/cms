@@ -53,11 +53,12 @@ public class Listeners {
         List<String> recipients = new ArrayList<>();
         recipients.add(user.getEmail());
         HashMap<String,String> body = new HashMap<>();
-        body.put("link", "<pass-reset-link>");
+        body.put("unsublink" , "...link to user page...");
+        body.put("link", "...pass-reset-link...");
         body.put("username",user.getEmail());
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
 
-        EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome.flth");//"welcome-email.flth");
+        EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome-email.flth");
         this.smtpServices.sendMail(email);
     }
 

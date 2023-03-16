@@ -29,4 +29,7 @@ public interface OrderRepo extends JpaRepository<Order,Integer>{
 
     @Query(value = "select status , count(id) from orders where cast(order_placed as date) between :date1 and :date2  group by status" , nativeQuery=true)
     public List<Tuple> getOrderStats(@Param("date1") String date1 , @Param("date2") String date2 );
+
+    @Query(value = "select order_type , count(id) from orders where cast(order_delivered as date) between :date1 and :date2 group by order_type" , nativeQuery=true)
+    public List<Tuple> getBreakfastVsLunchStats(@Param("date1") String date1 , @Param("date2") String date2 );
 }

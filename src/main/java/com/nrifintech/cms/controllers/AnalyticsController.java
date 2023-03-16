@@ -39,8 +39,12 @@ public class AnalyticsController {
     public Response getBestSeller(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getBestSeller(date1, date2) , HttpStatus.OK));
     }
-    @GetMapping(Route.Analytics.getOrderStats + "/{date1}" + "/{date2}")
+    @GetMapping(Route.Analytics.getOrderStats + "/statusstats" + "/{date1}" + "/{date2}")
     public Response getOrderStats(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getStatusReport(date1, date2) , HttpStatus.OK));
+    }
+    @GetMapping(Route.Analytics.getOrderStats + "/mealtypestats" + "/{date1}" + "/{date2}")
+    public Response getOrderMealtypeStats(@PathVariable String date1 , @PathVariable String date2){
+        return( Response.set(this.analyticsService.getOrderMealTypeReport(date1, date2) , HttpStatus.OK));
     }
 }
