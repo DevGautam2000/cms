@@ -64,16 +64,15 @@ public class MenuService implements Validator {
 		return m;
 	}
 
-	public boolean approveMenu(Menu m, Integer approvalStatusId) {
+	public Menu approveMenu(Menu m, Integer approvalStatusId) {
 
 		if (m.getApproval().equals(Approval.Pending)) {
 
 			m.setApproval(Approval.values()[approvalStatusId]);
-			menuRepo.save(m);
-			return true;
+			return menuRepo.save(m);
 
 		}
-		return false;
+		return null;
 	}
 
 	public Menu addItemToMenu(Integer menuId, Integer itemId) {

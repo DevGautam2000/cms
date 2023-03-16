@@ -49,9 +49,8 @@ public class MenuController {
 
 	}
 
-	// TODO: route for menu submission use principal also add to sec config
-	@PostMapping(Route.Menu.sumitMenu + "/{id}")
-	public Response sumitMenu(@PathVariable Integer id, Principal principal) {
+	@PostMapping(Route.Menu.submitMenu + "/{id}")
+	public Response submitMenu(@PathVariable Integer id, Principal principal) {
 
 		User user = userService.getuser(principal.getName());
 
@@ -60,9 +59,13 @@ public class MenuController {
 			Menu menu = menuService.getMenu(id);
 
 			if (menuService.isNotNull(menu)) {
-				
-				if(!menu.getApproval().equals(Approval.Incomplete))
-					return Response.setErr("Menu already "+menu.getApproval().toString().toLowerCase() + ".", HttpStatus.INTERNAL_SERVER_ERROR);
+
+				if (menu.getItems().isEmpty())
+					return Response.setErr("Menu has no items added.", HttpStatus.BAD_REQUEST);
+
+				if (!menu.getApproval().equals(Approval.Incomplete))
+					return Response.setErr("Menu already " + menu.getApproval().toString().toLowerCase() + ".",
+							HttpStatus.INTERNAL_SERVER_ERROR);
 
 				menu.setApproval(Approval.Pending);
 				menu = menuService.saveMenu(menu);
@@ -110,16 +113,22 @@ public class MenuController {
 	@PostMapping(Route.Menu.approveMenu + "/{menuId}/{approvalStatusId}")
 	public Response approveMenu(@PathVariable Integer menuId, @PathVariable Integer approvalStatusId) {
 
+		if (approvalStatusId == Approval.Incomplete.ordinal() ||
+				approvalStatusId == Approval.Pending.ordinal())
+			return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
+
 		Menu m = menuService.getMenu(menuId);
 
 		if (menuService.isNotNull(m)) {
 
 			String menuStatus = m.getApproval().toString();
-			if (!menuStatus.equalsIgnoreCase(Approval.Pending.toString()))
+
+			if (!menuStatus.equals(Approval.Pending.toString()))
 				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
-			if (menuService.approveMenu(m, approvalStatusId))
-				return Response.setMsg("Menu " + Approval.values()[approvalStatusId].toString().toLowerCase() + ".",
+			m = menuService.approveMenu(m, approvalStatusId);
+			if (menuService.isNotNull(m))
+				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".",
 						HttpStatus.OK);
 
 		}
@@ -150,7 +159,6 @@ public class MenuController {
 		return Response.setErr("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@SuppressWarnings("deprecation")
 	@GetMapping(Route.Menu.getByDate + "/{date}")
 	public Response getMenuByDate(@PathVariable Date date) {
 
