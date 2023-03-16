@@ -1,4 +1,4 @@
-walletRecharge.html
+debit.html
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -7,7 +7,7 @@ walletRecharge.html
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="color-scheme" content="light dark" />
     <meta name="supported-color-schemes" content="light dark" />
-    <title>Wallet Recharge Email Template</title>
+    <title>Wallet Debit Email Template</title>
     <style type="text/css" rel="stylesheet" media="all">
     /* Base ------------------------------ */
     
@@ -453,8 +453,8 @@ walletRecharge.html
                   <tr>
                     <td class="content-cell">
                       <div class="f-fallback">
-                        <h1>Welcome, ${username}!</h1>
-                        <p> Hurray &#127881; your wallet has been recharged!!!</p>
+                        <h1>Welcome, ${username} !</h1>
+                        <p> Hey your wallet has been debited against the order that has been placed!!!</p>
                         <p>Wallet Balance Details : </p>
                         <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
@@ -471,7 +471,7 @@ walletRecharge.html
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>Money Added : </strong> &#8377; ${money}
+                                 <strong>Money Debited : </strong> &#8377; ${money}
                                 </span>
                                   </td>
                                 </tr>
@@ -487,7 +487,7 @@ walletRecharge.html
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                      <strong>Transaction Id :</strong> ${transactionId}
+                                 <strong>Transaction Id :</strong> ${transactionId}
                                 </span>
                                   </td>
                                 </tr>
@@ -502,7 +502,7 @@ walletRecharge.html
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback" >
-                            <strong>Recharge Status : </strong> <span id="status"> Success</span>
+                            <strong>Debit Status : </strong> <span id="status"> Success</span>
                               </span>
                                   </td>
                                 </tr>
@@ -518,7 +518,7 @@ walletRecharge.html
                           <tr>
                             <td>
                               <p class="f-fallback sub">Hoping for the Best Service to be Served by our Team!!!</p>
-                              <p class="f-fallback sub">The Mail was Sent at : <strong>{timestamp}</strong></p>
+                              <p class="f-fallback sub">The Mail was Sent at : <strong>${timestamp}</strong></p>
                             </td>
                           </tr>
                         </table>
