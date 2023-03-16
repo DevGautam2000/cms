@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.security.Principal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,16 +8,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
-import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 import com.nrifintech.cms.utils.Validator;
@@ -30,20 +31,40 @@ public class MenuService implements Validator {
 	@Autowired
 	private ItemService itemService;
 
-	public Menu addMenu(Menu menu) {
+	@Autowired
+	private UserService userService;
 
+	public Menu addMenu(Menu menu) {
+		return menuRepo.save(menu);
+
+	}
+
+	public Menu saveMenu(Menu menu) {
 		return menuRepo.save(menu);
 
 	}
 
 	public Menu getMenu(Integer menuId) {
+		
+		
 
 		Menu m = menuRepo.findById(menuId).orElseThrow(() -> new NotFoundException("Menu"));
 		return m;
 	}
 
-	public List<Menu> getAllMenu() {
-		return menuRepo.findAll();
+	public List<Menu> getAllMenu(Principal principal) {
+		
+		User user = userService.getuser(principal.getName());
+		List<Menu> menus = menuRepo.findAll();
+		
+		if(userService.isNotNull(user)) {
+			
+			
+			if (user.getRole().equals(Role.Admin))
+				menus = menus.stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
+						.collect(Collectors.toList());
+		}
+		return menus;
 	}
 
 	public Optional<Menu> removeMenu(Integer menuId) {
@@ -57,16 +78,15 @@ public class MenuService implements Validator {
 		return m;
 	}
 
-	public boolean approveMenu(Menu m, Integer approvalStatusId) {
+	public Menu approveMenu(Menu m, Integer approvalStatusId) {
 
 		if (m.getApproval().equals(Approval.Pending)) {
 
 			m.setApproval(Approval.values()[approvalStatusId]);
-			menuRepo.save(m);
-			return true;
+			return menuRepo.save(m);
 
 		}
-		return false;
+		return null;
 	}
 
 	public Menu addItemToMenu(Integer menuId, Integer itemId) {
@@ -165,12 +185,22 @@ public class MenuService implements Validator {
 
 	}
 
-	public List<Menu> getMenuByDate(Date date) {
-		List<Menu> menus = menuRepo
-				.findMenuByDate(date)
-				.stream().filter( m ->
-						m.getApproval()
-						.equals(Approval.Approved)).collect(Collectors.toList());
+	public List<Menu> getMenuByDate(Date date, Principal principal) {
+
+		User user = userService.getuser(principal.getName());
+		List<Menu> menus = menuRepo.findMenuByDate(date);
+
+		if (userService.isNotNull(user)) {
+
+			if (user.getRole().equals(Role.Admin))
+				menus = menus.stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
+						.collect(Collectors.toList());
+			
+			if (user.getRole().equals(Role.User))
+				menus = menus.stream().filter(m -> m.getApproval().equals(Approval.Approved))
+						.collect(Collectors.toList());
+
+		}
 		return menus;
 	}
 
@@ -183,8 +213,8 @@ public class MenuService implements Validator {
 
 		return true;
 	}
-	
-	public Boolean isServingToday(Date date ) {
+
+	public Boolean isServingToday(Date date) {
 		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
 			return false;
 		}

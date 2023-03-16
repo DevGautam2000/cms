@@ -38,6 +38,8 @@ public class Route {
 		String approveMenu = "approvemenu";
 
 		String getByDate = "getbydate";
+
+		String submitMenu = "submitmenu";
 	}
 
 	public interface Item {
