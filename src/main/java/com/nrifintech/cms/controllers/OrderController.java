@@ -245,7 +245,7 @@ public class OrderController {
 					}
 					
 					
-					if(orderTotal < wallet.getBalance()) {
+					if(orderTotal > wallet.getBalance()) {
 						return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 					}
 					
