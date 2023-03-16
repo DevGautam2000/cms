@@ -1,3 +1,4 @@
+welcome..html
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -427,17 +428,14 @@
       color-scheme: light dark;
       supported-color-schemes: light dark;
     }
+
+    #status{
+      color : red;
+    }
     </style>
-    <!--[if mso]>
-    <style type="text/css">
-      .f-fallback  {
-        font-family: Arial, sans-serif;
-      }
-    </style>
-  <![endif]-->
   </head>
   <body>
-    <span class="preheader">Thanks for trying out [Product Name]. We’ve pulled together some information and resources to help you get started.</span>
+    <span class="preheader">A canteen management application that helps you manage the operations of cafeteria or canteen in an efficient and effective way.</span>
     <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
       <tr>
         <td align="center">
@@ -445,7 +443,7 @@
             <tr>
               <td class="email-masthead">
                 <a href="https://example.com" class="f-fallback email-masthead_name">
-                [Product Name]
+                Welcome To Canteen Management System
               </a>
               </td>
             </tr>
@@ -457,80 +455,63 @@
                   <tr>
                     <td class="content-cell">
                       <div class="f-fallback">
-                        <h1>Welcome, {{name}}!</h1>
-                        <p>Thanks for trying [Product Name]. We’re thrilled to have you on board. To get the most out of [Product Name], do this primary next step:</p>
-                        <!-- Action -->
+                        <h1>Welcome, ${username}!</h1>
+                        <p>A canteen management application that helps you manage the operations of cafeteria or canteen in an efficient and effective way.</p>
+                        <p>Your login credentials are provided below:</p>
+                        <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                          <tr>
+                            <td class="attributes_content">
+                              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                                <tr>
+                                  <td class="attributes_item">
+                                    <span class="f-fallback">
+                                 <strong>Username :</strong> ${username}
+                                </span>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+
                         <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
                             <td align="center">
-                              <!-- Border based button
-           https://litmus.com/blog/a-guide-to-bulletproof-buttons-in-email-design -->
                               <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
                                 <tr>
                                   <td align="center">
-                                    <a href="{{action_url}}" class="f-fallback button" target="_blank">Do this Next</a>
+                                    <a href="{{action_url}}" class="f-fallback button" target="_blank">Generate Password</a>
                                   </td>
                                 </tr>
                               </table>
                             </td>
                           </tr>
                         </table>
-                        <p>For reference, here's your login information:</p>
+                        <p>The password is not generated, however feel free to Generate Password to Activate your Account.</p>
                         <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
                             <td class="attributes_content">
                               <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
                                 <tr>
                                   <td class="attributes_item">
-                                    <span class="f-fallback">
-              <strong>Login Page:</strong> {{login_url}}
-            </span>
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td class="attributes_item">
-                                    <span class="f-fallback">
-              <strong>Username:</strong> {{username}}
-            </span>
+                                    <span class="f-fallback" >
+                            <strong>Current Account Status : </strong> <span id="status"> InActive</span>
+                              </span>
                                   </td>
                                 </tr>
                               </table>
                             </td>
                           </tr>
                         </table>
-                        <p>You've started a {{trial_length}} day trial. You can upgrade to a paying account or cancel any time.</p>
-                        <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
-                          <tr>
-                            <td class="attributes_content">
-                              <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-                                <tr>
-                                  <td class="attributes_item">
-                                    <span class="f-fallback">
-              <strong>Trial Start Date:</strong> {{trial_start_date}}
-            </span>
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td class="attributes_item">
-                                    <span class="f-fallback">
-              <strong>Trial End Date:</strong> {{trial_end_date}}
-            </span>
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                        </table>
-                        <p>If you have any questions, feel free to <a href="mailto:{{support_email}}">email our customer success team</a>. (We're lightning quick at replying.) We also offer <a href="{{live_chat_url}}">live chat</a> during business hours.</p>
+                        <p>If you have any questions, feel free to <a href="mailto:{{support_email}}">mail our customer success team</a>. (We're lightning quick at replying.)</p>
                         <p>Thanks,
-                          <br>[Sender Name] and the [Product Name] team</p>
-                        <p><strong>P.S.</strong> Need immediate help getting started? Check out our <a href="{{help_url}}">help documentation</a>. Or, just reply to this email, the [Product Name] support team is always ready to help!</p>
+                          <br>Canteen Management Team</p>
                         <!-- Sub copy -->
                         <table class="body-sub" role="presentation">
                           <tr>
                             <td>
-                              <p class="f-fallback sub">If you’re having trouble with the button above, copy and paste the URL below into your web browser.</p>
-                              <p class="f-fallback sub">{{action_url}}</p>
+                              <p class="f-fallback sub">Hoping for the Best Service to be Served by our Team!!!</p>
+                               <p class="f-fallback sub">The Mail was Sent at: <strong>${timestamp}</strong></p>
                             </td>
                           </tr>
                         </table>
@@ -546,9 +527,9 @@
                   <tr>
                     <td class="content-cell" align="center">
                       <p class="f-fallback sub align-center">
-                        [Company Name, LLC]
-                        <br>1234 Street Rd.
-                        <br>Suite 1234
+                        [Canteen Management System , NRIFintech]
+                        <br>PS Srijan Corporate Park
+                        <br>Salt Lake Sector V
                       </p>
                     </td>
                   </tr>

@@ -6,6 +6,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -17,6 +19,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.dtos.OrderToken;
+import com.nrifintech.cms.dtos.WalletEmailResponse;
+import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.CancelledOrderEvent;
@@ -24,6 +28,7 @@ import com.nrifintech.cms.events.DeliveredOrderEvent;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
+import com.nrifintech.cms.events.WalletRechargeEvent;
 import com.nrifintech.cms.services.SMTPservices;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -91,7 +96,8 @@ public class Listeners {
         body.put("username", placedOrderToken.getUsername());
         body.put("orderid",placedOrderToken.getOrder().getId()+"");
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        String itemDetails = mapper.writeValueAsString(placedOrderToken.getOrder().getCartItems());
+        List<String> listCartItems = placedOrderToken.getOrder().getCartItems().stream().map(c->c.getName()).collect(Collectors.toList());
+        String itemDetails = mapper.writeValueAsString(listCartItems);
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(placedOrderToken.getUsername());
@@ -110,7 +116,8 @@ public class Listeners {
         body.put("username", cancelledOrderToken.getUsername());
         body.put("orderid",cancelledOrderToken.getOrder().getId()+"");
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        String itemDetails = mapper.writeValueAsString(cancelledOrderToken.getOrder().getCartItems());
+        List<String> listCartItems = cancelledOrderToken.getOrder().getCartItems().stream().map(c->c.getName()).collect(Collectors.toList());
+        String itemDetails = mapper.writeValueAsString(listCartItems);
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(cancelledOrderToken.getUsername());
@@ -129,12 +136,28 @@ public class Listeners {
         body.put("username", deliveredOrderToken.getUsername());
         body.put("orderid",deliveredOrderToken.getOrder().getId()+"");
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        String itemDetails = mapper.writeValueAsString(deliveredOrderToken.getOrder().getCartItems());
+        List<String> listCartItems =  deliveredOrderToken.getOrder().getCartItems().stream().map(c->c.getName()).collect(Collectors.toList());
+        String itemDetails = mapper.writeValueAsString(listCartItems);
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(deliveredOrderToken.getUsername());
         System.out.println(deliveredOrderToken.getUsername());
         EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"delivered-order.flth");
+        this.smtpServices.sendMail(email);
+    }
+
+    @EventListener
+    @Async
+    public void onRecharge(WalletRechargeEvent walletRechargeEvent){
+        WalletEmailResponse w = (WalletEmailResponse) walletRechargeEvent.getSource();
+        HashMap<String,String> body = new HashMap<>();
+        body.put("username",w.getUsername());
+        body.put("curr", String.valueOf(w.getCurrentBalance()) );
+        body.put("money", String.valueOf(w.getMoneyAdded()) );
+        body.put("transactionId", w.getTransactionId());
+        List<String> recipients = new ArrayList<>();
+        recipients.add(w.getUsername());
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-recharge.flth");
         this.smtpServices.sendMail(email);
     }
 }

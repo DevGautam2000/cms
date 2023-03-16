@@ -45,7 +45,7 @@ public class CRONListeners {
         List<String> recipients = (List<String>) event.getSource();
         System.out.println(recipients.size());
         HashMap<String,String> body = new HashMap<>();
-        body.put("content", "Breakfast Service has started");
+        body.put("content", "Breakfast");
         body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         EmailModel emailModel = new EmailModel(recipients,"Canteen Management System",body,"service-start.flth");
         this.smtpServices.sendMail(emailModel);
@@ -57,7 +57,7 @@ public class CRONListeners {
         List<String> recipients = (List<String>) event.getSource();
         System.out.println(recipients.size());
         HashMap<String,String> body = new HashMap<>();
-        body.put("content", "Lunch Service has started");
+        body.put("content", "Lunch");
         body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         EmailModel emailModel = new EmailModel(recipients,"Canteen Management System",body,"service-start.flth");
         this.smtpServices.sendMail(emailModel);
