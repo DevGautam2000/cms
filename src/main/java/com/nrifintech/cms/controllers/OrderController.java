@@ -217,7 +217,6 @@ public class OrderController {
 			if (walletService.isNotNull(wallet)) {
 
 				// check sufficient wallet amount
-
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
 				if (!isPayable)
@@ -262,7 +261,8 @@ public class OrderController {
 						breakfastOrderTotal += price;
 					}
 
-					if (lunchOrderTotal > wallet.getBalance() || breakfastOrderTotal > wallet.getBalance()) {
+					if (lunchOrderTotal > wallet.getBalance() + WalletService.LIMIT
+							|| breakfastOrderTotal > wallet.getBalance() + WalletService.LIMIT) {
 						return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 					}
 
