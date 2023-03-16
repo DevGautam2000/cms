@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.security.Principal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,17 +8,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
-import com.nrifintech.cms.types.Response;
-import com.nrifintech.cms.types.Status;
+import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 import com.nrifintech.cms.utils.Validator;
@@ -31,6 +31,9 @@ public class MenuService implements Validator {
 	@Autowired
 	private ItemService itemService;
 
+	@Autowired
+	private UserService userService;
+
 	public Menu addMenu(Menu menu) {
 		return menuRepo.save(menu);
 
@@ -42,14 +45,25 @@ public class MenuService implements Validator {
 	}
 
 	public Menu getMenu(Integer menuId) {
+		
+		
 
 		Menu m = menuRepo.findById(menuId).orElseThrow(() -> new NotFoundException("Menu"));
 		return m;
 	}
 
-	public List<Menu> getAllMenu() {
-		List<Menu> menus = menuRepo.findAll().stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
-				.collect(Collectors.toList());
+	public List<Menu> getAllMenu(Principal principal) {
+		
+		User user = userService.getuser(principal.getName());
+		List<Menu> menus = menuRepo.findAll();
+		
+		if(userService.isNotNull(user)) {
+			
+			
+			if (user.getRole().equals(Role.Admin))
+				menus = menus.stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
+						.collect(Collectors.toList());
+		}
 		return menus;
 	}
 
@@ -171,9 +185,22 @@ public class MenuService implements Validator {
 
 	}
 
-	public List<Menu> getMenuByDate(Date date) {
-		List<Menu> menus = menuRepo.findMenuByDate(date).stream().filter(m -> m.getApproval().equals(Approval.Approved))
-				.collect(Collectors.toList());
+	public List<Menu> getMenuByDate(Date date, Principal principal) {
+
+		User user = userService.getuser(principal.getName());
+		List<Menu> menus = menuRepo.findMenuByDate(date);
+
+		if (userService.isNotNull(user)) {
+
+			if (user.getRole().equals(Role.Admin))
+				menus = menus.stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
+						.collect(Collectors.toList());
+			
+			if (user.getRole().equals(Role.User))
+				menus = menus.stream().filter(m -> m.getApproval().equals(Approval.Approved))
+						.collect(Collectors.toList());
+
+		}
 		return menus;
 	}
 

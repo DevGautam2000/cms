@@ -66,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.hasAnyAuthority(Role.Admin.toString())
 
 				.antMatchers(Route.Menu.prefix + Route.Menu.getMenu + "/*")
-				.hasAnyAuthority(Role.Admin.toString(), Role.Canteen.toString(), Role.User.toString())
+				.hasAnyAuthority(Role.Admin.toString(), Role.Canteen.toString())//, Role.User.toString())
 				.antMatchers(HttpMethod.POST, Route.Menu.prefix + Route.Menu.addMenu)
 				.hasAnyAuthority(Role.Canteen.toString())
 				.antMatchers(HttpMethod.POST, Route.Menu.prefix + Route.Menu.submitMenu + "/*")

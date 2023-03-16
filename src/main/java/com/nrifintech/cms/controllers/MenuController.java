@@ -92,9 +92,9 @@ public class MenuController {
 	}
 
 	@GetMapping(Route.Menu.getMonthMenu)
-	public Response getMonthlyMenu() {
+	public Response getMonthlyMenu(Principal principal) {
 
-		List<Menu> monthlyMenu = menuService.getAllMenu();
+		List<Menu> monthlyMenu = menuService.getAllMenu(principal);
 		return Response.set(monthlyMenu, HttpStatus.OK);
 	}
 
@@ -113,8 +113,7 @@ public class MenuController {
 	@PostMapping(Route.Menu.approveMenu + "/{menuId}/{approvalStatusId}")
 	public Response approveMenu(@PathVariable Integer menuId, @PathVariable Integer approvalStatusId) {
 
-		if (approvalStatusId == Approval.Incomplete.ordinal() ||
-				approvalStatusId == Approval.Pending.ordinal())
+		if (approvalStatusId == Approval.Incomplete.ordinal() || approvalStatusId == Approval.Pending.ordinal())
 			return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
 
 		Menu m = menuService.getMenu(menuId);
@@ -128,8 +127,7 @@ public class MenuController {
 
 			m = menuService.approveMenu(m, approvalStatusId);
 			if (menuService.isNotNull(m))
-				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".",
-						HttpStatus.OK);
+				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
 
 		}
 
@@ -160,12 +158,12 @@ public class MenuController {
 	}
 
 	@GetMapping(Route.Menu.getByDate + "/{date}")
-	public Response getMenuByDate(@PathVariable Date date) {
+	public Response getMenuByDate(@PathVariable Date date, Principal principal) {
 
 		if (!menuService.isServingToday(date))
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 
-		List<Menu> menus = menuService.getMenuByDate(date);
+		List<Menu> menus = menuService.getMenuByDate(date,principal);
 
 		if (!menus.isEmpty())
 			return Response.set(menus, HttpStatus.OK);
