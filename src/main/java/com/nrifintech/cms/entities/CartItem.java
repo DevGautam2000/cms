@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import com.nrifintech.cms.types.ItemType;
+import com.nrifintech.cms.types.MealType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,8 @@ public class CartItem {
 	private Integer id;
 
 	private Integer sourceId;
+
+	private MealType mealType;
 
 	private Integer quantity;
 	private Double price;
