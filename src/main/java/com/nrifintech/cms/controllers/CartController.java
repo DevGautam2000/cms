@@ -143,6 +143,8 @@ public class CartController {
 	@GetMapping(Route.Cart.getCart + "/{cartId}")
 	public Response getCart(@PathVariable Integer cartId) {
 
+		System.out.println(cartId);
+
 		Cart cart = cartService.getCart(cartId);
 		return Response.set(cart, HttpStatus.OK);
 
