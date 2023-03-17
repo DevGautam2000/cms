@@ -38,7 +38,6 @@ public class CRONListeners {
         this.smtpServices.sendMail(emailModel);
     }
 
-    /*fix this recipients null */
     @EventListener
     @Async
     public void onBreakfastStart(BreakfastStartEvent event){
