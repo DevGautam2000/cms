@@ -68,5 +68,4 @@ public class WalletController {
 		return Response.setErr("Error adding money.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
 }

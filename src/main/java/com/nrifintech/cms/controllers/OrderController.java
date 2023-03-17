@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.OrderResponseRequest;
 import com.nrifintech.cms.dtos.OrderToken;
+import com.nrifintech.cms.dtos.WalletEmailResponse;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
@@ -34,6 +35,8 @@ import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.events.PlacedOrderEvent;
+import com.nrifintech.cms.events.WalletDebitEvent;
+import com.nrifintech.cms.events.WalletRefundEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.MenuService;
@@ -305,6 +308,11 @@ public class OrderController {
 								this.applicationEventPublisher.publishEvent(
 										new PlacedOrderEvent(new OrderToken(user.getEmail(), lunchOrder)));
 
+								this.applicationEventPublisher.publishEvent(new WalletDebitEvent(
+									new WalletEmailResponse(user.getEmail(), wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber() )
+									)
+								);
+
 								orderResponseRequest.setIsLunchOrdered(true);
 							}
 
@@ -327,6 +335,11 @@ public class OrderController {
 
 								this.applicationEventPublisher.publishEvent(
 										new PlacedOrderEvent(new OrderToken(user.getEmail(), breakfastOrder)));
+
+								this.applicationEventPublisher.publishEvent(new WalletDebitEvent(
+										new WalletEmailResponse(user.getEmail(), wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber() )
+										)
+									);
 
 								orderResponseRequest.setIsBreakFastOrdered(true);
 							}
@@ -406,8 +419,10 @@ public class OrderController {
 						order.setStatus(Status.Cancelled);
 						order = orderService.saveOrder(order);
 
-						if (orderService.isNotNull(order))
+						if (orderService.isNotNull(order)){
+							this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName() , wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber())));
 							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+						}
 					}
 
 				}

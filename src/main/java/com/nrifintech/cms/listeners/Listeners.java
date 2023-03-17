@@ -28,7 +28,9 @@ import com.nrifintech.cms.events.DeliveredOrderEvent;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
+import com.nrifintech.cms.events.WalletDebitEvent;
 import com.nrifintech.cms.events.WalletRechargeEvent;
+import com.nrifintech.cms.events.WalletRefundEvent;
 import com.nrifintech.cms.services.SMTPservices;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -160,4 +162,35 @@ public class Listeners {
         EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-recharge.flth");
         this.smtpServices.sendMail(email);
     }
+
+    @EventListener
+    @Async
+    public void onDebit(WalletDebitEvent walletDebitEvent){
+        WalletEmailResponse w = (WalletEmailResponse) walletDebitEvent.getSource();
+        HashMap<String,String> body = new HashMap<>();
+        body.put("username",w.getUsername());
+        body.put("curr", String.valueOf(w.getCurrentBalance()) );
+        body.put("money", String.valueOf(w.getMoneyAdded()) );
+        body.put("transactionId", w.getTransactionId());
+        List<String> recipients = new ArrayList<>();
+        recipients.add(w.getUsername());
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-refund.flth");
+        this.smtpServices.sendMail(email);
+    }
+   
+    @EventListener
+    @Async
+    public void onRefund(WalletRefundEvent walletRefundEvent){
+        WalletEmailResponse w = (WalletEmailResponse) walletRefundEvent.getSource();
+        HashMap<String,String> body = new HashMap<>();
+        body.put("username",w.getUsername());
+        body.put("curr", String.valueOf(w.getCurrentBalance()) );
+        body.put("money", String.valueOf(w.getMoneyAdded()) );
+        body.put("transactionId", w.getTransactionId());
+        List<String> recipients = new ArrayList<>();
+        recipients.add(w.getUsername());
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-refund.flth");
+        this.smtpServices.sendMail(email);
+    }
 }
+
