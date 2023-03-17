@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.FeedbackStats;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.AnalyticsService;
 import com.nrifintech.cms.types.Response;
@@ -25,28 +26,48 @@ public class AnalyticsController {
     public Response getTotalExp(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getTotalExp(date1, date2) , HttpStatus.OK));
     }
+
     @GetMapping(Route.Analytics.getDateWiseExp + "/{date1}" + "/{date2}")
     public Response getDateWiseExp(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getExpDate(date1, date2) , HttpStatus.OK));
     }
+
     @GetMapping(Route.Analytics.getTotalSales + "/{date1}" + "/{date2}")
     public Response getTotalSales(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getTotalSales(date1, date2) , HttpStatus.OK));
     }
+
     @GetMapping(Route.Analytics.getDateWiseSales + "/{date1}" + "/{date2}")
     public Response getDateWiseSales(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getSalesDate(date1, date2) , HttpStatus.OK));
     }
+
     @GetMapping(Route.Analytics.getBestSeller + "/{date1}" + "/{date2}")
     public Response getBestSeller(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getBestSeller(date1, date2) , HttpStatus.OK));
     }
+
     @GetMapping(Route.Analytics.getOrderStats + "/statusstats" + "/{date1}" + "/{date2}")
     public Response getOrderStats(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getStatusReport(date1, date2) , HttpStatus.OK));
     }
+
     @GetMapping(Route.Analytics.getOrderStats + "/mealtypestats" + "/{date1}" + "/{date2}")
     public Response getOrderMealtypeStats(@PathVariable String date1 , @PathVariable String date2){
         return( Response.set(this.analyticsService.getOrderMealTypeReport(date1, date2) , HttpStatus.OK));
+    }
+
+    @GetMapping(Route.Analytics.getFeedbackStats)
+    public Response getFeedbacksStats(){
+        FeedbackStats f = this.analyticsService.getFeedBackReport();
+        if( f == null ){
+            return( Response.setMsg("No feedbacks as of now", HttpStatus.BAD_REQUEST));
+        }
+        return( Response.set( f, HttpStatus.OK));  
+    }
+
+    @GetMapping(Route.Analytics.getUserStats)
+    public Response getUserStats(){
+        return( Response.set(this.analyticsService.getUserGroup() , HttpStatus.OK));
     }
 }
