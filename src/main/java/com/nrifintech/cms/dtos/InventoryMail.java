@@ -10,6 +10,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class InventoryMail {
+
+    private Integer id;
     private String name;
-    private Double quantity;
+    private Double quantityInHand;
+    private Double quantityRequested;
+    private Double quantityPurchased;
+
+    public InventoryMail(Inventory i , Double quantityPurchased){
+        this.id = i.getId();
+        this.name = i.getName();
+        this.quantityInHand = i.getQuantityInHand();
+        this.quantityRequested = i.getQuantityRequested();
+        this.quantityPurchased = quantityPurchased;
+    }
+
+    public InventoryMail(Inventory i){
+        this.id = i.getId();
+        this.name = i.getName();
+        this.quantityInHand = i.getQuantityInHand();
+        this.quantityRequested = i.getQuantityRequested();
+    }
 }

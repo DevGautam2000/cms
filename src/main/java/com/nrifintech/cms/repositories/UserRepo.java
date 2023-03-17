@@ -34,4 +34,7 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 
 	@Query(value = "select role,count(id) from user where status = 0 group by role",nativeQuery = true)
 	List<Tuple> getAllUserGroup();
+
+	@Query(value = "select email from user where role = :role" , nativeQuery = true)
+	public List<Tuple> getUserEmailsByRole(@Param("role") Integer role);
 }

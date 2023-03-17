@@ -95,7 +95,8 @@ public class InventoryController {
     public void updateQtyRequested(@PathVariable int id , @PathVariable double qtyreq){
         this.inventoryService.updateQtyRequested(qtyreq, id);
         //this should go to all admin users...
-        this.applicationEventPublisher.publishEvent( new UpdateQtyReqEvent(new InventoryMail( this.inventoryService.getInventoryById(id).getName(), qtyreq)) );
+        Inventory i = this.inventoryService.getInventoryById(id);
+        this.applicationEventPublisher.publishEvent( new UpdateQtyReqEvent(new InventoryMail( i )) );
     }
 
 }
