@@ -142,6 +142,8 @@ public class Route {
 		String getDateWiseSales = "datebydatesales";
 		String getBestSeller = "bestseller";
 		String getOrderStats = "orderstats";
+		String getFeedbackStats = "feedbackstats";
+		String getUserStats = "userstats";
 	}
 
 
