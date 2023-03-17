@@ -21,14 +21,17 @@ import org.springframework.stereotype.Service;
 import com.nrifintech.cms.config.jwt.JwtUtils;
 import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
-import com.nrifintech.cms.entities.ResetPasswordUUID;
+import com.nrifintech.cms.entities.TokenBlacklist;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.errorhandler.UserIsEnabledException;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
+import com.nrifintech.cms.repositories.TokenBlacklistRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.UserStatus;
 
 import eu.bitwalker.useragentutils.UserAgent;
+import io.jsonwebtoken.JwtException;
 
 @Service
 public class AuthenticationService {
@@ -40,6 +43,8 @@ public class AuthenticationService {
     private JwtUtils jwtUtils;
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private TokenBlacklistRepo tokenRepo;
     
     
     //TODO: check password
@@ -72,21 +77,6 @@ public class AuthenticationService {
         resetPasswordEmail(user);
     }
 
-    // public void setNewPassword(String email){
-    //     User user=userService.getuser(email);
-        
-    //     setNewPasswordEmail(user);
-    // }
-
-    // public void setNewPasswordEmail(User user){
-    //     System.out.println(user);
-    //     String token = jwtUtils.generateNewPasswordToken(new MyUserDetails(user));
-    //     //TODO : ** url needs to be changed **
-    //     String url="/auth/set-new-password?token="+token;
-    //     System.out.println(url);
-    //     //code here
-    // }
-
     private void resetPasswordEmail(User user){
         System.out.println(user);
         MyUserDetails myUser = new MyUserDetails(user);
@@ -112,8 +102,53 @@ public class AuthenticationService {
             throw new UsernameNotFoundException("token: "+token+" is not valid");
         }
 
+        if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
+        tokenRepo.save(new TokenBlacklist(token));
+
         System.out.println("Password updated");
         userService.updatePassword(user,newPassword);
 
     }
+
+    public void setNewPassword(String email){
+        User user=userService.getuser(email);
+        
+        if(!(user.getStatus().equals(UserStatus.InActive)))
+            throw new UserIsEnabledException();
+        
+        setNewPasswordEmail(user);
+    }
+
+    private void setNewPasswordEmail(User user){
+        System.out.println(user);
+        String token = jwtUtils.generateNewPasswordToken(new MyUserDetails(user));
+        //TODO : ** url needs to be changed **
+        String url="/auth/activate-new-password?token="+token;
+        System.out.println(url);
+        //code here
+    }
+    
+    public void setNewPasswordAndActivate(String email,String token,String newPassword) {
+
+        final int statusIdEnabled=0;
+        User user = userService.getuser(email);
+
+        if(!(user.getStatus().equals(UserStatus.InActive)))
+            throw new UserIsEnabledException();
+
+        if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
+            throw new UsernameNotFoundException("token: "+token+" is not valid");
+        }
+
+        if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
+        tokenRepo.save(new TokenBlacklist(token));
+
+		user.setStatus(UserStatus.values()[statusIdEnabled]);
+		userService.saveUser(user);
+        System.out.println("User Activated & Password updated");
+        
+        userService.updatePassword(user,newPassword);
+
+    }
+
 }

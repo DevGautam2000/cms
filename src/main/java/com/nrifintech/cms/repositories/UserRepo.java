@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.Tuple;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,4 +31,7 @@ public interface UserRepo extends JpaRepository<User, Integer> {
 
 	@Query(value ="select email from user where role = 2 and email_status = 0",nativeQuery = true)
 	Optional<List<String>> getAllConsumers();
+
+	@Query(value = "select role,count(id) from user where status = 0 group by role",nativeQuery = true)
+	List<Tuple> getAllUserGroup();
 }

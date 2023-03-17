@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,8 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
+import io.jsonwebtoken.JwtException;
+
 @RestController
 @CrossOrigin
 @RequestMapping(Route.Authentication.prefix)
@@ -48,9 +51,12 @@ public class AuthenticationController {
 	@Autowired
 	private JwtUtils jwtUtils;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@ErrorHandlerImplemented(
 		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
-	@PostMapping("/generate-token")
+	@PostMapping(Route.Authentication.generateToken)
 	public Response generateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
 		authService.authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
 
@@ -60,10 +66,13 @@ public class AuthenticationController {
 		return Response.set(new JwtResponse(token), HttpStatus.OK);
 	}
 
-	@GetMapping("current-user")
+	@GetMapping(Route.Authentication.currentUser)
 	public Response getCurrentUser(Principal principal) {
 
+		if(principal==null)throw new JwtException("Invalid Token");
+
 		User exUser = userService.getuser(principal.getName());
+
 		if (exUser.getRole().equals(Role.User)) {
 
 			Unprivileged userDto = new UserDto.Unprivileged(exUser);
@@ -75,9 +84,9 @@ public class AuthenticationController {
 		return Response.set(userDto, HttpStatus.OK);
 	}
 
-	@PostMapping("forgot-password")
+	@PostMapping(Route.Authentication.forgotPassword)
 	public Response forgotPassword(@RequestBody JwtRequest user) {
-		System.out.println(user);
+		// System.out.println(user);
 
 		authService.forgetPassword(user.getUsername());
 
@@ -85,19 +94,31 @@ public class AuthenticationController {
 
 	}
 
-	@PostMapping("change-password")
+	@PostMapping(Route.Authentication.changePassword)
 	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
-		authService.changePassword(userInfo.getUsername(), token, userInfo.getPassword());
+
+		authService.changePassword(userInfo.getUsername(), token, passwordEncoder.encode(userInfo.getPassword()));
+		
 		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
 	}
 
-//	@GetMapping("/hi")
-//	public String hi() {
-//		return "hi";
-//	}
-//
-//	@GetMapping("/test")
-//	public String test() {
-//		return "only admin";
-//	}
+	
+	@PostMapping(Route.Authentication.setNewPassword)
+	public Response setNewPassword(@RequestBody JwtRequest user) {
+		// System.out.println(user);
+
+		authService.setNewPassword(user.getUsername());
+
+		return Response.setMsg("Email sent.", HttpStatus.OK);
+
+	}
+
+	@PostMapping(Route.Authentication.activateNewPassword)
+	public Response setNewPasswordAndActivate(@RequestParam String token, @RequestBody JwtRequest userInfo) {
+		
+		authService.setNewPasswordAndActivate(userInfo.getUsername(), token, passwordEncoder.encode(userInfo.getPassword()));
+		
+		return Response.setMsg("Password changed Successfully", HttpStatus.OK);
+	}
+	
 }
