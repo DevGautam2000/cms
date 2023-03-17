@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.errorhandler.UserIsEnabledException;
 import com.nrifintech.cms.types.Response;
 
 import io.jsonwebtoken.MalformedJwtException;
@@ -109,6 +110,14 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     public Response userIsDisabledException(
       Exception ex, WebRequest request) {
         return Response.setErr(
+          ex.getMessage(), 
+          HttpStatus.UNAUTHORIZED);
+    }
+    
+    @ExceptionHandler({ UserIsEnabledException.class })
+    public Response userIsEnabledException(
+      Exception ex, WebRequest request) {
+        return Response.set(
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }

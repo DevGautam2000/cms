@@ -45,7 +45,7 @@ public class SMTPservices {
             mimeMessageHelper.setFrom(mail.getFrom());
             String[] strarray = new String[mail.getTo().size()];
             (mail.getTo()).toArray(strarray);
-            mimeMessageHelper.setTo(strarray);
+            mimeMessageHelper.setBcc(strarray);
             mail.setEmbeddedHTML(getContentFromTemplate(m,mail.getTemplateUsed()));
             mimeMessageHelper.setText(mail.getEmbeddedHTML(), true);
  

@@ -20,20 +20,22 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.repositories.TokenBlacklistRepo;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-	@Autowired
-	private MyUserDetailsService userDetailsServiceImple;
-	@Autowired
-	private JwtUtils jutUtil;
-	@Autowired
-	@Qualifier("handlerExceptionResolver")
-	private HandlerExceptionResolver resolver;
+    @Autowired 
+    private MyUserDetailsService userDetailsServiceImple;
+    @Autowired
+    private JwtUtils jutUtil;
+    @Autowired
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver resolver;
+    @Autowired
+    private TokenBlacklistRepo blacklistRepo;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -59,18 +61,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		} else {
 			System.out.println("Invalid Token , not start with Bearer string");
 //			resolver.resolveException(request, response, null, new AccessDeniedException("Access Denied."));
-
-			 // ------> this line stops the further code run
-
-			// resolver.resolveException(request, response, null,new JwtException("Invalid
-			// Token , not start with Bearer string"));
 		}
-
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			final UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(username);
-
-			if (!userDetails.isEnabled())
-				resolver.resolveException(request, response, null, new UserIsDisabledException("InActive User"));
+		
+        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null && blacklistRepo.findById(jwtToken).orElse(null)==null){
+            final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
+            
+            if(!userDetails.isEnabled())
+                resolver.resolveException(request, response, null, new UserIsDisabledException("InActive User"));
 
 			else if (this.jutUtil.validateToken(jwtToken, userDetails)) {
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

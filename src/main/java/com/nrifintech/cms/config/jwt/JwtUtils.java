@@ -32,13 +32,13 @@ public class JwtUtils {
 	        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
 	    }
 
-	    private Boolean isTokenExpired(String token) {
+	    public Boolean isTokenExpired(String token) {
 	        return extractExpiration(token).before(new Date());
 	    }
 
 	    public String generateToken(UserDetails userDetails) {
 	        Map<String, Object> claims = new HashMap<>();
-	        return createToken(claims, userDetails.getUsername(),10*60);
+	        return createToken(claims, userDetails.getUsername(),10*24*60);
 	    }
 
 		

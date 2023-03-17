@@ -48,6 +48,10 @@ public class CartService implements Validator {
 			if (isNull(exItems))
 				exItems = new ArrayList<>();
 
+			if (isNotNull(items) || !items.isEmpty())
+				items.forEach(i -> {
+					i.setMealType(reqs.get(items.indexOf(i)).getMealType());
+				});
 			exItems.addAll(items);
 			cartItemService.saveItems(exItems);
 
@@ -67,9 +71,9 @@ public class CartService implements Validator {
 		ids.forEach(id -> cartItemService.deleteItem(id));
 		cart.getCartItems().clear();
 		cart = this.saveCart(cart);
-		
-		System.out.println("CART CLEAR: "+ cart);
-		
+
+		System.out.println("CART CLEAR: " + cart);
+
 		return cart;
 	}
 

@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.security.Principal;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.MenuService;
+import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
-import com.nrifintech.cms.types.WeekDay;
+import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
 @CrossOrigin
@@ -30,6 +33,9 @@ public class MenuController {
 
 	@Autowired
 	private MenuService menuService;
+
+	@Autowired
+	private UserService userService;
 
 	@PostMapping(Route.Menu.addMenu)
 	public Response newMenu(@RequestBody Menu menu) {
@@ -43,6 +49,41 @@ public class MenuController {
 
 	}
 
+	@PostMapping(Route.Menu.submitMenu + "/{id}")
+	public Response submitMenu(@PathVariable Integer id, Principal principal) {
+
+		User user = userService.getuser(principal.getName());
+
+		if (user.getRole().equals(Role.Canteen)) {
+
+			Menu menu = menuService.getMenu(id);
+
+			if (menuService.isNotNull(menu)) {
+
+				if (menu.getItems().isEmpty())
+					return Response.setErr("Menu has no items added.", HttpStatus.BAD_REQUEST);
+
+				if (!menu.getApproval().equals(Approval.Incomplete))
+					return Response.setErr("Menu already " + menu.getApproval().toString().toLowerCase() + ".",
+							HttpStatus.INTERNAL_SERVER_ERROR);
+
+				menu.setApproval(Approval.Pending);
+				menu = menuService.saveMenu(menu);
+
+				if (menuService.isNotNull(menu))
+					return Response.setMsg("Menu added for review.", HttpStatus.OK);
+
+				return Response.setErr("Error adding menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+
+			}
+
+			return Response.setErr("Menu not found.", HttpStatus.NOT_FOUND);
+
+		}
+
+		return Response.setErr("Menu cannot be added by user.", HttpStatus.NOT_FOUND);
+	}
+
 	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.Menu.getMenu + "/{id}")
 	public Response getMenu(@PathVariable Integer id) {
@@ -51,9 +92,9 @@ public class MenuController {
 	}
 
 	@GetMapping(Route.Menu.getMonthMenu)
-	public Response getMonthlyMenu() {
+	public Response getMonthlyMenu(Principal principal) {
 
-		List<Menu> monthlyMenu = menuService.getAllMenu();
+		List<Menu> monthlyMenu = menuService.getAllMenu(principal);
 		return Response.set(monthlyMenu, HttpStatus.OK);
 	}
 
@@ -72,17 +113,21 @@ public class MenuController {
 	@PostMapping(Route.Menu.approveMenu + "/{menuId}/{approvalStatusId}")
 	public Response approveMenu(@PathVariable Integer menuId, @PathVariable Integer approvalStatusId) {
 
+		if (approvalStatusId == Approval.Incomplete.ordinal() || approvalStatusId == Approval.Pending.ordinal())
+			return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
+
 		Menu m = menuService.getMenu(menuId);
 
 		if (menuService.isNotNull(m)) {
 
 			String menuStatus = m.getApproval().toString();
-			if (!menuStatus.equalsIgnoreCase(Approval.Pending.toString()))
+
+			if (!menuStatus.equals(Approval.Pending.toString()))
 				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
-			if (menuService.approveMenu(m, approvalStatusId))
-				return Response.setMsg("Menu " + Approval.values()[approvalStatusId].toString().toLowerCase() + ".",
-						HttpStatus.OK);
+			m = menuService.approveMenu(m, approvalStatusId);
+			if (menuService.isNotNull(m))
+				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
 
 		}
 
@@ -112,14 +157,13 @@ public class MenuController {
 		return Response.setErr("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@SuppressWarnings("deprecation")
 	@GetMapping(Route.Menu.getByDate + "/{date}")
-	public Response getMenuByDate(@PathVariable Date date) {
+	public Response getMenuByDate(@PathVariable Date date, Principal principal) {
 
 		if (!menuService.isServingToday(date))
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 
-		List<Menu> menus = menuService.getMenuByDate(date);
+		List<Menu> menus = menuService.getMenuByDate(date,principal);
 
 		if (!menus.isEmpty())
 			return Response.set(menus, HttpStatus.OK);
