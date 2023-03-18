@@ -37,7 +37,7 @@ interface Message {
 public class ErrorController extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
-	public Response handleNotFoundException(NotFoundException ex, WebRequest request) {
+	public Response handleNotFoundException(NotFoundException ex) {
 		return Response.setErr(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 

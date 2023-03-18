@@ -63,6 +63,8 @@ public class AuthenticationController {
 		UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(jwtRequest.getUsername());
 		String token = this.jwtUtils.generateToken(userDetails);
 
+		System.out.println(userDetails);
+
 		return Response.set(new JwtResponse(token), HttpStatus.OK);
 	}
 

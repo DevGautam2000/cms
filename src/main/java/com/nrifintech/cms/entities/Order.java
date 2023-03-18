@@ -14,16 +14,13 @@ import javax.persistence.Table;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Status;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @ToString
 @Entity
 @Table(name = "orders")
