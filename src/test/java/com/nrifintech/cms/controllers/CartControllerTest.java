@@ -1,22 +1,22 @@
 package com.nrifintech.cms.controllers;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nrifintech.cms.MockMvcSetup;
 import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartItemService;
 import com.nrifintech.cms.services.CartService;
-import com.nrifintech.cms.services.ItemService;
 import com.nrifintech.cms.services.UserService;
-import com.nrifintech.cms.types.*;
+import com.nrifintech.cms.types.ItemType;
+import com.nrifintech.cms.types.MealType;
+import com.nrifintech.cms.types.Response;
+import com.nrifintech.cms.types.Role;
 import lombok.var;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -35,13 +34,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(MockitoJUnitRunner.class)

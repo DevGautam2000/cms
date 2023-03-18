@@ -117,7 +117,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ UserIsEnabledException.class })
     public Response userIsEnabledException(
       Exception ex, WebRequest request) {
-        return Response.set(
+        return Response.setErr(
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
