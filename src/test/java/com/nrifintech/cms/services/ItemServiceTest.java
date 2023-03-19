@@ -75,7 +75,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void getItemSuccess(){
+    public void testGetItemSuccess(){
 
         int itemId = 10;
         Item item = mock(Item.class);
@@ -90,7 +90,7 @@ public class ItemServiceTest {
 
 
     @Test
-    public void getItemFailure(){
+    public void testGetItemFailure(){
 
 
         int itemId = 10;
@@ -112,7 +112,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void addItems(){
+    public void testAddItems(){
 
         List<Item> items = new ArrayList<>();
         items.add(Item.builder().id(10).name("Chicken").build());
@@ -138,7 +138,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void getItemsForItemIds(){
+    public void testGetItemsForItemIds(){
 
         List<String> itemIds = new ArrayList<>();
         itemIds.add("10");
