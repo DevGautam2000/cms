@@ -17,6 +17,7 @@ import lombok.*;
 @Builder
 @Setter
 @Entity
+@ToString
 public class Wallet {
 
 	@Id

@@ -76,19 +76,6 @@ public class OrderController {
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 
-	@PostMapping(Route.Order.addOrders)
-	public Response addOrders(@RequestBody List<Order> orders) {
-
-		List<Order> o = orderService.addOrders(orders);
-
-		if (orderService.isNotNull(o)) {
-			return Response.setMsg("Orders added.", HttpStatus.OK);
-		}
-
-		return Response.setErr("Error adding orders.", HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
-
 	@GetMapping(Route.Order.getOrders)
 	public Response getOrders() {
 		List<Order> o = orderService.getOrders();

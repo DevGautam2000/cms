@@ -16,51 +16,51 @@ import com.nrifintech.cms.utils.Validator;
 @Service
 public class ItemService implements Validator {
 
-	@Autowired
-	private ItemRepo itemRepo;
+    @Autowired
+    private ItemRepo itemRepo;
 
-	@Autowired
-	private CartItemRepo cartItemRepo;
-	// add a food
-	public Item addItem(Item i) {
-		
-		List<Item> items = this.getItems();
-		
-		for(Item item : items) {
-			if(item.getName().trim().equalsIgnoreCase(i.getName().trim()))
-				return null;
-		}
-		
-		return itemRepo.save(i);
-	}
-	
+    @Autowired
+    private CartItemRepo cartItemRepo;
+
+    // add a food
+    public Item addItem(Item i) {
+
+        List<Item> items = this.getItems();
 
 
-	// get a food
-	public Item getItem(Integer id) {
-		return itemRepo.findById(id).orElseThrow(() -> new NotFoundException("Item"));
-	}
+        for (Item item : items) {
+            if (item.getName().trim().equalsIgnoreCase(i.getName().trim()))
+                return null;
+        }
 
-	// add foods
-	public List<Item> addItems(List<Item> items) {
-		return itemRepo.saveAll(items);
-	}
+        return itemRepo.save(i);
+    }
 
-	// get foods
-	public List<Item> getItems() {
-		return itemRepo.findAll();
-	}
 
-	
-	
-	public List<Item> getItems(List<String> itemIds) {
-		List<Item> allItems = this.getItems();
-		List<Item> items = allItems.stream().filter(item -> itemIds.contains(item.getId().toString()))
-				.collect(Collectors.toList());
+    // get a food
+    public Item getItem(Integer id) {
+        return itemRepo.findById(id).orElseThrow(() -> new NotFoundException("Item"));
+    }
 
-		return items;
-	}
-	
-	
+    // add foods
+    public List<Item> addItems(List<Item> items) {
+        itemRepo.saveAll(items);
+        return items;
+    }
+
+    // get foods
+    public List<Item> getItems() {
+        return itemRepo.findAll();
+    }
+
+
+    public List<Item> getItems(List<String> itemIds) {
+        List<Item> allItems = this.getItems();
+        List<Item> items = allItems.stream().filter(item -> itemIds.contains(item.getId().toString()))
+                .collect(Collectors.toList());
+
+        return items;
+    }
+
 
 }

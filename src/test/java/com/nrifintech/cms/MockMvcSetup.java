@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.nrifintech.cms.controllers.CartController;
 import com.nrifintech.cms.controllers.CartControllerTest;
 import com.nrifintech.cms.errorcontroller.ErrorController;
@@ -15,6 +16,9 @@ import java.io.IOException;
 
 public class MockMvcSetup {
 
+    protected MockMvc mockMvc;
+    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectWriter objectWriter = objectMapper.writer();
     protected static String prefix="";
 
     public static MockMvc setUp(String pref,Object testClass, Object... controllers) {

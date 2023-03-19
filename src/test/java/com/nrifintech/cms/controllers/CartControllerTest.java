@@ -44,9 +44,6 @@ public class CartControllerTest extends MockMvcSetup {
 
     private MockMvc mockMvc;
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    ObjectWriter objectWriter = objectMapper.writer();
-
     @Mock
     private CartService cartService;
 
