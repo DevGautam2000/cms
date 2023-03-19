@@ -6,10 +6,8 @@ import com.nrifintech.cms.dtos.OrderResponseRequest;
 import com.nrifintech.cms.entities.*;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.*;
-import com.nrifintech.cms.types.ItemType;
-import com.nrifintech.cms.types.MealType;
-import com.nrifintech.cms.types.Response;
-import com.nrifintech.cms.types.Status;
+import com.nrifintech.cms.types.*;
+import jdk.nashorn.internal.runtime.regexp.joni.ast.StringNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.lang.reflect.Array;
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,7 +67,7 @@ public class OrderControllerTest extends MockMvcSetup {
     private OrderController orderController;
 
     private List<Order> orders;
-    private Order order;
+    private Order order,order12;
     private FeedBack feedBack;
 
     private Principal principal;
@@ -83,8 +82,9 @@ public class OrderControllerTest extends MockMvcSetup {
     private void loadData() {
         orders = new ArrayList<>();
         order = Order.builder().id(10).orderType(MealType.Lunch).build();
+        order12 = Order.builder().id(12).orderType(MealType.Lunch).build();
         orders.add(order);
-        orders.add(Order.builder().id(12).orderType(MealType.Lunch).build());
+        orders.add(order12);
         orders.add(Order.builder().id(13).orderType(MealType.Lunch).build());
 
         feedBack = new FeedBack();
@@ -636,6 +636,286 @@ public class OrderControllerTest extends MockMvcSetup {
     }
 
 
+    @Test
+    public void testPlaceOrderFailureIfCartEmpty() throws Exception {
+
+        int userId = 20;
+
+        Wallet wallet = Wallet.builder().id(23).balance(2000d).build();
+
+
+        Mockito.when(menuService.isServingToday()).thenReturn(true);
+
+        Mockito.when(userService.getuser(userId)).thenReturn(user);
+        Mockito.when(userService.isNotNull(user)).thenReturn(true);
+
+        user.setWallet(wallet);
+
+        Mockito.when(walletService.isNotNull(wallet)).thenReturn(true);
+        Mockito.when(walletService.checkMinimumAmount(wallet)).thenReturn(true);
+
+        Order lunchOrder = order;
+        Order breakFastOrder = Order.builder().id(12).orderType(MealType.Breakfast).build();
+
+        Mockito.when(orderService.addNewOrder(MealType.Lunch)).thenReturn(lunchOrder);
+        Mockito.when(orderService.addNewOrder(MealType.Breakfast)).thenReturn(breakFastOrder);
+
+        Mockito.when(orderService.isNotNull(any(Order.class))).thenReturn(true);
+
+        Mockito.when(cartService.isNull(user.getCart())).thenReturn(true);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.placeOrder + "/{id}"), userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.BAD_REQUEST.value(), is(res.getStatus()));
+        assertThat("empty cart.", is(res.getMessage().toString().trim().toLowerCase()));
+
+    }
+
+
+    @Test
+    public void testPlaceOrderFailureIfNotServingToday() throws Exception {
+
+        int userId = 20;
+
+        Mockito.when(menuService.isServingToday()).thenReturn(false);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.placeOrder + "/{id}"), userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isNotAcceptable())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.NOT_ACCEPTABLE.value(), is(res.getStatus()));
+        assertThat("no food will be served today.", is(res.getMessage().toString().trim().toLowerCase()));
+
+    }
+
+
+    @Test
+    public void testCancelOrderSuccess() throws Exception {
+
+        int orderId = 10;
+
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(order);
+        Mockito.when(orderService.isNotNull(order)).thenReturn(true);
+
+        order.setStatus(Status.Pending);
+        order.setOrderPlaced(new Timestamp(System.currentTimeMillis()));
+        Transaction transaction = new Transaction(2000, TransactionType.Withdrawl);
+        order.setTransaction(transaction);
+
+        user.getRecords().add(order);
+
+        Wallet wallet = Wallet.builder().id(23).balance(2000d).transactions(new ArrayList<>()).build();
+        wallet.getTransactions().add(transaction);
+        user.setWallet(wallet);
+
+        Mockito.when(walletService.isNotNull(user.getWallet())).thenReturn(true);
+
+        Mockito.when(walletService.refundToWallet(user.getWallet(), order.getTransaction().getAmount(), order.getId())).thenReturn(wallet);
+
+        Mockito.when(orderService.saveOrder(order)).thenReturn(order);
+        Mockito.when(orderService.isNotNull(order)).thenReturn(true);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.OK.value(), is(res.getStatus()));
+        assertThat("order cancelled.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+    @Test
+    public void testCancelOrderFailureIfCancelTimeSurpassed() throws Exception {
+
+        int orderId = 10;
+
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(order);
+        Mockito.when(orderService.isNotNull(order)).thenReturn(true);
+
+        order.setStatus(Status.Pending);
+        order.setOrderPlaced(new Timestamp(System.currentTimeMillis()-(1000 * 60 * 60 * 24))); //previous day
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isNotAcceptable())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.NOT_ACCEPTABLE.value(), is(res.getStatus()));
+        assertThat("order cannot be cancelled.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+    @Test
+    public void testCancelOrderFailureIfStatusIsNotPending() throws Exception {
+
+        int orderId = 10;
+
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(order);
+        Mockito.when(orderService.isNotNull(order)).thenReturn(true);
+
+        order.setStatus(Status.NotDelivered);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.BAD_REQUEST.value(), is(res.getStatus()));
+        assertThat("order cannot be cancelled.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+    @Test
+    public void testCancelOrderFailureIfOrderAlreadyCancelled() throws Exception {
+
+        int orderId = 10;
+
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(order);
+        Mockito.when(orderService.isNotNull(order)).thenReturn(true);
+
+        order.setStatus(Status.Cancelled);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isBadRequest())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.BAD_REQUEST.value(), is(res.getStatus()));
+        assertThat("order already cancelled.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+
+    @Test
+    public void testCancelOrderFailureIfWalletNotFound() throws Exception {
+
+        int orderId = 10;
+
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(order);
+        Mockito.when(orderService.isNotNull(order)).thenReturn(true);
+
+        order.setStatus(Status.Pending);
+        order.setOrderPlaced(new Timestamp(System.currentTimeMillis()));
+        Transaction transaction = new Transaction(2000, TransactionType.Withdrawl);
+        order.setTransaction(transaction);
+
+        user.getRecords().add(order);
+
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isNotFound())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.NOT_FOUND.value(), is(res.getStatus()));
+        assertThat("wallet not found.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+    @Test
+    public void testCancelOrderFailureIfOrderDoesNotExistForUser() throws Exception {
+
+        int orderId = 12;
+
+        Order newOrder = Order.builder().id(23).build();
+
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        order.setStatus(Status.Pending);
+        order.setOrderPlaced(new Timestamp(System.currentTimeMillis()));
+        Transaction transaction = new Transaction(2000, TransactionType.Withdrawl);
+        order.setTransaction(transaction);
+
+        user.getRecords().add(order);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(newOrder);
+        Mockito.when(orderService.isNotNull(newOrder)).thenReturn(true);
+
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isUnauthorized())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.UNAUTHORIZED.value(), is(res.getStatus()));
+        assertThat("order does not exist for user.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+
+    @Test
+    public void testCancelOrderFailureIfOrderNotFound() throws Exception {
+
+        int orderId = 12;
+        principal = user::getUsername;
+
+        Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
+
+        Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(null);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.post(prefix(Route.Order.cancelOrder + "/{orderId}"), orderId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .principal(principal)
+                ).andExpect(status().isNotFound())
+                .andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        assertThat(HttpStatus.NOT_FOUND.value(), is(res.getStatus()));
+        assertThat("order not found.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
 
 }
 
