@@ -1,13 +1,11 @@
 package com.nrifintech.cms.services;
 
 import com.nrifintech.cms.entities.FeedBack;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.OrderRepo;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Status;
-import org.aspectj.weaver.ast.Or;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +22,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
