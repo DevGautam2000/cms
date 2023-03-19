@@ -1,20 +1,17 @@
 package com.nrifintech.cms.payments.service;
 
-import com.nrifintech.cms.MockMvcSetup;
 import com.nrifintech.cms.entities.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 
 
-public class StripeServiceTest extends MockMvcSetup {
+public class StripeServiceTest{
 
     @Mock
     private StripeService service;

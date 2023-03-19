@@ -28,7 +28,6 @@ public class MockMvcSetup {
         return MockMvcBuilders.standaloneSetup(controllers).setControllerAdvice(new ErrorController()).build();
     }
 
-
     protected String mapToJson(Object obj) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsString(obj);
