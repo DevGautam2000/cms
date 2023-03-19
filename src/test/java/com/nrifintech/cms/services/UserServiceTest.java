@@ -124,7 +124,7 @@ public class UserServiceTest {
     void testGetUsers() {
         List<User> actualUser = userService.getUsers();
 
-        assertEquals(users.toArray().toString(),actualUser.toArray().toString());
+        assertArrayEquals(users.toArray(),actualUser.toArray());
     }
 
     @Test
@@ -149,6 +149,10 @@ public class UserServiceTest {
 
     @Test
     void testSaveUser() {
+        assertEquals(users.get(0),userService.saveUser(users.get(0)));
+        assertEquals(users.get(1),userService.saveUser(users.get(1)));
+        assertEquals(users.get(2),userService.saveUser(users.get(2)));
+        assertEquals(users.get(3),userService.saveUser(users.get(3)));
 
     }
 
@@ -159,6 +163,10 @@ public class UserServiceTest {
 
     @Test
     void testUpdateUser() {
+        assertEquals(users.get(0),userService.updateUser(users.get(0).getId(),users.get(0)));
+        assertEquals(users.get(1),userService.updateUser(users.get(1).getId(),users.get(1)));
+        assertEquals(users.get(2),userService.updateUser(users.get(2).getId(),users.get(2)));
+        assertEquals(users.get(3),userService.updateUser(users.get(3).getId(),users.get(3)));
 
     }
 }
