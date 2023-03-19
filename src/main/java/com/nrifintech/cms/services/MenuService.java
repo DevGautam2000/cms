@@ -84,7 +84,7 @@ public class MenuService implements Validator {
 
 					// m.getFoods().add(menu.getFoods().get(0));
 					menuRepo.save(m);
-				} else
+				}
 					return null;
 			}
 			return null;

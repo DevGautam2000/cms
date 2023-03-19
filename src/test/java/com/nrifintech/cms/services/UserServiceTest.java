@@ -1,15 +1,20 @@
 package com.nrifintech.cms.services;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +38,8 @@ import com.nrifintech.cms.types.UserStatus;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
+    private List<User> users = new ArrayList<>();
+    
     @Mock(lenient = true)
     private UserRepo userRepo;
 
@@ -42,18 +49,49 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    @DisplayName("add user test")
+    @BeforeEach
+    void setup(){
+        users.add(new User(999,"avatar1.png","abc1@gamil.com","password1","9876543211",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+        users.add(new User(998,"avatar2.png","abc2@gamil.com","password2","9876543212",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+        users.add(new User(997,"avatar3.png","abc3@gamil.com","password3","9876543213",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+        users.add(new User(996,"avatar4.png","abc4@gamil.com","password4","9876543214",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+    
+        when(userRepo.findByEmail("abc1@gamil.com")).thenReturn(Optional.of(users.get(0)));
+        when(userRepo.findByEmail("abc2@gamil.com")).thenReturn(Optional.of(users.get(1)));
+        when(userRepo.findByEmail("abc3@gamil.com")).thenReturn(Optional.of(users.get(2)));
+        when(userRepo.findByEmail("abc4@gamil.com")).thenReturn(Optional.of(users.get(3)));
+
+        Mockito.when(userRepo.save(users.get(0))).thenReturn(users.get(0));
+        Mockito.when(userRepo.save(users.get(1))).thenReturn(users.get(1));
+        Mockito.when(userRepo.save(users.get(2))).thenReturn(users.get(2));
+        Mockito.when(userRepo.save(users.get(3))).thenReturn(users.get(3));
+
+        Mockito.when(userRepo.findAll()).thenReturn(users);
+
+
+    }
+
+    @AfterEach
+    void destroy(){
+        users.clear();
+    }
+
     @Test
-    void testAddUser() {
-        User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,
-        null,null,null);
-        when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
-        Mockito.when(userRepo.save(user1)).thenReturn(user1);
+    void testAddUserCase1() {
+        User created1 = userService.addUser(users.get(0));
 
-        User created = userService.addUser(user1);
+        assertEquals(users.get(0), created1);
+        // verify(userRepo).save(user1);
+    }
+    
 
-        System.out.println(created);
-        assertEquals(user1, created);
+    @Test
+    void testAddUserCase2() {
+        User created1 = userService.addUser(users.get(1));
+
+        
+
+        assertEquals(users.get(1), created1);
         // verify(userRepo).save(user1);
     }
 
@@ -63,28 +101,30 @@ public class UserServiceTest {
     }
 
     @Test
-    void testGetAllConsumers() {
+    void testGetAllConsumers() {//
 
     }
 
     @Test
-    void testGetOrdersByDate() {
+    void testGetOrdersByDate() {//
 
     }
 
     @Test
-    void testGetOrdersByDateAndOrderType() {
+    void testGetOrdersByDateAndOrderType() {//
 
     }
 
     @Test
-    void testGetUserByOrderId() {
+    void testGetUserByOrderId() {//
 
     }
 
     @Test
     void testGetUsers() {
+        List<User> actualUser = userService.getUsers();
 
+        assertEquals(users.toArray().toString(),actualUser.toArray().toString());
     }
 
     @Test

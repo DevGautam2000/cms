@@ -2,6 +2,8 @@ package com.nrifintech.cms.errorcontroller;
 
 
 
+import java.io.IOException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -127,6 +129,12 @@ public class ErrorController extends ResponseEntityExceptionHandler {
       Exception ex, WebRequest request) {
     	Response.setErr("Invalid token.", HttpStatus.BAD_REQUEST);
         //handle the error to bypass and do not send any response
+    }
+
+    @ExceptionHandler({ IOException.class })
+    public void iOException(
+      Exception ex, WebRequest request) {
+    	Response.setErr("Logout not successful", HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
 }
