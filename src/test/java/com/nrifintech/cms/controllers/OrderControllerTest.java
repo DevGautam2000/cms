@@ -60,9 +60,6 @@ public class OrderControllerTest extends MockMvcSetup {
     @Mock
     private TransactionService transactionService;
 
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-
     @InjectMocks
     private OrderController orderController;
 
