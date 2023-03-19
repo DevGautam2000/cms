@@ -60,6 +60,9 @@ public class OrderControllerTest extends MockMvcSetup {
     @Mock
     private TransactionService transactionService;
 
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @InjectMocks
     private OrderController orderController;
 
@@ -237,6 +240,11 @@ public class OrderControllerTest extends MockMvcSetup {
         order.setStatus(Status.Pending);
 
         Mockito.when(orderService.getOrder(eq(orderId))).thenReturn(order);
+
+        Mockito.lenient()
+                .doAnswer((Answer<Void>) invocation -> null)
+                .when(applicationEventPublisher).publishEvent(any(ApplicationEvent.class));
+
         Mockito.when(orderService.isNotNull(order)).thenReturn(true);
 
         String r = mockMvc.perform(

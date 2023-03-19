@@ -15,6 +15,7 @@ import com.nrifintech.cms.types.Response;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -23,6 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.security.Principal;
 
+import static org.hamcrest.Matchers.any;
 import static org.junit.Assert.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,6 +50,9 @@ public class WalletControllerTest extends MockMvcSetup {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private WalletController walletController;
@@ -127,6 +133,7 @@ public class WalletControllerTest extends MockMvcSetup {
         Integer amount = 1000;
         Principal principal = user::getUsername;
         StripeToken stripeToken = new StripeToken();
+        stripeToken.setToken("token");
         String chargeId = "chargeId";
 
         Mockito.when(userService.getuser(principal.getName())).thenReturn(user);
@@ -134,13 +141,9 @@ public class WalletControllerTest extends MockMvcSetup {
         Mockito.when(walletService.addMoneyToWallet(user.getEmail(), wallet, amount, stripeToken.getToken()))
                 .thenReturn(chargeId);
 
-        Mockito.lenient().doAnswer((Answer<Void>) invocation -> null)
-                .when(mock(ApplicationEventPublisher.class))
-                .publishEvent(
-                        new WalletRechargeEvent(
-                                new WalletEmailResponse(principal.getName(),
-                                        wallet.getBalance(), amount, chargeId)
-                        ));
+        Mockito.lenient()
+                .doAnswer((Answer<Void>) invocation -> null)
+                .when(applicationEventPublisher).publishEvent(ArgumentMatchers.any(ApplicationEvent.class));
 
         String r = mockMvc.perform(
                 MockMvcRequestBuilders.post(prefix(Route.Wallet.addMoney + "/{amount}"), amount)
