@@ -72,8 +72,6 @@ public class CartService implements Validator {
 		cart.getCartItems().clear();
 		cart = this.saveCart(cart);
 
-		System.out.println("CART CLEAR: " + cart);
-
 		return cart;
 	}
 

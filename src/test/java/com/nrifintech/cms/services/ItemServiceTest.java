@@ -125,7 +125,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public void getItems(){
+    public void testGetItems(){
 
         List<Item> items = new ArrayList<>();
         items.add(Item.builder().id(10).name("Chicken").build());
