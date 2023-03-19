@@ -18,7 +18,7 @@ import com.nrifintech.cms.utils.Validator;
 @Service
 public class WalletService implements Validator {
 
-	private static final Double LIMIT = 100.0;
+	public static final Double LIMIT = 100.0;
 
 	@Autowired
 	private WalletRepo walletRepo;

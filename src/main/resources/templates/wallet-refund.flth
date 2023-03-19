@@ -1,3 +1,4 @@
+walletRefund.html
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -6,7 +7,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="color-scheme" content="light dark" />
     <meta name="supported-color-schemes" content="light dark" />
-    <title>Delivered order Email Template</title>
+    <title>Wallet Refund Email Template</title>
     <style type="text/css" rel="stylesheet" media="all">
     /* Base ------------------------------ */
     
@@ -453,8 +454,8 @@
                     <td class="content-cell">
                       <div class="f-fallback">
                         <h1>Welcome, ${username} !</h1>
-                        <p> Hurray &#127881; your order bas been delivered.<br> Enjoy The Meal!!!</p>
-                        <p>Order Details : </p>
+                        <p> Hurray &#127881; &#8377; ${money} debited from your wallet has been refunded !!!</p>
+                        <p>Wallet Balance Details : </p>
                         <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
                             <td class="attributes_content">
@@ -470,7 +471,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>OrderId</strong> ${orderid}
+                                 <strong>Money Refunded : </strong> &#8377; ${money}
                                 </span>
                                   </td>
                                 </tr>
@@ -478,7 +479,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>Items : </strong> ${items}
+                                 <strong>Current Balance : </strong> &#8377; ${curr}
                                 </span>
                                   </td>
                                 </tr>
@@ -486,7 +487,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>TimeStamp :</strong> ${timestamp}
+                                      <strong>Transaction Id :</strong> ${transactionId}
                                 </span>
                                   </td>
                                 </tr>
@@ -501,7 +502,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback" >
-                            <strong>Current Order Status : </strong> <span id="status"> Delivered</span>
+                            <strong>Recharge Status : </strong> <span id="status"> Refunded</span>
                               </span>
                                   </td>
                                 </tr>

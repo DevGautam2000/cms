@@ -28,7 +28,7 @@ public class Menu {
 	@Id
 	@GeneratedValue
 	private Integer id;
-	private Approval approval = Approval.Pending;
+	private Approval approval = Approval.Incomplete;
 
 	private Date date;
 	

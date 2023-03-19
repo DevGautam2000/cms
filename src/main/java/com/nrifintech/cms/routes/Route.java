@@ -38,6 +38,8 @@ public class Route {
 		String approveMenu = "approvemenu";
 
 		String getByDate = "getbydate";
+
+		String submitMenu = "submitmenu";
 	}
 
 	public interface Item {
@@ -129,7 +131,19 @@ public class Route {
 		String prefix = "/purchase/";
 		String save = "save";
 		String get = "get/";
-		String rollback = "rollback";
+		String rollback = "rollback/";
+	}
+
+	public interface Analytics{
+		String prefix = "/analytics/";
+		String getTotalExp = "totalexp";
+		String getDateWiseExp = "datebydateexp";
+		String getTotalSales = "totalsales";
+		String getDateWiseSales = "datebydatesales";
+		String getBestSeller = "bestseller";
+		String getOrderStats = "orderstats";
+		String getFeedbackStats = "feedbackstats";
+		String getUserStats = "userstats";
 	}
 
 

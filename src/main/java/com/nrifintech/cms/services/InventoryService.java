@@ -15,7 +15,11 @@ public class InventoryService {
     InventoryRepo inventoryRepo;
     
     public Inventory addToInventory(Inventory inventory){
-        return( this.inventoryRepo.save(inventory) );
+        List<Inventory> i = this.inventoryRepo.findByName(inventory.getName());
+        if( i.size() > 0 ){
+            return( null );
+        }
+        return(this.inventoryRepo.save(inventory));
     }
 
     public List<Inventory> addAlltoInventory(List<Inventory> inventory){
