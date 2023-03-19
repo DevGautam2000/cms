@@ -337,9 +337,10 @@ public class OrderController {
         // order cancellation is 12 pm
 
         if (orderService.isNotNull(order)) {
-
+            System.out.println("comingjjjjjjjjj here");
             if (user.getRecords().contains(order)) {
 
+                System.out.println("coming here");
                 if (order.getStatus().equals(Status.Cancelled))
                     return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
 
@@ -382,6 +383,7 @@ public class OrderController {
                         order = orderService.saveOrder(order);
 
                         if (orderService.isNotNull(order)) {
+
                             this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName(), wallet.getBalance(), transaction.getAmount(), transaction.getReferenceNumber())));
                             return Response.setMsg("Order Cancelled.", HttpStatus.OK);
                         }
