@@ -87,7 +87,7 @@ public class OrderService implements Validator {
 			FeedBack f = order.getFeedBack();
 
 			if (isNull(f)) {
-				String trimmedComment = feedBack.getComments().toString().trim();
+				String trimmedComment = feedBack.getComments().trim();
 				feedBack.setComments(trimmedComment);
 
 				feedBackService.addFeedBack(feedBack);
@@ -97,36 +97,6 @@ public class OrderService implements Validator {
 
 			} else
 				return f;
-		}
-		return order;
-	}
-
-	public Object addItemsToOrder(Integer orderId, List<String> itemIds, List<String> quantities) {
-		Order order = this.getOrder(orderId);
-
-		if (isNotNull(order)) {
-
-			List<CartItem> exItems = order.getCartItems();
-
-			if (exItems.isEmpty()) {
-
-				List<CartItem> items = new ArrayList<>();
-
-				itemIds.forEach(id -> {
-
-					Item item = itemService.getItem(Integer.valueOf(id));
-
-					if (isNotNull(item)) {
-						items.add(new CartItem(item, Integer.valueOf(quantities.get(itemIds.lastIndexOf(id)))));
-					}
-
-				});
-
-				order.setCartItems(items);
-				orderRepo.save(order);
-
-			} else
-				return exItems.size() > 0 ? new Item() : null;
 		}
 		return order;
 	}
