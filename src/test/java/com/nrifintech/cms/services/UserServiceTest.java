@@ -61,6 +61,12 @@ public class UserServiceTest {
         when(userRepo.findByEmail("abc3@gamil.com")).thenReturn(Optional.of(users.get(2)));
         when(userRepo.findByEmail("abc4@gamil.com")).thenReturn(Optional.of(users.get(3)));
 
+        
+        when(userRepo.findById(999)).thenReturn(Optional.of(users.get(0)));
+        when(userRepo.findById(998)).thenReturn(Optional.of(users.get(1)));
+        when(userRepo.findById(997)).thenReturn(Optional.of(users.get(2)));
+        when(userRepo.findById(996)).thenReturn(Optional.of(users.get(3)));
+
         Mockito.when(userRepo.save(users.get(0))).thenReturn(users.get(0));
         Mockito.when(userRepo.save(users.get(1))).thenReturn(users.get(1));
         Mockito.when(userRepo.save(users.get(2))).thenReturn(users.get(2));
@@ -129,12 +135,18 @@ public class UserServiceTest {
 
     @Test
     void testGetuser() {
-
+        assertEquals(users.get(0), userService.getuser(users.get(0).getId()));
+        assertEquals(users.get(1), userService.getuser(users.get(1).getId()));
+        assertEquals(users.get(2), userService.getuser(users.get(2).getId()));
+        assertEquals(users.get(3), userService.getuser(users.get(3).getId()));
     }
 
     @Test
     void testGetuser2() {
-
+        assertEquals(users.get(0), userService.getuser(users.get(0).getEmail()));
+        assertEquals(users.get(1), userService.getuser(users.get(1).getEmail()));
+        assertEquals(users.get(2), userService.getuser(users.get(2).getEmail()));
+        assertEquals(users.get(3), userService.getuser(users.get(3).getEmail()));
     }
 
     @Test
@@ -158,6 +170,10 @@ public class UserServiceTest {
 
     @Test
     void testUpdatePassword() {
+        assertEquals("newPassword" , userService.updatePassword(users.get(0),"newPassword").getPassword());
+        assertEquals("newPassword" , userService.updatePassword(users.get(1),"newPassword").getPassword());
+        assertEquals("newPassword" , userService.updatePassword(users.get(2),"newPassword").getPassword());
+        assertEquals("newPassword" , userService.updatePassword(users.get(3),"newPassword").getPassword());
 
     }
 
