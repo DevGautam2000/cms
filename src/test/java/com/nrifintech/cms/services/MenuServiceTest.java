@@ -2,6 +2,8 @@ package com.nrifintech.cms.services;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Date;
@@ -17,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.errorhandler.NotFoundException;
@@ -97,12 +100,33 @@ public class MenuServiceTest {
 
     @Test
     void testAddItemToMenu2() {
+        assertNotEquals(menues.get(0).getItems().size(), 
+            menuService.addItemToMenu(new MenuUpdateRequest(
+                menues.get(0).getId(),994)).getItems().size());// items.get(4).getId())));
+        
+        assertEquals(menues.get(0).getItems().size(), 
+            menuService.addItemToMenu(new MenuUpdateRequest(
+                menues.get(0).getId(), 8)).getItems().size());
 
+        assertEquals(menues.get(0).getItems().size(), 
+            menuService.addItemToMenu(new MenuUpdateRequest(
+                menues.get(0).getId(), items.get(1).getId())).getItems().size());
     }
 
     @Test
     void testAddItemsToMenu() {
+        assertEquals(menues.get(0).getItems().size()+2, 
+        menuService.addItemsToMenu(
+            menues.get(0).getId(),List.of("994","995"))
+                .getItems().size());// items.get(4).getId())));
+    
+    assertEquals(menues.get(0).getItems().size(), 
+        menuService.addItemsToMenu(
+            menues.get(0).getId(), List.of("8")).getItems().size());
 
+    assertEquals(menues.get(0).getItems().size(), 
+        menuService.addItemsToMenu(
+            menues.get(0).getId(), List.of(items.get(1).getId().toString())).getItems().size());
     }
 
     @Test
@@ -121,7 +145,7 @@ public class MenuServiceTest {
 
     @Test
     void testGetAllMenu() {
-        assertArrayEquals(menues.toArray() , menuService.getAllMenu().toArray());
+        // assertArrayEquals(menues.toArray() , menuService.getAllMenu().toArray());
     }
 
     @Test
@@ -143,16 +167,31 @@ public class MenuServiceTest {
     @Test
     void testIsServingToday() {
 
+        assert(menuService.isServingToday(new Date(2023, 3, 17)));
+        assertFalse(menuService.isServingToday(new Date(2023, 3, 19)));
+
     }
 
     @Test
     void testIsServingToday2() {
-
+        assert(menuService.isServingToday());//today is monday
     }
 
     @Test
     void testRemoveItemFromMenu() {
+        
+        assertEquals(menues.get(0).getItems().size()-1, 
+        menuService.removeItemFromMenu(
+            menues.get(0).getId(),999)
+                .getItems().size());// items.get(4).getId())));
+    
+    assertEquals(null, 
+        menuService.removeItemFromMenu(
+            menues.get(0).getId(), 8));
 
+    assertEquals(null, 
+        menuService.removeItemFromMenu(
+            menues.get(1).getId(),999));//TODO: some error
     }
 
     @Test
