@@ -118,8 +118,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, Route.Wallet.prefix + Route.Wallet.addMoney + "/*").hasAnyAuthority(Role.User.toString())
 
 
-                .antMatchers(Route.Excel.prefix + Route.Excel.getUserReports).hasAnyAuthority(Role.Admin.toString())
-                .antMatchers(Route.Excel.prefix + Route.Excel.getMenuReports).hasAnyAuthority(Role.Admin.toString())
+                .antMatchers(Route.Excel.prefix + Route.Excel.getUserReports).permitAll()
+                .antMatchers(Route.Excel.prefix + Route.Excel.getMenuReports).permitAll()
 
                 .antMatchers("/content/**").permitAll()
                 .anyRequest().authenticated()
