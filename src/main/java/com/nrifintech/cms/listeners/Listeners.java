@@ -37,6 +37,7 @@ import com.nrifintech.cms.events.WalletDebitEvent;
 import com.nrifintech.cms.events.WalletRechargeEvent;
 import com.nrifintech.cms.events.WalletRefundEvent;
 import com.nrifintech.cms.repositories.UserRepo;
+import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.SMTPservices;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -49,12 +50,15 @@ public class Listeners {
     @Autowired
     private UserRepo userRepo;
 
+    @Autowired
+    private AuthenticationService authenticationService;
+
     @EventListener
     @Async
     public void onForgotPassword(ForgotPasswordEvent event){
         HashMap<String,String> body = (HashMap<String, String>) event.getSource();
         body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        body.put("link","<pass-forgot-link>");
+        body.put("frontendlink","pass-forgot-link(frontend)");
         List<String> recipients = new ArrayList<>();
         recipients.add(body.get("username"));
         EmailModel email = new EmailModel(recipients , "Forgot-password-request" , body , "forgot-password.flth");
@@ -70,10 +74,10 @@ public class Listeners {
         recipients.add(user.getEmail());
         HashMap<String,String> body = new HashMap<>();
         body.put("unsublink" , "...link to user page...");
-        body.put("link", "...pass-reset-link...");
+        body.put("frontendlink", "frontend page link");
+        body.put("resetlink" , authenticationService.setNewPassword(user.getEmail()));
         body.put("username",user.getEmail());
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-
         EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome-email.flth");
         this.smtpServices.sendMail(email);
     }
