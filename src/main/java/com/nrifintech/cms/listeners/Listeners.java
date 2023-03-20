@@ -74,7 +74,7 @@ public class Listeners {
         recipients.add(user.getEmail());
         HashMap<String,String> body = new HashMap<>();
         body.put("unsublink" , "...link to user page...");
-        body.put("actionurl" , "http://localhost:3000/resetPassword?link=" + authenticationService.setNewPassword(user.getEmail()));
+        body.put("actionurl" , "http://localhost:3000/resetPassword?link=" +authenticationService.setNewPassword(user.getEmail()) + "&username=" + user.getEmail()  );
         body.put("username",user.getEmail());
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome-email.flth");
