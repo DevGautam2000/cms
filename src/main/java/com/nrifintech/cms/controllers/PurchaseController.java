@@ -19,6 +19,7 @@ import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.entities.Inventory;
 import com.nrifintech.cms.entities.Purchase;
 import com.nrifintech.cms.events.ApprovedQtyReqEvent;
+import com.nrifintech.cms.repositories.InventoryRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.services.PurchaseService;
@@ -34,15 +35,22 @@ public class PurchaseController {
     private PurchaseService purchaseService;
 
     @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     @PostMapping(Route.Purchase.save)
     public Response save(@RequestBody Purchase purchase){
+        if( purchase.getInventoryRef().getId() == null ){
+            return( Response.setErr("Reference ID is null", HttpStatus.BAD_REQUEST));
+        }
         Purchase obj = this.purchaseService.initiateNewPurchase(purchase);
         if( obj == null ){
             return( Response.setErr("Unable to save", HttpStatus.BAD_REQUEST));
         }
-        this.applicationEventPublisher.publishEvent( new ApprovedQtyReqEvent( new InventoryMail(purchase.getInventoryRef().getName() , purchase.getQuantity()) ));
+        // will go to all canteen users
+        this.applicationEventPublisher.publishEvent( new ApprovedQtyReqEvent( new InventoryMail( this.inventoryService.getInventoryById( purchase.getInventoryRef().getId() ) , purchase.getQuantity()) ) );
         return( Response.set(obj , HttpStatus.OK));
     }
 

@@ -1,8 +1,11 @@
 package com.nrifintech.cms.controllers;
 
 import java.security.Principal;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,12 +28,14 @@ import com.nrifintech.cms.dtos.UserDto.Privileged;
 import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
+import com.stripe.model.Application;
 
 import io.jsonwebtoken.JwtException;
 
@@ -53,6 +58,9 @@ public class AuthenticationController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@ErrorHandlerImplemented(
 		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
@@ -90,7 +98,11 @@ public class AuthenticationController {
 	public Response forgotPassword(@RequestBody JwtRequest user) {
 		// System.out.println(user);
 
-		authService.forgetPassword(user.getUsername());
+		//authService.forgetPassword(user.getUsername());
+		HashMap<String,String> info = new HashMap<>();
+        info.put("username",user.getUsername());
+        info.put("forgotlink",authService.forgetPassword(user.getUsername()));
+        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(info));
 
 		return Response.setMsg("Email sent.", HttpStatus.OK);
 
