@@ -54,4 +54,44 @@ public class UserRepoTest {
     void testHasUserCartitem() {
 
     }
+
+    @org.junit.Test
+    public void testFindByEmail2() {
+        
+    }
+
+    @org.junit.Test
+    public void testGetAllConsumers() {
+        
+    }
+
+    @org.junit.Test
+    public void testGetAllUserGroup() {
+        
+    }
+
+    @org.junit.Test
+    public void testGetUserByOrderDate2() {
+        
+    }
+
+    @org.junit.Test
+    public void testGetUserByOrderDateAndType() {
+        
+    }
+
+    @org.junit.Test
+    public void testGetUserByOrderId() {
+        
+    }
+
+    @org.junit.Test
+    public void testGetUserEmailsByRole() {
+        
+    }
+
+    @org.junit.Test
+    public void testHasUserCartitem2() {
+        
+    }
 }
