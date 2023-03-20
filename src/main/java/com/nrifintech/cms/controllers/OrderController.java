@@ -34,6 +34,8 @@ import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.entities.Wallet;
+import com.nrifintech.cms.events.CancelledOrderEvent;
+import com.nrifintech.cms.events.DeliveredOrderEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.events.WalletDebitEvent;
 import com.nrifintech.cms.events.WalletRefundEvent;
@@ -149,7 +151,7 @@ public class OrderController {
 	}
 
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
-	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId) {
+	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {
 
 		Status[] status = Status.values();
 		if (status[statusId].toString().equalsIgnoreCase(Status.Pending.toString()))
@@ -170,11 +172,8 @@ public class OrderController {
 			orderService.saveOrder(order);
 			// email code
 			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
-				// this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new
-				// OrderToken(user.getEmail(), order)));
-			} else if (order.getStatus().toString().equalsIgnoreCase(Status.Cancelled.toString())) {
-				// this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new
-				// OrderToken(user.getEmail(), order)));
+				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new
+				OrderToken(principal.getName(), order)));
 			}
 
 			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
@@ -421,6 +420,8 @@ public class OrderController {
 
 						if (orderService.isNotNull(order)){
 							this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName() , wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber())));
+							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new
+							OrderToken(principal.getName(), order)));
 							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
 						}
 					}

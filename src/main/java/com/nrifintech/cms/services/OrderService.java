@@ -131,8 +131,8 @@ public class OrderService implements Validator {
 		return order;
 	}
 
-	public void autoArchive() {
-		orderRepo.autoArchive();
+	public void autoArchive(String date) {
+		orderRepo.autoArchive(date);
 	}
 
 	public Boolean getServerEpoch(Timestamp prev, Timestamp curr) {
