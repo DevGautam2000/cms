@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="color-scheme" content="light dark" />
     <meta name="supported-color-schemes" content="light dark" />
-    <title>Wallet Recharge Email Template</title>
+    <title>Inventory Request Email Template</title>
     <style type="text/css" rel="stylesheet" media="all">
     /* Base ------------------------------ */
     
@@ -427,7 +427,7 @@
     }
 
     #status{
-      color : rgb(179, 255, 0);
+      color : rgb(53, 231, 21);
     }
     </style>
   </head>
@@ -452,17 +452,25 @@
                   <tr>
                     <td class="content-cell">
                       <div class="f-fallback">
-                        <h1>Welcome, ${username}!</h1>
-                        <p> Hurray &#127881; your wallet has been recharged!!!</p>
-                        <p>Wallet Balance Details : </p>
+                        <h1>Welcome, Canteen User !</h1>
+                        <p> Hey, Admin has purchased the Items as requested by you.<br> Please look into the Details!!!</p>
+                        <p>Inventory Details :</p>
                         <table class="attributes" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                           <tr>
                             <td class="attributes_content">
                               <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+
+                                <tr>
+                                    <td class="attributes_item">
+                                      <span class="f-fallback">
+                                        <strong>Item Id :</strong> ${id}
+                                  </span>
+                                    </td>
+                                  </tr>
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>Username :</strong> ${username}
+                                 <strong>Name : </strong> ${name}
                                 </span>
                                   </td>
                                 </tr>
@@ -470,7 +478,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>Money Added : </strong> &#8377; ${money}
+                                 <strong>Earlier Quantity in Hand : </strong> ${qtyInHand}
                                 </span>
                                   </td>
                                 </tr>
@@ -478,18 +486,18 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback">
-                                 <strong>Current Balance : </strong> &#8377; ${curr}
+                                 <strong>Earlier Quantity Requested :  </strong> ${qtyReq}
                                 </span>
                                   </td>
                                 </tr>
 
                                 <tr>
-                                  <td class="attributes_item">
-                                    <span class="f-fallback">
-                                      <strong>Transaction Id :</strong> ${transactionId}
-                                </span>
-                                  </td>
-                                </tr>
+                                    <td class="attributes_item">
+                                      <span class="f-fallback">
+                                   <strong>Quantity Purchased :  </strong> ${qtypur}
+                                  </span>
+                                    </td>
+                                  </tr>
                               </table>
                             </td>
                           </tr>
@@ -501,7 +509,7 @@
                                 <tr>
                                   <td class="attributes_item">
                                     <span class="f-fallback" >
-                            <strong>Recharge Status : </strong> <span id="status"> Success</span>
+                            <strong>Purcahse Status : </strong> <span id="status"> Success</span>
                               </span>
                                   </td>
                                 </tr>
@@ -517,7 +525,7 @@
                           <tr>
                             <td>
                               <p class="f-fallback sub">Hoping for the Best Service to be Served by our Team!!!</p>
-                              <p class="f-fallback sub">The Mail was Sent at : <strong>{timestamp}</strong></p>
+                              <p class="f-fallback sub">The Mail was Sent at : <strong>${timestamp}</strong></p>
                             </td>
                           </tr>
                         </table>

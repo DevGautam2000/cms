@@ -1,6 +1,7 @@
 package com.nrifintech.cms.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -12,6 +13,8 @@ import org.springframework.data.repository.query.Param;
 import com.nrifintech.cms.entities.Inventory;
 
 public interface InventoryRepo extends JpaRepository<Inventory,Integer>{
+
+    public Optional<Inventory> findById(Integer id);
 
     public List<Inventory> findByName(String name);
 

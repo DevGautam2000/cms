@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import javax.persistence.Tuple;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -18,19 +20,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nrifintech.cms.dtos.EmailModel;
+import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.dtos.WalletEmailResponse;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
+import com.nrifintech.cms.events.ApprovedQtyReqEvent;
 import com.nrifintech.cms.events.CancelledOrderEvent;
 import com.nrifintech.cms.events.DeliveredOrderEvent;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
+import com.nrifintech.cms.events.UpdateQtyReqEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.events.WalletDebitEvent;
 import com.nrifintech.cms.events.WalletRechargeEvent;
 import com.nrifintech.cms.events.WalletRefundEvent;
+import com.nrifintech.cms.repositories.UserRepo;
+import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.SMTPservices;
 import com.nrifintech.cms.types.UserStatus;
 
@@ -40,12 +47,18 @@ public class Listeners {
     @Autowired
     private SMTPservices smtpServices;
 
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private AuthenticationService authenticationService;
+
     @EventListener
     @Async
     public void onForgotPassword(ForgotPasswordEvent event){
         HashMap<String,String> body = (HashMap<String, String>) event.getSource();
         body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        body.put("link","<pass-forgot-link>");
+        body.put("actionurl","http://localhost:3000/resetPassword?link=" + body.get("forgotlink"));
         List<String> recipients = new ArrayList<>();
         recipients.add(body.get("username"));
         EmailModel email = new EmailModel(recipients , "Forgot-password-request" , body , "forgot-password.flth");
@@ -61,10 +74,9 @@ public class Listeners {
         recipients.add(user.getEmail());
         HashMap<String,String> body = new HashMap<>();
         body.put("unsublink" , "...link to user page...");
-        body.put("link", "...pass-reset-link...");
+        body.put("actionurl" , "http://localhost:3000/resetPassword?link=" + authenticationService.setNewPassword(user.getEmail()));
         body.put("username",user.getEmail());
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-
         EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome-email.flth");
         this.smtpServices.sendMail(email);
     }
@@ -157,6 +169,7 @@ public class Listeners {
         body.put("curr", String.valueOf(w.getCurrentBalance()) );
         body.put("money", String.valueOf(w.getMoneyAdded()) );
         body.put("transactionId", w.getTransactionId());
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
         EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-recharge.flth");
@@ -172,6 +185,7 @@ public class Listeners {
         body.put("curr", String.valueOf(w.getCurrentBalance()) );
         body.put("money", String.valueOf(w.getMoneyAdded()) );
         body.put("transactionId", w.getTransactionId());
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
         EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-refund.flth");
@@ -187,10 +201,52 @@ public class Listeners {
         body.put("curr", String.valueOf(w.getCurrentBalance()) );
         body.put("money", String.valueOf(w.getMoneyAdded()) );
         body.put("transactionId", w.getTransactionId());
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
         EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-refund.flth");
         this.smtpServices.sendMail(email);
+    }
+
+    @EventListener
+    @Async
+    public void onApproval(ApprovedQtyReqEvent approvedQtyReqEvent){
+
+        List<Tuple> resTup = userRepo.getUserEmailsByRole(1);
+        List<String> recipients = resTup.stream().map(u->u.get(0,String.class)).collect(Collectors.toList());
+        HashMap<String , String> body = new HashMap<>();
+        InventoryMail iMail = (InventoryMail) approvedQtyReqEvent.getSource();
+
+        body.put("id" , String.valueOf(iMail.getId()) );
+        body.put("name" , iMail.getName() );
+        body.put("qtyInHand", String.valueOf(iMail.getQuantityInHand()) );
+        body.put("qtyReq", String.valueOf(iMail.getQuantityRequested()) );
+        body.put("qtypur" , String.valueOf(iMail.getQuantityPurchased()) );
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"approval-inventory.flth");
+        this.smtpServices.sendMail(email);
+
+    }
+
+    @EventListener
+    @Async
+    public void onRequest(UpdateQtyReqEvent updateQtyReqEvent){
+
+        List<Tuple> resTup = userRepo.getUserEmailsByRole(0);
+        List<String> recipients = resTup.stream().map(u->u.get(0,String.class)).collect(Collectors.toList());
+        HashMap<String , String> body = new HashMap<>();
+        InventoryMail iMail = (InventoryMail) updateQtyReqEvent.getSource();
+
+        body.put("id" , String.valueOf(iMail.getId()) );
+        body.put("name" , iMail.getName() );
+        body.put("qtyInHand", String.valueOf(iMail.getQuantityInHand()) );
+        body.put("qtyReq", String.valueOf(iMail.getQuantityRequested()) );
+        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"request-inventory.flth");
+        this.smtpServices.sendMail(email);
+
     }
 }
 

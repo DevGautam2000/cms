@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.TransactionScoped;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -42,8 +44,6 @@ public class AuthenticationService {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Autowired
     private TokenBlacklistRepo tokenRepo;
     
     
@@ -68,27 +68,21 @@ public class AuthenticationService {
     }
 
 
-    public void forgetPassword(String email){
+    public String forgetPassword(String email){
         User user=userService.getuser(email);
 
         if(!(user.getStatus().equals(UserStatus.Active)))
             throw new UserIsDisabledException();
             
-        resetPasswordEmail(user);
+        return(resetPasswordEmail(user));
     }
 
-    private void resetPasswordEmail(User user){
+    private String resetPasswordEmail(User user){
         System.out.println(user);
         MyUserDetails myUser = new MyUserDetails(user);
         String token = jwtUtils.generateResetToken(myUser);
-        //TODO : ** url needs to be changed **
         String url="/auth/change-password?token="+token;
-        System.out.println(url);
-        //code here
-        HashMap<String,String> info = new HashMap<>();
-        info.put("username",user.getEmail());
-        info.put("token",token);
-        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(info));
+        return(url);
     }
 
     public void changePassword(String email,String token,String newPassword) {
@@ -110,22 +104,23 @@ public class AuthenticationService {
 
     }
 
-    public void setNewPassword(String email){
+    @Transactional
+    public String setNewPassword(String email){
         User user=userService.getuser(email);
         
         if(!(user.getStatus().equals(UserStatus.InActive)))
             throw new UserIsEnabledException();
         
-        setNewPasswordEmail(user);
+        return(setNewPasswordEmail(user));
     }
 
-    private void setNewPasswordEmail(User user){
+    @Transactional
+    private String setNewPasswordEmail(User user){
         System.out.println(user);
         String token = jwtUtils.generateNewPasswordToken(new MyUserDetails(user));
         //TODO : ** url needs to be changed **
         String url="/auth/activate-new-password?token="+token;
-        System.out.println(url);
-        //code here
+        return(url);
     }
     
     public void setNewPasswordAndActivate(String email,String token,String newPassword) {
