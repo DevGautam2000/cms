@@ -118,7 +118,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers(Route.Wallet.prefix+Route.Wallet.getWallet + "/{walletId}").access((authentication, object) -> aManagerAdapter.preCheckUserWalletId(authentication, object)) 
 			.antMatchers(HttpMethod.POST, Route.Wallet.prefix+Route.Wallet.addMoney + "/*").hasAnyAuthority(Role.User.toString())
 
-			.antMatchers("/content/**").permitAll()
+				//TODO
+				.antMatchers("/excel/getuserreports").permitAll()
+
+				.antMatchers("/content/**").permitAll()
 			.anyRequest().authenticated()
 		     .and()
              .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
