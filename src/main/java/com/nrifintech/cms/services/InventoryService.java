@@ -35,8 +35,12 @@ public class InventoryService {
     public List<Inventory> getAllInventory(){
         return( this.inventoryRepo.findAll() );
     }
-    public void removeInventoryById(Integer id){
+    public boolean removeInventoryById(Integer id){
+        if( id == null || this.inventoryRepo.findById(id).isEmpty() ){
+            return(false);
+        }
         this.inventoryRepo.deleteById(id);
+        return(true);
     }
 
     public void updateQtyInHand(Double qty,int id){

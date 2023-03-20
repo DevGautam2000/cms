@@ -87,7 +87,7 @@ public class OrderService implements Validator {
 			FeedBack f = order.getFeedBack();
 
 			if (isNull(f)) {
-				String trimmedComment = feedBack.getComments().toString().trim();
+				String trimmedComment = feedBack.getComments().trim();
 				feedBack.setComments(trimmedComment);
 
 				feedBackService.addFeedBack(feedBack);
@@ -133,6 +133,7 @@ public class OrderService implements Validator {
 
 	public void autoArchive(String date) {
 		orderRepo.autoArchive(date);
+
 	}
 
 	public Boolean getServerEpoch(Timestamp prev, Timestamp curr) {
