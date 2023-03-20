@@ -30,11 +30,7 @@ public class WalletService implements Validator {
 	private StripeService stripeService;
 
 	private Boolean checkForMinimumLimit(Double currentBalance) {
-
-		if (currentBalance < LIMIT)
-			return false;
-
-		return true;
+		return currentBalance >= LIMIT;
 	}
 
 	public Boolean checkMinimumAmount(Wallet w) {
@@ -73,8 +69,6 @@ public class WalletService implements Validator {
 
 			chargeId = stripeService.createCharge(email, token, amount);
 			t.setChargeId(chargeId);
-
-			System.out.println(chargeId);
 
 			w.getTransactions().add(t);
 			this.save(w);

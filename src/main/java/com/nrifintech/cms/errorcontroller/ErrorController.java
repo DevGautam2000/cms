@@ -37,7 +37,7 @@ interface Message {
 public class ErrorController extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(NotFoundException.class)
-	public Response handleNotFoundException(NotFoundException ex, WebRequest request) {
+	public Response handleNotFoundException(NotFoundException ex) {
 		return Response.setErr(ex.getMessage(), HttpStatus.NOT_FOUND);
 	}
 
@@ -117,7 +117,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ UserIsEnabledException.class })
     public Response userIsEnabledException(
       Exception ex, WebRequest request) {
-        return Response.set(
+        return Response.setErr(
           ex.getMessage(), 
           HttpStatus.UNAUTHORIZED);
     }
