@@ -146,5 +146,12 @@ public class Route {
 		String getUserStats = "userstats";
 	}
 
+	public interface Excel {
+		String prefix  = "/excel/";
+
+		String getUserReports = "getuserreports";
+		String getMenuReports = "getmenureports";
+	}
+
 
 }

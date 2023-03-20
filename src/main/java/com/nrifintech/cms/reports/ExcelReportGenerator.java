@@ -1,16 +1,24 @@
 package com.nrifintech.cms.reports;
 
-import com.nrifintech.cms.entities.Order;
-import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.entities.*;
+import com.nrifintech.cms.reports.dto.ResourceDTO;
+import com.nrifintech.cms.repositories.MenuRepo;
+import com.nrifintech.cms.repositories.UserRepo;
+import com.nrifintech.cms.types.ItemType;
+import com.nrifintech.cms.types.TransactionType;
 import org.apache.catalina.connector.Response;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,58 +26,255 @@ import java.util.List;
 
 public class ExcelReportGenerator {
 
-    public void generate(List<User> users) throws IOException {
-        // Creating a Workbook
-        Workbook workbook = new XSSFWorkbook();
-        // Creating a Sheet
-        Sheet sheet = workbook.createSheet("Past Orders");
-        // Creating a DateTimeFormatter
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
+    @Service
+    @Transactional
+    public static class UserReport {
+        @Autowired
+        private UserRepo userRepository;
 
-        String fileName = "past_orders_" + dtf.format(now) + ".xlsx";
-        // Creating a Row for the Title
-        Row titleRow = sheet.createRow(0);
-        // Creating a Cell for the Title
-        Cell titleCell = titleRow.createCell(0);
-        // Setting the Title
-        int rowNum=1;
-        titleCell.setCellValue("List of the Previous Orders - " + dtf.format(now));
-        Row r = sheet.createRow(rowNum++);
-        r.createCell(0).setCellValue("User Name");
-//        r.createCell(1).setCellValue("Order Date");
-//        r.createCell(2).setCellValue("Order Id");
-//        r.createCell(3).setCellValue("Item Name");
-//        r.createCell(4).setCellValue("Price");
-        rowNum = 3;
-        for (User user : users) {
-            Row row = sheet.createRow(rowNum++);
-//            row.createCell(0).setCellValue(order.getCanteenUsers().getName());
-//            row.createCell(1).setCellValue(order.getOrderDate().toString());
-//            row.createCell(2).setCellValue(order.getOrderId());
-//            row.createCell(3).setCellValue(order.getFood().getName());
-//            row.createCell(4).setCellValue(order.getTotalPrice());
-            row.createCell(0).setCellValue(user.getEmail());
+
+        public ResourceDTO exportUsers() {
+            List<User> userList = userRepository.findAll();
+            Resource resource = prepareExcel(userList);
+            return ResourceDTO.builder().resource(resource).mediaType(MediaType.parseMediaType
+                    ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).build();
         }
-        // Setting the Column Widths
-        sheet.setColumnWidth(0, 6000);
-//        sheet.setColumnWidth(1, 4000);
-//        sheet.setColumnWidth(2, 4000);
-//        sheet.setColumnWidth(3, 6000);
-//        sheet.setColumnWidth(4, 4000);
-        // Writing the Workbook to the Response
-        HttpServletResponse httpServletResponse = new Response();
-        httpServletResponse.setContentType("application/vnd.ms-excel");
-        httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-        ServletOutputStream outputStream = httpServletResponse.getOutputStream();
-        workbook.write(outputStream);
-        outputStream.flush();
-        outputStream.close();
+
+        private Resource prepareExcel(List<User> userList) {
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("USERS");
 
 
-        System.out.println("HI mf");
+            prepareHeaders(workbook, sheet, "Id", "Email", "Role", "Status", "Created At", "Total Orders", "Total Veg Item", "Total Non Veg Item", "Wallet Balance", "Total transactions",
+                    "Total Deposits", "Total Withdrawals", "Total deposited", "Total expense");
+            populateUserData(workbook, sheet, userList);
 
-        workbook.close();
+
+            try (ByteArrayOutputStream byteArrayOutputStream
+                         = new ByteArrayOutputStream()) {
+
+                workbook.write(byteArrayOutputStream);
+                return new ByteArrayResource(byteArrayOutputStream.toByteArray());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException
+                        ("Error while generating excel.");
+            }
+        }
+
+        private void populateUserData(Workbook workbook, Sheet sheet, List<User> users) {
+
+            int rowNo = 1;
+
+            for (User obj : users) {
+
+                int columnNo = 0;
+                Row row = sheet.createRow(rowNo);
+                populateCell(sheet, row, columnNo++, String.valueOf(obj.getId()));
+                populateCell(sheet, row, columnNo++, obj.getEmail());
+                populateCell(sheet, row, columnNo++, obj.getRole().toString());
+                populateCell(sheet, row, columnNo++, obj.getStatus().toString());
+                populateCell(sheet, row, columnNo++, obj.getCreated().toString());
+                populateCell(sheet, row, columnNo++, String.valueOf(obj.getRecords().size()));
+
+                long veg = 0, nonVeg = 0;
+                for (Order order : obj.getRecords()) {
+                    veg += order.getCartItems().stream().filter(i -> i.getItemType().equals(ItemType.Veg)).count();
+                    nonVeg += order.getCartItems().stream().filter(i -> i.getItemType().equals(ItemType.NonVeg)).count();
+                }
+
+
+                populateCell(sheet, row, columnNo++, String.valueOf(veg));
+                populateCell(sheet, row, columnNo++, String.valueOf(nonVeg));
+
+                if (obj.getWallet() != null) {
+                    populateCell(sheet, row, columnNo++, String.valueOf(obj.getWallet().getBalance()));
+                    populateCell(sheet, row, columnNo++, String.valueOf(obj.getWallet().getTransactions().size()));
+
+                    int deposits = (int) obj.getWallet().getTransactions().stream().filter(
+                            t -> t.getType().equals(TransactionType.Deposit)
+                    ).count();
+
+                    double depositedAmount = 0d, expenseAmount = 0d;
+                    for (Transaction t : obj.getWallet().getTransactions()) {
+                        if (t.getType().equals(TransactionType.Deposit))
+                            depositedAmount += t.getAmount();
+                        else expenseAmount += t.getAmount();
+                    }
+
+
+                    populateCell(sheet, row, columnNo++, String.valueOf(deposits));
+                    populateCell(sheet, row, columnNo++, String.valueOf(obj.getWallet().getTransactions().size() - deposits));
+                    populateCell(sheet, row, columnNo++, String.valueOf(depositedAmount));
+                    populateCell(sheet, row, columnNo++, String.valueOf(expenseAmount));
+                } else {
+                    populateCell(sheet, row, columnNo++, "NA");
+                    populateCell(sheet, row, columnNo++, "NA");
+                    populateCell(sheet, row, columnNo++, "NA");
+                    populateCell(sheet, row, columnNo++, "NA");
+                    populateCell(sheet, row, columnNo++, "NA");
+                    populateCell(sheet, row, columnNo++, "NA");
+                }
+                rowNo++;
+            }
+        }
+
+        private void populateOrderData(Workbook workbook, Sheet sheet,
+                                       List<Order> orders) {
+
+            int rowNo = 1;
+
+            for (Order obj : orders) {
+
+                int columnNo = 0;
+                Row row = sheet.createRow(rowNo);
+                populateCell(sheet, row, columnNo++, String.valueOf((obj.getId())));
+                populateCell(sheet, row, columnNo++, obj.getStatus().toString());
+                populateCell(sheet, row, columnNo++, String.valueOf(obj.getCartItems().size()));
+                populateCell(sheet, row, columnNo++, obj.getFeedBack().toString());
+                populateCell(sheet, row, columnNo, obj.getOrderPlaced().toString());
+
+                rowNo++;
+            }
+        }
+
+        private void populateCell(Sheet sheet, Row row, int columnNo,
+                                  String value) {
+
+            Cell cell = row.createCell(columnNo);
+            cell.setCellValue(value);
+            sheet.autoSizeColumn(columnNo);
+
+        }
+
+        private void populateCell(Sheet sheet, Row row, int columnNo,
+                                  String value, Hyperlink link) {
+
+            Cell cell = row.createCell(columnNo);
+            cell.setCellValue(value);
+            sheet.autoSizeColumn(columnNo);
+
+
+            cell.setHyperlink(link);
+//        cell.setCellStyle();
+
+        }
+
+        private void prepareHeaders(Workbook workbook,
+                                    Sheet sheet, String... headers) {
+
+            Row headerRow = sheet.createRow(0);
+            Font font = workbook.createFont();
+            font.setBold(true);
+//        font.setFontName("Arial");
+
+            CellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setFont(font);
+
+            int columnNo = 0;
+            for (String header : headers) {
+                Cell headerCell = headerRow.createCell(columnNo++);
+                headerCell.setCellValue(header);
+                headerCell.setCellStyle(cellStyle);
+            }
+        }
     }
 
+
+    @Service
+    @Transactional
+    public static class MenuReport {
+        @Autowired
+        private MenuRepo menuRepo;
+
+
+        public ResourceDTO exportMenus() {
+            List<Menu> menus = menuRepo.findAll();
+            Resource resource = prepareExcel(menus);
+            return ResourceDTO.builder().resource(resource).mediaType(MediaType.parseMediaType
+                    ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).build();
+        }
+
+        private Resource prepareExcel(List<Menu> menus) {
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("MENUS");
+
+
+            prepareHeaders(workbook, sheet,"Id","Approval","For Date","Menu Type","Total items",
+                    "Total Veg Items","Total Non Veg Items");
+            populateMenuData(workbook, sheet, menus);
+
+
+            try (ByteArrayOutputStream byteArrayOutputStream
+                         = new ByteArrayOutputStream()) {
+
+                workbook.write(byteArrayOutputStream);
+                return new ByteArrayResource(byteArrayOutputStream.toByteArray());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException
+                        ("Error while generating excel.");
+            }
+        }
+
+        private void populateMenuData(Workbook workbook, Sheet sheet, List<Menu> menus) {
+
+            int rowNo = 1;
+
+            for (Menu obj : menus) {
+
+                int columnNo = 0;
+                Row row = sheet.createRow(rowNo);
+                populateCell(sheet, row, columnNo++, String.valueOf(obj.getId()));
+                populateCell(sheet, row, columnNo++, String.valueOf(obj.getApproval()));
+                populateCell(sheet, row, columnNo++, obj.getDate().toString());
+                populateCell(sheet, row, columnNo++, obj.getMenuType().toString());
+                populateCell(sheet, row, columnNo++, String.valueOf(obj.getItems().size()));
+
+
+                int veg =0,nonVeg=0;
+
+                for (Item i :
+                        obj.getItems()) {
+                    if(i.getItemType().equals(ItemType.Veg))
+                        veg++;
+                    else nonVeg++;
+                }
+
+                populateCell(sheet, row, columnNo++, String.valueOf(veg));
+                populateCell(sheet, row, columnNo++, String.valueOf(nonVeg));
+
+                rowNo++;
+            }
+        }
+
+
+        private void populateCell(Sheet sheet, Row row, int columnNo,
+                                  String value) {
+
+            Cell cell = row.createCell(columnNo);
+            cell.setCellValue(value);
+            sheet.autoSizeColumn(columnNo);
+
+        }
+
+        private void prepareHeaders(Workbook workbook,
+                                    Sheet sheet, String... headers) {
+
+            Row headerRow = sheet.createRow(0);
+            Font font = workbook.createFont();
+            font.setBold(true);
+//        font.setFontName("Arial");
+
+            CellStyle cellStyle = workbook.createCellStyle();
+            cellStyle.setFont(font);
+
+            int columnNo = 0;
+            for (String header : headers) {
+                Cell headerCell = headerRow.createCell(columnNo++);
+                headerCell.setCellValue(header);
+                headerCell.setCellStyle(cellStyle);
+            }
+        }
+    }
 }
