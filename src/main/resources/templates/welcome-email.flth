@@ -479,7 +479,7 @@
                               <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
                                 <tr>
                                   <td align="center">
-                                    <a href="{{action_url}}" class="f-fallback button" target="_blank">${frontendlink} ${resetlink} Generate password</a>
+                                    <a href=${actionurl} class="f-fallback button" target="_blank">Generate password</a>
                                   </td>
                                 </tr>
                               </table>
