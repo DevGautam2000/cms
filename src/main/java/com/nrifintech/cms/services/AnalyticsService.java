@@ -51,7 +51,7 @@ public class AnalyticsService {
     //get expenes day by day
     public List<AnalyticsResponseDate> getExpDate(String date1 , String date2){
         List<Tuple> resTup = ( this.purchaseRepo.getExpDate(date1, date2) );
-        List<AnalyticsResponseDate> result = resTup.stream().map(t->new AnalyticsResponseDate(t.get(0, String.class), t.get(1, Double.class))).collect(Collectors.toList());
+        List<AnalyticsResponseDate> result = resTup.stream().map(t->new AnalyticsResponseDate(t.get(0, String.class), t.get(1, BigDecimal.class))).collect(Collectors.toList());
         return( result );
     }
 
@@ -63,7 +63,7 @@ public class AnalyticsService {
     //get day by day sales
     public List<AnalyticsResponseDate> getSalesDate(String date1 , String date2){
         List<Tuple> resTup = ( this.orderRepo.getDaybyDaySales(date1, date2) );
-        List<AnalyticsResponseDate> result = resTup.stream().map(t->new AnalyticsResponseDate(t.get(0, String.class), t.get(1, Double.class))).collect(Collectors.toList());
+        List<AnalyticsResponseDate> result = resTup.stream().map(t->new AnalyticsResponseDate(t.get(0, String.class), t.get(1, BigDecimal.class))).collect(Collectors.toList());
         return( result );
     }
 
