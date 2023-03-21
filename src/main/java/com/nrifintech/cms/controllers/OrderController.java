@@ -343,7 +343,7 @@ public class OrderController {
         // order cancellation is 12 pm
 
         if (orderService.isNotNull(order)) {
-            System.out.println("comingjjjjjjjjj here");
+           
             if (user.getRecords().contains(order)) {
 
                 System.out.println("coming here");
@@ -396,12 +396,13 @@ public class OrderController {
 						}
 					}
                         
-                    }
+                    
 
                 }
 
                 return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
             }
+            
 
             return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
         }
@@ -409,4 +410,5 @@ public class OrderController {
         return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
 
     }
+
 }

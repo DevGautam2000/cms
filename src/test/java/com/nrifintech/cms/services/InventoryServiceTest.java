@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,8 +64,8 @@ public class InventoryServiceTest {
         } 
         Mockito.when(inventoryRepo.save(invetories.get(0))).thenReturn(invetories.get(0));
        // Mockito.when(inventoryRepo.save(invetories.get(1))).thenReturn(invetories.get(1));
-        Mockito.when(inventoryRepo.findByName(eq(invetories.get(0).getName()))).thenReturn(List.of());
-        Mockito.when(inventoryRepo.findByName(eq(invetories.get(1).getName()))).thenReturn(List.of(invetories.get(1)));
+        Mockito.when(inventoryRepo.findByName(eq(invetories.get(0).getName()))).thenReturn(Arrays.asList());
+        Mockito.when(inventoryRepo.findByName(eq(invetories.get(1).getName()))).thenReturn(Arrays.asList(invetories.get(1)));
         assertEquals(invetories.get(0), inventoryService.addToInventory(invetories.get(0)));
         assertEquals(null, inventoryService.addToInventory(invetories.get(1)));
         Mockito.verify(inventoryRepo , Mockito.times(2)).findByName(anyString());

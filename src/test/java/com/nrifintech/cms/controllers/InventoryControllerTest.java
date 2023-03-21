@@ -2,6 +2,7 @@ package com.nrifintech.cms.controllers;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -131,7 +132,7 @@ public class InventoryControllerTest extends MockMvcSetup{
 
     @Test
     public void testGetByNameSuccess() throws JsonProcessingException, UnsupportedEncodingException, Exception {
-        Mockito.when( this.inventoryService.getInventoryByName("Potato") ).thenReturn(List.of(this.inventory));
+        Mockito.when( this.inventoryService.getInventoryByName("Potato") ).thenReturn(Arrays.asList(this.inventory));
 
         String r1 = mockMvc.perform(
         MockMvcRequestBuilders.get(prefix(Route.Inventory.getByName + "{name}") , this.inventory.getName())
@@ -140,12 +141,12 @@ public class InventoryControllerTest extends MockMvcSetup{
         ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         Inventory[] actual = mapFromJson(r1, Inventory[].class);
 
-        assertArrayEquals(actual, List.of(this.inventory).toArray());
+        assertArrayEquals(actual, Arrays.asList(this.inventory).toArray());
     }
 
     @Test
     public void testGetByNameFailure() throws JsonProcessingException, UnsupportedEncodingException, Exception {
-        Mockito.when( this.inventoryService.getInventoryByName("Tomato") ).thenReturn(List.of());
+        Mockito.when( this.inventoryService.getInventoryByName("Tomato") ).thenReturn(Arrays.asList());
 
         String r1 = mockMvc.perform(
         MockMvcRequestBuilders.get(prefix(Route.Inventory.getByName + "{name}") , "Tomato")
