@@ -89,6 +89,7 @@
 			<artifactId>UserAgentUtils</artifactId>
 			<version>1.21</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
@@ -99,7 +100,14 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>5.1.0</version>
 		</dependency>
-	</dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
