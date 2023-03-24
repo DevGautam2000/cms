@@ -236,13 +236,13 @@ public class InventoryControllerTest extends MockMvcSetup{
         assertEquals("Unable to save" , response.getMessage());
     }
 
-    // @Test
-    // public void testUpdateQtyInHand() {
+    @Test
+    public void testUpdateQtyInHand() {
 
-    // }
+    }
 
-    // @Test
-    // public void testUpdateQtyRequested() {
+    @Test
+    public void testUpdateQtyRequested() {
 
-    // }
+    }
 }

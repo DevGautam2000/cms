@@ -32,7 +32,6 @@ public class PurchaseServiceTest {
         this.purchaseSample = new Purchase(100,2.0,12,null,null);
     }
 
-
     @Test
     public void testGetAllPurchase() {
 
@@ -45,8 +44,6 @@ public class PurchaseServiceTest {
 
     @Test
     public void testInitiateNewPurchase() {
-        // Mockito.when( this.purchaseRepo.save(purchase) ).thenReturn(purchase);
-
     }
 
     @Test
