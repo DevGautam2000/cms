@@ -101,8 +101,38 @@ public class OrderService implements Validator {
 		return order;
 	}
 
-	public void autoArchive() {
-		orderRepo.autoArchive();
+	// public Object addItemsToOrder(Integer orderId, List<String> itemIds, List<String> quantities) {
+	// 	Order order = this.getOrder(orderId);
+
+	// 	if (isNotNull(order)) {
+
+	// 		List<CartItem> exItems = order.getCartItems();
+
+	// 		if (exItems.isEmpty()) {
+
+	// 			List<CartItem> items = new ArrayList<>();
+
+	// 			itemIds.forEach(id -> {
+
+	// 				Item item = itemService.getItem(Integer.valueOf(id));
+
+	// 				if (isNotNull(item)) {
+	// 					items.add(new CartItem(item, Integer.valueOf(quantities.get(itemIds.lastIndexOf(id)))));
+	// 				}
+
+	// 			});
+
+	// 			order.setCartItems(items);
+	// 			orderRepo.save(order);
+
+	// 		} else
+	// 			return exItems.size() > 0 ? new Item() : null;
+	// 	}
+	// 	return order;
+	// }
+
+	public void autoArchive(String date) {
+		orderRepo.autoArchive(date);
 	}
 
 	public Boolean getServerEpoch(Timestamp prev, Timestamp curr) {

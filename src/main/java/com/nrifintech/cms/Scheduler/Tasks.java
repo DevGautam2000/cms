@@ -40,39 +40,45 @@ public class Tasks {
     @Autowired
     OrderService orderService;
 
-    // @Scheduled( fixedDelay = 10000)
-    // public void promotionalEvent(){
-    //     List<String> recipients = userService.getAllConsumers();
-    //     if( recipients.size()!=0 ){
-    //         applicationEventPublisher.publishEvent(new PromotionalEvent(recipients));
-    //     }
-    // }
-
-    // @Scheduled(fixedDelay = 10000)
-    // public void BreakfastStart(){
-    //     DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
-    //     LocalDateTime now = LocalDateTime.now();  
-    //     List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Breakfast.ordinal());
-    //     if(recipients.size()>0){
-    //         applicationEventPublisher.publishEvent(new BreakfastStartEvent(recipients));
-    //     } 
-    // }
-    // @Scheduled(fixedDelay = 10000)
-    // public void LunchStart(){
-    //     DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
-    //     LocalDateTime now = LocalDateTime.now();  
-    //     List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Lunch.ordinal());
-    //     if( recipients.size()>0 ){
-    //         applicationEventPublisher.publishEvent(new LunchStartEvent(recipients));
-    //     } 
-    // }
-
-    // @Scheduled(fixedDelay = 10000)
-    // public void autoArchive(){
-    //     orderService.autoArchive();
-    // }
+    @Scheduled( fixedDelay = 10000)
+    public void promotionalEvent(){
+        List<String> recipients = userService.getAllConsumers();
+        if( recipients.size()!=0 ){
+            applicationEventPublisher.publishEvent(new PromotionalEvent(recipients));
+        }
+    }
 
     @Scheduled(fixedDelay = 10000)
+    //@Scheduled(cron = "0 30 3 ? * MON,TUE,WED,THU,FRI *")
+    public void BreakfastStart(){
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        LocalDateTime now = LocalDateTime.now();  
+        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Breakfast.ordinal());
+        if(recipients.size()>0){
+            applicationEventPublisher.publishEvent(new BreakfastStartEvent(recipients));
+        } 
+    }
+    @Scheduled(fixedDelay = 10000)
+    //@Scheduled(cron = "0 30 6 ? * MON,TUE,WED,THU,FRI *")
+    public void LunchStart(){
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        LocalDateTime now = LocalDateTime.now();  
+        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Lunch.ordinal());
+        if( recipients.size()>0 ){
+            applicationEventPublisher.publishEvent(new LunchStartEvent(recipients));
+        } 
+    }
+
+    @Scheduled(fixedDelay = 10000)
+    // @Scheduled(cron = "0 30 18 ? * MON,TUE,WED,THU,FRI,SAT *" )
+    public void autoArchive(){
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        LocalDateTime now = LocalDateTime.now();
+        orderService.autoArchive( (Date.valueOf(dtf.format(now).toString())).toString() );
+    }
+
+    @Scheduled(fixedDelay = 10000)
+    // @Scheduled(cron = "0 30 18 ? * MON,TUE,WED,THU,FRI,SAT *" )
     public void autoFlush(){
         List<TokenBlacklist> operationList = this.tokenBlacklistRepo.findAll();
 

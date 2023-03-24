@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.nrifintech.cms.events.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -35,6 +34,11 @@ import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.entities.Wallet;
+import com.nrifintech.cms.events.CancelledOrderEvent;
+import com.nrifintech.cms.events.DeliveredOrderEvent;
+import com.nrifintech.cms.events.PlacedOrderEvent;
+import com.nrifintech.cms.events.WalletDebitEvent;
+import com.nrifintech.cms.events.WalletRefundEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.CartService;
 import com.nrifintech.cms.services.MenuService;
@@ -53,351 +57,384 @@ import com.nrifintech.cms.utils.SameRoute;
 @RequestMapping(Route.Order.prefix)
 public class OrderController {
 
+	@Autowired
+	private OrderService orderService;
 
-    private OrderService orderService;
+	@Autowired
+	private MenuService menuService;
 
-    @Autowired
-    private MenuService menuService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private CartService cartService;
 
-    @Autowired
-    private CartService cartService;
+	@Autowired
+	private WalletService walletService;
 
-    @Autowired
-    private WalletService walletService;
+	@Autowired
+	private TransactionService transactionService;
 
-    @Autowired
-    private TransactionService transactionService;
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+	@PostMapping(Route.Order.addOrders)
+	public Response addOrders(@RequestBody List<Order> orders) {
 
-    @GetMapping(Route.Order.getOrders)
-    public Response getOrders() {
-        List<Order> o = orderService.getOrders();
+		List<Order> o = orderService.addOrders(orders);
 
-        if (orderService.isNotNull(o)) {
-            return Response.set(o, HttpStatus.OK);
-        }
+		if (orderService.isNotNull(o)) {
+			return Response.setMsg("Orders added.", HttpStatus.OK);
+		}
 
-        return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+		return Response.setErr("Error adding orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
-    }
+	}
 
-    @SameRoute
-    @GetMapping(Route.Order.getOrders + "/{orderIds}")
-    public Response getOrders(@PathVariable List<String> orderIds) {
+	@GetMapping(Route.Order.getOrders)
+	public Response getOrders() {
+		List<Order> o = orderService.getOrders();
 
-        List<Order> o = orderService.getOrders(orderIds);
+		if (orderService.isNotNull(o)) {
+			return Response.set(o, HttpStatus.OK);
+		}
 
-        if (orderService.isNotNull(o)) {
-            return Response.set(o, HttpStatus.OK);
-        }
+		return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
-        return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
-    }
+	@SameRoute
+	@GetMapping(Route.Order.getOrders + "/{orderIds}")
+	public Response getOrders(@PathVariable List<String> orderIds) {
 
-    @PostMapping(Route.FeedBack.addFeedback + "/{orderId}")
-    public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBack feedBack) {
+		List<Order> o = orderService.getOrders(orderIds);
 
-        Object obj = orderService.addFeedBackToOrder(orderId, feedBack);
+		if (orderService.isNotNull(o)) {
+			return Response.set(o, HttpStatus.OK);
+		}
 
-        if (orderService.isNotNull(obj) && obj instanceof FeedBack)
-            return Response.setErr("Feedback already exists.", HttpStatus.BAD_REQUEST);
+		return Response.setErr("Error getting orders.", HttpStatus.INTERNAL_SERVER_ERROR);
 
-        if (orderService.isNotNull(obj)) {
-            return Response.setMsg("Feedback added.", HttpStatus.OK);
-        }
+	}
 
-        return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+	@PostMapping(Route.FeedBack.addFeedback + "/{orderId}")
+	public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBack feedBack) {
 
-    }
+		Object obj = orderService.addFeedBackToOrder(orderId, feedBack);
 
-    @PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
-    public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId,Principal principal) {
+		if (orderService.isNotNull(obj) && obj instanceof FeedBack)
+			return Response.setErr("Feedback already exists.", HttpStatus.BAD_REQUEST);
 
-        Status[] status = Status.values();
-        if (status[statusId].toString().equalsIgnoreCase(Status.Pending.toString()))
-            return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
+		if (orderService.isNotNull(obj)) {
+			return Response.setMsg("Feedback added.", HttpStatus.OK);
+		}
 
-        Order order = orderService.getOrder(orderId);
+		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 
-        if (orderService.isNotNull(order)) {
+	}
 
-            boolean isStatusDelivered = status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString());
-            if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())
-                    && isStatusDelivered)
-                return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
+	// @PostMapping(Route.CartItem.addItems + "/{orderId}/{itemIds}")
+	// public Response addItems(@PathVariable Integer orderId, @PathVariable List<String> itemIds,
+	// 		@RequestBody List<String> quantities) {
 
-            if (isStatusDelivered)
-                order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
+	// 	Object obj = orderService.addItemsToOrder(orderId, itemIds, quantities);
 
-            order.setStatus(status[statusId]);
-            orderService.saveOrder(order);
-            // email code
-            if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
-                 this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new
-                 OrderToken(principal.getName(), order)));
-            } else if (order.getStatus().toString().equalsIgnoreCase(Status.Cancelled.toString())) {
-                 this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new
-                 OrderToken(principal.getName(), order)));
-            }
+	// 	if (orderService.isNotNull(obj) && obj instanceof Item)
+	// 		return Response.setErr("Items already exist.", HttpStatus.BAD_REQUEST);
 
-            return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
-        }
+	// 	if (orderService.isNotNull(obj)) {
+	// 		return Response.setMsg("Items added.", HttpStatus.OK);
+	// 	}
 
-        return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
-    }
+	// 	return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 
-    // for Canteen users to add a new order for a normal user
-    @PostMapping(Route.Order.placeOrder + "/{id}")
-    public Response placeOrder(@PathVariable Integer id) {
+	// }
 
-        if (!menuService.isServingToday())
-            return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
+	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {
+
+		Status[] status = Status.values();
+		if (status[statusId].toString().equalsIgnoreCase(Status.Pending.toString()))
+			return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
+
+		Order order = orderService.getOrder(orderId);
+
+		if (orderService.isNotNull(order)) {
+
+			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())
+					&& status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString()))
+				return Response.setErr("Operation not allowed.", HttpStatus.BAD_REQUEST);
+
+			if (status[statusId].toString().equalsIgnoreCase(Status.Delivered.toString()))
+				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
+
+			order.setStatus(status[statusId]);
+			orderService.saveOrder(order);
+			// email code
+			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
+				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new
+				OrderToken(principal.getName(), order)));
+			}
+
+			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
+		}
+
+		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+	}
+
+	// for Canteen users to add a new order for a normal user
+	@PostMapping(Route.Order.placeOrder + "/{id}")
+	public Response placeOrder(@PathVariable Integer id) {
+
+		if (!menuService.isServingToday())
+			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
 
-        // Get the current date and time
-        LocalDateTime currentDateTime = LocalDateTime.now();
+		// Get the current date and time
+		LocalDateTime currentDateTime = LocalDateTime.now();
 
-        // Get the time at 8:00 PM | 20:00 on the same day
-        LocalDateTime cutoffDateTime = LocalDateTime.of(currentDateTime.toLocalDate(),
-                LocalTime.of(Global.PLACE_ORDER_FREEZE_TIME, 0));
+		// Get the time at 8:00 PM | 20:00 on the same day
+		LocalDateTime cutoffDateTime = LocalDateTime.of(currentDateTime.toLocalDate(),
+				LocalTime.of(Global.PLACE_ORDER_FREEZE_TIME, 0));
 
-        // Check if the current time is before 8:00 PM on the same day
-        if (!currentDateTime.isBefore(cutoffDateTime)) {
-            return Response.setErr("Order cannot be placed after " + Global.PLACE_ORDER_FREEZE_TIME + ".",
-                    HttpStatus.NOT_ACCEPTABLE);
-        }
+		// Check if the current time is before 8:00 PM on the same day
+		if (!currentDateTime.isBefore(cutoffDateTime)) {
+			return Response.setErr("Order cannot be placed after " + Global.PLACE_ORDER_FREEZE_TIME + ".",
+					HttpStatus.NOT_ACCEPTABLE);
+		}
 
 //		************************************************
 
-        User user = userService.getuser(id);
+//		if (mealId > 1)
+//			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
-        if (userService.isNotNull(user)) {
+		User user = userService.getuser(id);
 
-            // get wallet
+		if (userService.isNotNull(user)) {
 
-            Wallet wallet = user.getWallet();
+			// get wallet
 
-            if (walletService.isNotNull(wallet)) {
+			Wallet wallet = user.getWallet();
 
-                // check sufficient wallet amount
-                Boolean isPayable = walletService.checkMinimumAmount(wallet);
+			if (walletService.isNotNull(wallet)) {
 
-                if (!isPayable)
-                    return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
+				// check sufficient wallet amount
+				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
-                Order lunchOrder = orderService.addNewOrder(MealType.Lunch);
-                Order breakfastOrder = orderService.addNewOrder(MealType.Breakfast);
+				if (!isPayable)
+					return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 
-                if (orderService.isNotNull(lunchOrder) || orderService.isNotNull(breakfastOrder)) {
+				Order lunchOrder = orderService.addNewOrder(MealType.Lunch);
+				Order breakfastOrder = orderService.addNewOrder(MealType.Breakfast);
 
-                    Cart cart = user.getCart();
+				if (orderService.isNotNull(lunchOrder) || orderService.isNotNull(breakfastOrder)) {
 
-                    if (cartService.isNull(cart))
-                        return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
+					Cart cart = user.getCart();
 
-                    List<CartItem> cartItems = cart.getCartItems();
+					if (cartService.isNull(cart))
+						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
-                    if (orderService.isNull(cartItems) || cartItems.isEmpty())
-                        return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
+					List<CartItem> cartItems = cart.getCartItems();
 
-                    // filter lunch and bf cart items and separately get the orderTotals
+					if (orderService.isNull(cartItems) || cartItems.isEmpty())
+						return Response.setErr("Empty Cart.", HttpStatus.BAD_REQUEST);
 
-                    List<CartItem> lunchItems = cartItems.stream().filter(ci -> ci.getMealType().equals(MealType.Lunch))
-                            .collect(Collectors.toList());
+					// filter lunch and bf cart items and separately get the orderTotals
 
-                    List<CartItem> breakfastItems = cartItems.stream()
-                            .filter(ci -> ci.getMealType().equals(MealType.Breakfast)).collect(Collectors.toList());
+					List<CartItem> lunchItems = cartItems.stream().filter(ci -> ci.getMealType().equals(MealType.Lunch))
+							.collect(Collectors.toList());
 
-                    lunchOrder.setCartItems(new ArrayList<>(lunchItems));
-                    breakfastOrder.setCartItems(new ArrayList<>(breakfastItems));
+					List<CartItem> breakfastItems = cartItems.stream()
+							.filter(ci -> ci.getMealType().equals(MealType.Breakfast)).collect(Collectors.toList());
 
-                    Integer lunchOrderTotal = 0;
-                    Integer breakfastOrderTotal = 0;
+					lunchOrder.setCartItems(new ArrayList<>(lunchItems));
+					breakfastOrder.setCartItems(new ArrayList<>(breakfastItems));
 
+					Integer lunchOrderTotal = 0;
+					Integer breakfastOrderTotal = 0;
 
+					for (CartItem item : lunchOrder.getCartItems()) {
+						Integer price = (int) (item.getPrice() * item.getQuantity());
+						lunchOrderTotal += price;
+					}
 
+					for (CartItem item : breakfastOrder.getCartItems()) {
+						Integer price = (int) (item.getPrice() * item.getQuantity());
+						breakfastOrderTotal += price;
+					}
 
-                    for (CartItem item : lunchOrder.getCartItems()) {
-                        Integer price = (int) (item.getPrice() * item.getQuantity());
-                        lunchOrderTotal += price;
-                    }
+					if (lunchOrderTotal > wallet.getBalance() + WalletService.LIMIT
+							|| breakfastOrderTotal > wallet.getBalance() + WalletService.LIMIT) {
+						return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
+					}
 
-                    for (CartItem item : breakfastOrder.getCartItems()) {
-                        Integer price = (int) (item.getPrice() * item.getQuantity());
-                        breakfastOrderTotal += price;
-                    }
+					if (!lunchItems.isEmpty()) {
 
-                    if (lunchOrderTotal > wallet.getBalance() + WalletService.LIMIT
-                            || breakfastOrderTotal > wallet.getBalance() + WalletService.LIMIT) {
-                        return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
-                    }
+						orderService.saveOrder(lunchOrder);
+						user.getRecords().add(lunchOrder);
+					}
 
-                    if (!lunchItems.isEmpty()) {
+					if (!breakfastItems.isEmpty()) {
 
-                        orderService.saveOrder(lunchOrder);
-                        user.getRecords().add(lunchOrder);
-                    }
+						orderService.saveOrder(breakfastOrder);
+						user.getRecords().add(breakfastOrder);
+					}
 
-                    if (!breakfastItems.isEmpty()) {
+					user = userService.saveUser(user);
 
-                        orderService.saveOrder(breakfastOrder);
-                        user.getRecords().add(breakfastOrder);
-                    }
+					// clear the cart after placing the order
+					if (userService.isNotNull(user)) {
 
-                    user = userService.saveUser(user);
+						user.getCart().getCartItems().clear();
+						user = userService.saveUser(user);
 
-                    // clear the cart after placing the order
-                    if (userService.isNotNull(user)) {
+						OrderResponseRequest orderResponseRequest = new OrderResponseRequest(false, false);
 
-                        user.getCart().getCartItems().clear();
-                        user = userService.saveUser(user);
+						if (!lunchItems.isEmpty()) {
 
-                        OrderResponseRequest orderResponseRequest = new OrderResponseRequest(false, false);
+							List<Object> lunchOrderObjects = walletService.updateWallet(wallet, lunchOrderTotal);
 
-                        if (!lunchItems.isEmpty()) {
+							wallet = (Wallet) lunchOrderObjects.get(0);
+							Transaction transaction = (Transaction) lunchOrderObjects.get(1);
 
-                            List<Object> lunchOrderObjects = walletService.updateWallet(wallet, lunchOrderTotal);
+							if (walletService.isNotNull(wallet) && transactionService.isNotNull(transaction)) {
 
-                            wallet = (Wallet) lunchOrderObjects.get(0);
-                            Transaction transaction = (Transaction) lunchOrderObjects.get(1);
+								lunchOrder.setTransaction(transaction);
+								orderService.saveOrder(lunchOrder);
 
-                            if (walletService.isNotNull(wallet) && transactionService.isNotNull(transaction)) {
+								walletService.save(wallet);
 
-                                continuePlacingOrder(user, wallet, lunchOrder, transaction);
+								this.applicationEventPublisher.publishEvent(
+										new PlacedOrderEvent(new OrderToken(user.getEmail(), lunchOrder)));
 
-                                orderResponseRequest.setIsLunchOrdered(true);
-                            }
+								this.applicationEventPublisher.publishEvent(new WalletDebitEvent(
+									new WalletEmailResponse(user.getEmail(), wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber() )
+									)
+								);
 
-                        }
+								orderResponseRequest.setIsLunchOrdered(true);
+							}
 
-                        if (!breakfastItems.isEmpty()) {
+						}
 
-                            List<Object> breakfastOrderObjects = walletService.updateWallet(wallet,
-                                    breakfastOrderTotal);
+						if (!breakfastItems.isEmpty()) {
 
-                            wallet = (Wallet) breakfastOrderObjects.get(0);
-                            Transaction transaction = (Transaction) breakfastOrderObjects.get(1);
+							List<Object> breakfastOrderObjects = walletService.updateWallet(wallet,
+									breakfastOrderTotal);
 
-                            if (walletService.isNotNull(wallet) && transactionService.isNotNull(transaction)) {
+							wallet = (Wallet) breakfastOrderObjects.get(0);
+							Transaction transaction = (Transaction) breakfastOrderObjects.get(1);
 
-                                continuePlacingOrder(user, wallet, breakfastOrder, transaction);
+							if (walletService.isNotNull(wallet) && transactionService.isNotNull(transaction)) {
 
-                                orderResponseRequest.setIsBreakFastOrdered(true);
-                            }
+								breakfastOrder.setTransaction(transaction);
+								orderService.saveOrder(breakfastOrder);
 
-                        }
+								walletService.save(wallet);
 
-                        if (orderResponseRequest.getIsBreakFastOrdered() && orderResponseRequest.getIsLunchOrdered())
-                            return Response.setMsg("Added 2 new orders.", HttpStatus.OK);
-                        else if (orderResponseRequest.getIsBreakFastOrdered()
-                                || orderResponseRequest.getIsLunchOrdered())
-                            return Response.setMsg("Added new order.", HttpStatus.OK);
+								this.applicationEventPublisher.publishEvent(
+										new PlacedOrderEvent(new OrderToken(user.getEmail(), breakfastOrder)));
 
-                        return Response.setErr("Error placing order.", HttpStatus.OK);
+								this.applicationEventPublisher.publishEvent(new WalletDebitEvent(
+										new WalletEmailResponse(user.getEmail(), wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber() )
+										)
+									);
 
-                    }
+								orderResponseRequest.setIsBreakFastOrdered(true);
+							}
 
-                }
+						}
 
-            }
-            return Response.setErr("Wallet not found.", HttpStatus.BAD_REQUEST);
-        }
+						if (orderResponseRequest.getIsBreakFastOrdered() && orderResponseRequest.getIsLunchOrdered())
+							return Response.setMsg("Added 2 new orders.", HttpStatus.OK);
+						else if (orderResponseRequest.getIsBreakFastOrdered()
+								|| orderResponseRequest.getIsLunchOrdered())
+							return Response.setMsg("Added new order.", HttpStatus.OK);
 
-        return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
-    }
+						return Response.setErr("Error placing order.", HttpStatus.OK);
 
-    private void continuePlacingOrder(User user, Wallet wallet, Order order, Transaction transaction) {
-        order.setTransaction(transaction);
-        orderService.saveOrder(order);
+					}
 
-        walletService.save(wallet);
+				}
 
-        this.applicationEventPublisher.publishEvent(
-                new PlacedOrderEvent(new OrderToken(user.getEmail(), order)));
+			}
+			return Response.setErr("Wallet not found.", HttpStatus.BAD_REQUEST);
+		}
 
-        this.applicationEventPublisher.publishEvent(new WalletDebitEvent(
-                        new WalletEmailResponse(user.getEmail(), wallet.getBalance(), transaction.getAmount(), transaction.getReferenceNumber())
-                )
-        );
-    }
+		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
+	}
 
-    @PostMapping(Route.Order.cancelOrder + "/{orderId}")
-    public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
+	@PostMapping(Route.Order.cancelOrder + "/{orderId}")
+	public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
 
-        User user = userService.getuser(principal.getName());
+		User user = userService.getuser(principal.getName());
 
-        Order order = orderService.getOrder(orderId);
+		Order order = orderService.getOrder(orderId);
 
-        // order cancellation is 12 pm
+		// order cancellation is 12 pm
 
-        if (orderService.isNotNull(order)) {
-            System.out.println("comingjjjjjjjjj here");
-            if (user.getRecords().contains(order)) {
+		if (orderService.isNotNull(order)) {
 
-                System.out.println("coming here");
-                if (order.getStatus().equals(Status.Cancelled))
-                    return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+			if (user.getRecords().contains(order)) {
 
-                if (!order.getStatus().equals(Status.Pending))
-                    return Response.setErr("Order cannot be cancelled.", HttpStatus.BAD_REQUEST);
+				if (order.getStatus().equals(Status.Cancelled))
+					return Response.setErr("Order already cancelled.", HttpStatus.BAD_REQUEST);
+
+				if (!order.getStatus().equals(Status.Pending))
+					return Response.setErr("Order cannot be cancelled.", HttpStatus.BAD_REQUEST);
 
 //					***********************************************
 
-                // Get the creation date and time from the database table or file
-                Timestamp creationDateTime = order.getOrderPlaced();
+				// Get the creation date and time from the database table or file
+				Timestamp creationDateTime = order.getOrderPlaced();
 
-                // Get the current date and time
-                LocalDateTime currentDateTime = LocalDateTime.now();
+				// Get the current date and time
+				LocalDateTime currentDateTime = LocalDateTime.now();
 
-                // Add one day to the creation date and time and set the time to 12:00 AM
-                LocalDateTime nextDay = creationDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
-                        .plusDays(1).with(Global.CANCEL_ORDER_FREEZE_TIME);
+				// Add one day to the creation date and time and set the time to 12:00 AM
+				LocalDateTime nextDay = creationDateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+						.plusDays(1).with(Global.CANCEL_ORDER_FREEZE_TIME);
 
-                // Check if the current date and time is after 12:00 AM on the next day
-                if (currentDateTime.isAfter(nextDay)) {
-                    return Response.setErr("Order cannot be cancelled.", HttpStatus.NOT_ACCEPTABLE);
-                }
+				// Check if the current date and time is after 12:00 AM on the next day
+				if (currentDateTime.isAfter(nextDay)) {
+					return Response.setErr("Order cannot be cancelled.", HttpStatus.NOT_ACCEPTABLE);
+				}
 
 //					************************************************
 
-                // refund back to wallet
+				// refund back to wallet
 
-                Transaction transaction = order.getTransaction();
+				Transaction transaction = order.getTransaction();
 
-                Wallet wallet = user.getWallet();
+				Wallet wallet = user.getWallet();
 
-                if (walletService.isNotNull(wallet)) {
+				if (walletService.isNotNull(wallet)) {
 
-                    if (wallet.getTransactions().contains(transaction)) {
+					if (wallet.getTransactions().contains(transaction)) {
 
-                        wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
 
-                        // cancle the order
-                        order.setStatus(Status.Cancelled);
-                        order = orderService.saveOrder(order);
+						// cancle the order
+						order.setStatus(Status.Cancelled);
+						order = orderService.saveOrder(order);
 
-                        if (orderService.isNotNull(order)) {
+						if (orderService.isNotNull(order)){
+							this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName() , wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber())));
+							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new
+							OrderToken(principal.getName(), order)));
+							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
+						}
+					}
 
-                            this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName(), wallet.getBalance(), transaction.getAmount(), transaction.getReferenceNumber())));
-                            return Response.setMsg("Order Cancelled.", HttpStatus.OK);
-                        }
-                    }
+				}
 
-                }
+				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
+			}
 
-                return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
-            }
+			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
+		}
 
-            return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
-        }
+		return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
 
-        return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
-
-    }
+	}
 }

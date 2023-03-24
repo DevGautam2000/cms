@@ -16,8 +16,8 @@ import com.nrifintech.cms.entities.Order;
 public interface OrderRepo extends JpaRepository<Order,Integer>{
     @Modifying
     @Transactional
-    @Query(value = "update orders set status = 2 where status = 0 ",nativeQuery = true)
-    public void autoArchive();
+    @Query(value = "update orders set status = 2 where status = 0 and Cast(order_placed as date) = :date",nativeQuery = true)
+    public void autoArchive(@Param("date") String date);
 
     @Query(value = "select Cast(Cast(order_delivered as date) as char) as date , sum(amount) as value from orders,transaction  where orders.transaction_id = transaction.id group by date having date between :date1 and :date2",
            nativeQuery = true)
