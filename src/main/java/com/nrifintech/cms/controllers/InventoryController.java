@@ -83,7 +83,7 @@ public class InventoryController {
         if(flag){
             return Response.set("Deleted successfully", HttpStatus.OK);
         }
-        return Response.setMsg("Deletion failed", HttpStatus.BAD_REQUEST);
+        return Response.setErr("Deletion failed", HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(Route.Inventory.updateQtyInHand + "{id}" + "/" + "{qtyhand}")

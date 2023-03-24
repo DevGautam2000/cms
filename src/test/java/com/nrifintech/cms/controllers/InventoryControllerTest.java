@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.print.attribute.standard.Media;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,8 +64,26 @@ public class InventoryControllerTest extends MockMvcSetup{
     
 
     @Test
-    public void testDelete() {
+    public void testDeleteSuccess() throws UnsupportedEncodingException, Exception {
+        Mockito.when( this.inventoryService.removeInventoryById(100)).thenReturn(true);
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.get(prefix(Route.Inventory.remove + "{id}"), 100)
+            .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        assertEquals(r, "Deleted successfully");
+    }
 
+    @Test
+    public void testDeleteFailure() throws UnsupportedEncodingException, Exception {
+        Mockito.when( this.inventoryService.removeInventoryById(10)).thenReturn(false);
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.get(prefix(Route.Inventory.remove + "{id}"), 10)
+            .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+        assertEquals(res.getStatus(), HttpStatus.BAD_REQUEST.value());
+        assertEquals(res.getMessage(), "Deletion failed");
     }
 
     @Test
@@ -115,7 +135,7 @@ public class InventoryControllerTest extends MockMvcSetup{
 
     @Test
     public void testGetByIdFailure() throws UnsupportedEncodingException, Exception {
-        Mockito.when( this.inventoryService.getInventoryById(this.inventory.getId()) ).thenReturn(null);
+        Mockito.when( this.inventoryService.getInventoryById(anyInt()) ).thenReturn(null);
 
         String r1 = mockMvc.perform(
             MockMvcRequestBuilders.get(prefix(Route.Inventory.getById + "{id}") , 190)
@@ -158,16 +178,62 @@ public class InventoryControllerTest extends MockMvcSetup{
     }
 
     @Test
-    public void testSaveAll() {
+    public void testSaveAllSuccess() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+        Mockito.when( this.inventoryService.addAlltoInventory(sample) ).thenReturn(sample);
 
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.post(prefix(Route.Inventory.saveAll) )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapToJson(sample))
+        ).andExpect( status().isOk() ).andReturn().getResponse().getContentAsString();
+        Inventory[] i = mapFromJson(r, Inventory[].class);
+        
+        assertArrayEquals(i, sample.toArray());
     }
 
     @Test
-    public void testSaveOne() {
+    public void testSaveAllFailure() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+        Mockito.when( this.inventoryService.addAlltoInventory(emptySample) ).thenReturn(emptySample);
+
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.post(prefix(Route.Inventory.saveAll) )
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapToJson(emptySample))
+        ).andExpect( status().isOk() ).andReturn().getResponse().getContentAsString();
+        Inventory[] i = mapFromJson(r, Inventory[].class);
+        
+        assertArrayEquals(i, emptySample.toArray());
+    }
+
+    @Test
+    public void testSaveOneSuccess() throws JsonProcessingException, UnsupportedEncodingException, Exception {
 
         Mockito.when( this.inventoryService.addToInventory(inventory) ).thenReturn(inventory);
-        
 
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.post(prefix(Route.Inventory.saveOne))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapToJson(inventory))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        Inventory i = mapFromJson(r, Inventory.class);
+        
+        assertEquals(inventory, i);
+    }
+
+    @Test
+    public void testSaveOneFailure() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+
+        Mockito.when( this.inventoryService.addToInventory(inventory) ).thenReturn(null);
+
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.post(prefix(Route.Inventory.saveOne))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapToJson(inventory))
+        ).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+       Response.JsonEntity response = mapFromJson(r,Response.JsonEntity.class);
+        
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals("Unable to save" , response.getMessage());
     }
 
     // @Test
