@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.events.MenuStatusChangeEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.services.UserService;
@@ -25,6 +27,7 @@ import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
+import com.stripe.model.Application;
 
 @CrossOrigin
 @RestController
@@ -36,6 +39,9 @@ public class MenuController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@PostMapping(Route.Menu.addMenu)
 	public Response newMenu(@RequestBody Menu menu) {
@@ -70,8 +76,10 @@ public class MenuController {
 				menu.setApproval(Approval.Pending);
 				menu = menuService.saveMenu(menu);
 
-				if (menuService.isNotNull(menu))
+				if (menuService.isNotNull(menu)){
+					this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(menu) );
 					return Response.setMsg("Menu added for review.", HttpStatus.OK);
+				}
 
 				return Response.setErr("Error adding menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -126,8 +134,10 @@ public class MenuController {
 				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
 			m = menuService.approveMenu(m, approvalStatusId);
-			if (menuService.isNotNull(m))
+			if (menuService.isNotNull(m)){
+				this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(m) );
 				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
+			}
 
 		}
 

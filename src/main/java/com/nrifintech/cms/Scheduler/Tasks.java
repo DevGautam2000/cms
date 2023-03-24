@@ -22,6 +22,7 @@ import com.nrifintech.cms.entities.TokenBlacklist;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.BreakfastStartEvent;
 import com.nrifintech.cms.events.LunchStartEvent;
+import com.nrifintech.cms.events.MenuStatusChangeEvent;
 import com.nrifintech.cms.events.PromotionalEvent;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.repositories.TokenBlacklistRepo;
@@ -131,6 +132,7 @@ public class Tasks {
         menus.stream().filter(m->m.getItems().size()!=0).filter(m->m.getApproval()==Approval.Pending).forEach(m->{ 
             m.setApproval(Approval.Approved);
             menuRepo.save(m);
+            this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(m) );
             }
         );
     }
