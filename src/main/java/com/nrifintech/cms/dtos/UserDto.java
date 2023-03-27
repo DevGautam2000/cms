@@ -6,7 +6,9 @@ import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 
@@ -31,7 +33,8 @@ public class UserDto{
 		}
 		
 	}
-	
+	@NoArgsConstructor
+	@AllArgsConstructor
 	@Data
 	public static class Unprivileged{
 		private Integer id;
