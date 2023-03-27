@@ -42,7 +42,7 @@ public class PurchaseController {
 
     @PostMapping(Route.Purchase.save)
     public Response save(@RequestBody Purchase purchase){
-        if( purchase.getInventoryRef().getId() == null ){
+        if( purchase.getInventoryRef() == null || purchase.getInventoryRef().getId() == null ){
             return( Response.setErr("Reference ID is null", HttpStatus.BAD_REQUEST));
         }
         Purchase obj = this.purchaseService.initiateNewPurchase(purchase);
