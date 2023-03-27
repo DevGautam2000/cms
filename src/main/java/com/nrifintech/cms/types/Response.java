@@ -1,14 +1,10 @@
 package com.nrifintech.cms.types;
 
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 /*
 100 Continue
@@ -92,8 +88,9 @@ public class Response extends ResponseEntity<Object> {
 	@Getter
 	@Setter
 	@ToString
+	@NoArgsConstructor
 	@AllArgsConstructor
-	private static class JsonEntity{
+	public static class JsonEntity{
 		private Object message;
 		private Integer status=404;
 	}

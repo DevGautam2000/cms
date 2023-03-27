@@ -133,22 +133,22 @@ public class OrderController {
 
 	}
 
-	@PostMapping(Route.CartItem.addItems + "/{orderId}/{itemIds}")
-	public Response addItems(@PathVariable Integer orderId, @PathVariable List<String> itemIds,
-			@RequestBody List<String> quantities) {
+	// @PostMapping(Route.CartItem.addItems + "/{orderId}/{itemIds}")
+	// public Response addItems(@PathVariable Integer orderId, @PathVariable List<String> itemIds,
+	// 		@RequestBody List<String> quantities) {
 
-		Object obj = orderService.addItemsToOrder(orderId, itemIds, quantities);
+	// 	Object obj = orderService.addItemsToOrder(orderId, itemIds, quantities);
 
-		if (orderService.isNotNull(obj) && obj instanceof Item)
-			return Response.setErr("Items already exist.", HttpStatus.BAD_REQUEST);
+	// 	if (orderService.isNotNull(obj) && obj instanceof Item)
+	// 		return Response.setErr("Items already exist.", HttpStatus.BAD_REQUEST);
 
-		if (orderService.isNotNull(obj)) {
-			return Response.setMsg("Items added.", HttpStatus.OK);
-		}
+	// 	if (orderService.isNotNull(obj)) {
+	// 		return Response.setMsg("Items added.", HttpStatus.OK);
+	// 	}
 
-		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+	// 	return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
 
-	}
+	// }
 
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
 	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {

@@ -8,15 +8,12 @@ import javax.persistence.Id;
 import com.nrifintech.cms.types.ItemType;
 import com.nrifintech.cms.types.MealType;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 @ToString
 @Entity
