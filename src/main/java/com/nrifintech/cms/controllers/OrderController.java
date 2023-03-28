@@ -174,8 +174,7 @@ public class OrderController {
 			orderService.saveOrder(order);
 			// email code
 			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
-				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new
-				OrderToken(principal.getName(), order)));
+				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(principal.getName(), order)));
 			}
 
 			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
@@ -422,8 +421,7 @@ public class OrderController {
 
 						if (orderService.isNotNull(order)){
 							this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName() , wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber())));
-							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new
-							OrderToken(principal.getName(), order)));
+							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new OrderToken(principal.getName(), order)));
 							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
 						}
 					}

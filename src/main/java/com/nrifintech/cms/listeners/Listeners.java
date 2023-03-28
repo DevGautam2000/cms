@@ -24,12 +24,14 @@ import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.dtos.WalletEmailResponse;
 import com.nrifintech.cms.entities.CartItem;
+import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.ApprovedQtyReqEvent;
 import com.nrifintech.cms.events.CancelledOrderEvent;
 import com.nrifintech.cms.events.DeliveredOrderEvent;
 import com.nrifintech.cms.events.ForgotPasswordEvent;
+import com.nrifintech.cms.events.MenuStatusChangeEvent;
 import com.nrifintech.cms.events.PlacedOrderEvent;
 import com.nrifintech.cms.events.UpdateQtyReqEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
@@ -248,5 +250,30 @@ public class Listeners {
         this.smtpServices.sendMail(email);
 
     }
-}
 
+    @EventListener
+    @Async
+    public void onMenuStatusChange(MenuStatusChangeEvent menuStatusChangeEvent){
+
+        Menu m = (Menu) menuStatusChangeEvent.getSource();
+
+        List<Tuple> resAdmins = userRepo.getUserEmailsByRole(0);
+        List<Tuple> resCanteen = userRepo.getUserEmailsByRole(1);
+        List<String> admins = resAdmins.stream().map( u -> u.get(0,String.class) ).collect( Collectors.toList() );
+        List<String> canteen = resCanteen.stream().map( u -> u.get(0,String.class) ).collect( Collectors.toList() );
+
+        HashMap<String,String> body = new HashMap<>();
+        body.put("id", String.valueOf(m.getId()) );
+        body.put("forday" , m.getDate().toString() );
+        body.put("status" , m.getApproval().toString() );
+        body.put("mealtype" , m.getMenuType().toString() );
+        body.put("timestamp" , LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString() );
+
+        EmailModel email1 = new EmailModel(admins,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"menu-status-change.flth");
+        EmailModel email2 = new EmailModel(canteen,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"menu-status-change.flth");
+        this.smtpServices.sendMail(email1);
+        // System.out.println(email2);
+        this.smtpServices.sendMail(email2);
+
+    }
+}
