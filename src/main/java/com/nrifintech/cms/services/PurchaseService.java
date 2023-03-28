@@ -45,6 +45,9 @@ public class PurchaseService {
 
     @Transactional
     public Purchase rollbackPurchase(Integer purchaseID)throws IllegalArgumentException{
+        if(purchaseID == null){
+            return(null);
+        }
         Purchase purchase = purchaseRepo.findById(purchaseID).orElse(null);
         if( purchase==null ){
             return(null);
