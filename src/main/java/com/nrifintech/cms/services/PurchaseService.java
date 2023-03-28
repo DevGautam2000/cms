@@ -29,6 +29,9 @@ public class PurchaseService {
     @Transactional
     public Purchase initiateNewPurchase(Purchase purchase)throws IllegalArgumentException{
         Inventory i = purchase.getInventoryRef();
+        if( i == null ){
+            return(null);
+        }
         purchase.setInventoryRef(inventoryRepo.findById(i.getId()).orElse(null));
         if(purchase.getInventoryRef() == null){
             return(null);
@@ -44,6 +47,9 @@ public class PurchaseService {
     public Purchase rollbackPurchase(Integer purchaseID)throws IllegalArgumentException{
         Purchase purchase = purchaseRepo.findById(purchaseID).orElse(null);
         if( purchase==null ){
+            return(null);
+        }
+        if( inventoryRepo.findById(purchase.getInventoryRef().getId()).isEmpty() ){
             return(null);
         }
         purchaseRepo.delete(purchase);

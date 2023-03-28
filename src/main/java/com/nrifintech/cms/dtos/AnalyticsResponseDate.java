@@ -1,5 +1,7 @@
 package com.nrifintech.cms.dtos;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class AnalyticsResponseDate {
     private String date;
-    private double value;
+    private BigDecimal value;
 }

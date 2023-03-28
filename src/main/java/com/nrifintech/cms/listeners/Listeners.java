@@ -188,7 +188,7 @@ public class Listeners {
         body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-refund.flth");
+        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-debit.flth");
         this.smtpServices.sendMail(email);
     }
    

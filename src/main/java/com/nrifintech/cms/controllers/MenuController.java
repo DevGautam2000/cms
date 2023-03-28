@@ -72,6 +72,7 @@ public class MenuController {
 
 				if (menuService.isNotNull(menu))
 					return Response.setMsg("Menu added for review.", HttpStatus.OK);
+					//send menu submitted for approval mail from here...
 
 				return Response.setErr("Error adding menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -127,6 +128,7 @@ public class MenuController {
 
 			m = menuService.approveMenu(m, approvalStatusId);
 			if (menuService.isNotNull(m))
+				//send menu approved mail from here...
 				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
 
 		}
@@ -160,8 +162,9 @@ public class MenuController {
 	@GetMapping(Route.Menu.getByDate + "/{date}")
 	public Response getMenuByDate(@PathVariable Date date, Principal principal) {
 
-		if (!menuService.isServingToday(date))
-			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+		//TODO:
+		// if (!menuService.isServingToday(date))
+		// 	return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 
 		List<Menu> menus = menuService.getMenuByDate(date,principal);
 
