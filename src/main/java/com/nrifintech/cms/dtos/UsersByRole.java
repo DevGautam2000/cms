@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class UsersByRole {
     Role role;
-    BigInteger count;
+    Object count;
 }

@@ -109,6 +109,11 @@ public class MenuController {
 	@PostMapping(Route.Menu.removeMenu + "/{menuId}")
 	public Response removeMenu(@PathVariable Integer menuId) {
 
+		Menu menu = menuService.getMenu(menuId);
+		if(menu==null || menu.getApproval() != Approval.Incomplete){
+			return Response.setErr("Error removing menu.", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 		Optional<Menu> m = menuService.removeMenu(menuId);
 
 		if (m.isPresent())

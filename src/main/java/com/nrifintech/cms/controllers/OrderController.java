@@ -421,6 +421,7 @@ public class OrderController {
 
 						if (orderService.isNotNull(order)){
 							this.applicationEventPublisher.publishEvent(new WalletRefundEvent(new WalletEmailResponse(principal.getName() , wallet.getBalance() , transaction.getAmount() , transaction.getReferenceNumber())));
+							System.out.println(order); //Warning: Invokes lazy init..
 							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new OrderToken(principal.getName(), order)));
 							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
 						}

@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class AnalyticsResponseDate {
     private String date;
-    private BigDecimal value;
+    private Object value;
 }

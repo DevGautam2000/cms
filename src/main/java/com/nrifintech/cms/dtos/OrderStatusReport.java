@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class OrderStatusReport {
     private Status status;
-    private BigInteger count;
+    private Object count;
 }

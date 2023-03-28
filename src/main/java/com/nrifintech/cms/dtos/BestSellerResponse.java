@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class BestSellerResponse {
     private String name;
-    private BigDecimal count;
+    private Object count;
 }

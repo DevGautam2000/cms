@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class OrderMealtypeReport {
     private MealType mealType;
-    private BigInteger count;
+    private Object count;
 }

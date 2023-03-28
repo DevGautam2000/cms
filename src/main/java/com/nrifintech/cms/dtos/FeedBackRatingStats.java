@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class FeedBackRatingStats {
     private Feedback feedback;
-    private BigInteger count;
+    private Object count;
 }

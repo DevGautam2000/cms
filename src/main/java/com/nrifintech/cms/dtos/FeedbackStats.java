@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class FeedbackStats {
-    private BigInteger totalCount;
-    private BigDecimal avgRating;
+    private Object totalCount;
+    private Object avgRating;
     private List<FeedBackRatingStats> feedbackRaingStats;
 }
