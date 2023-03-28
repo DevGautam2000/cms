@@ -56,7 +56,6 @@ public class ExcelReportGenerator {
                 workbook.write(byteArrayOutputStream);
                 return new ByteArrayResource(byteArrayOutputStream.toByteArray());
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new RuntimeException
                         ("Error while generating excel.");
             }
@@ -211,7 +210,6 @@ public class ExcelReportGenerator {
                 workbook.write(byteArrayOutputStream);
                 return new ByteArrayResource(byteArrayOutputStream.toByteArray());
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new RuntimeException
                         ("Error while generating excel.");
             }

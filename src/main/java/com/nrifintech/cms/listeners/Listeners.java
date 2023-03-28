@@ -1,5 +1,6 @@
 package com.nrifintech.cms.listeners;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import javax.mail.MessagingException;
 import javax.persistence.Tuple;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,11 @@ import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.SMTPservices;
 import com.nrifintech.cms.types.UserStatus;
 
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+
 @Component
 public class Listeners {
 
@@ -57,7 +64,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onForgotPassword(ForgotPasswordEvent event){
+    public void onForgotPassword(ForgotPasswordEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         HashMap<String,String> body = (HashMap<String, String>) event.getSource();
         body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
         body.put("actionurl","http://localhost:3000/resetPassword?link=" + body.get("forgotlink"));
@@ -69,7 +76,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onAddedNewUser(AddedNewUserEvent event){
+    public void onAddedNewUser(AddedNewUserEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         User user = (User) event.getSource();
 
         List<String> recipients = new ArrayList<>();
@@ -85,7 +92,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onUpdateUserStatus(UpdateUserStatusEvent event){
+    public void onUpdateUserStatus(UpdateUserStatusEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         User user = (User) event.getSource();
         String template = "inactive-user.flth";
         if(user.getStatus() == UserStatus.Active){
@@ -104,7 +111,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onPlacedOrder(PlacedOrderEvent placedOrderEvent) throws JsonProcessingException{
+    public void onPlacedOrder(PlacedOrderEvent placedOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         OrderToken placedOrderToken = (OrderToken) placedOrderEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
@@ -124,7 +131,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onCancelledOrder(CancelledOrderEvent cancelledOrderEvent) throws JsonProcessingException{
+    public void onCancelledOrder(CancelledOrderEvent cancelledOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         OrderToken cancelledOrderToken = (OrderToken) cancelledOrderEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
@@ -144,7 +151,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onDeliveredOrder(CancelledOrderEvent deliveredOrderEvent) throws JsonProcessingException{
+    public void onDeliveredOrder(CancelledOrderEvent deliveredOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         OrderToken deliveredOrderToken = (OrderToken) deliveredOrderEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
@@ -164,7 +171,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onRecharge(WalletRechargeEvent walletRechargeEvent){
+    public void onRecharge(WalletRechargeEvent walletRechargeEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         WalletEmailResponse w = (WalletEmailResponse) walletRechargeEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         body.put("username",w.getUsername());
@@ -180,7 +187,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onDebit(WalletDebitEvent walletDebitEvent){
+    public void onDebit(WalletDebitEvent walletDebitEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         WalletEmailResponse w = (WalletEmailResponse) walletDebitEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         body.put("username",w.getUsername());
@@ -196,7 +203,7 @@ public class Listeners {
    
     @EventListener
     @Async
-    public void onRefund(WalletRefundEvent walletRefundEvent){
+    public void onRefund(WalletRefundEvent walletRefundEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         WalletEmailResponse w = (WalletEmailResponse) walletRefundEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         body.put("username",w.getUsername());
@@ -212,7 +219,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onApproval(ApprovedQtyReqEvent approvedQtyReqEvent){
+    public void onApproval(ApprovedQtyReqEvent approvedQtyReqEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
 
         List<Tuple> resTup = userRepo.getUserEmailsByRole(1);
         List<String> recipients = resTup.stream().map(u->u.get(0,String.class)).collect(Collectors.toList());
@@ -233,7 +240,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onRequest(UpdateQtyReqEvent updateQtyReqEvent){
+    public void onRequest(UpdateQtyReqEvent updateQtyReqEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
 
         List<Tuple> resTup = userRepo.getUserEmailsByRole(0);
         List<String> recipients = resTup.stream().map(u->u.get(0,String.class)).collect(Collectors.toList());
@@ -253,7 +260,7 @@ public class Listeners {
 
     @EventListener
     @Async
-    public void onMenuStatusChange(MenuStatusChangeEvent menuStatusChangeEvent){
+    public void onMenuStatusChange(MenuStatusChangeEvent menuStatusChangeEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
 
         Menu m = (Menu) menuStatusChangeEvent.getSource();
 

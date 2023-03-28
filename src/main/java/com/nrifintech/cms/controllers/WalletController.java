@@ -23,6 +23,7 @@ import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.Response;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Application;
 
 @CrossOrigin
@@ -53,7 +54,7 @@ public class WalletController {
 	}
 	
 	@PostMapping(Route.Wallet.addMoney +"/{amount}")
-	public Response addMoney(Principal principal,@PathVariable Integer amount,@RequestBody StripeToken token) {
+	public Response addMoney(Principal principal,@PathVariable Integer amount,@RequestBody StripeToken token) throws StripeException {
 	
 		User user = userService.getuser(principal.getName());
 		

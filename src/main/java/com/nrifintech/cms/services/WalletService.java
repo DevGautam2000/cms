@@ -14,6 +14,7 @@ import com.nrifintech.cms.payments.service.StripeService;
 import com.nrifintech.cms.repositories.WalletRepo;
 import com.nrifintech.cms.types.TransactionType;
 import com.nrifintech.cms.utils.Validator;
+import com.stripe.exception.StripeException;
 
 @Service
 public class WalletService implements Validator {
@@ -55,7 +56,7 @@ public class WalletService implements Validator {
 		return Arrays.asList(w,t);
 	}
 
-	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token) {
+	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token) throws StripeException {
 
 		w.setBalance(w.getBalance() + amount);
 
@@ -77,7 +78,7 @@ public class WalletService implements Validator {
 		return chargeId;
 	}
 
-	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token, String remarks) {
+	public String addMoneyToWallet(String email, Wallet w, Integer amount, String token, String remarks) throws StripeException {
 
 		w.setBalance(w.getBalance() + amount);
 

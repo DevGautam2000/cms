@@ -2,6 +2,10 @@ package com.nrifintech.cms.errorcontroller;
 
 
 
+import java.io.IOException;
+
+import javax.mail.MessagingException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,9 +25,14 @@ import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.errorhandler.UserIsEnabledException;
 import com.nrifintech.cms.types.Response;
+import com.stripe.exception.StripeException;
 
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
+import freemarker.core.ParseException;
 
 interface Message {
 	String payloadNotFound = "Required payload not found or wrongly passed.";
@@ -129,4 +138,18 @@ public class ErrorController extends ResponseEntityExceptionHandler {
         //handle the error to bypass and do not send any response
     }
     
+    @ExceptionHandler({ StripeException.class })
+    public void stripeException(
+      Exception ex, WebRequest request) {
+    	Response.setErr(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        //handle the error to bypass and do not send any response
+    }
+    
+    @ExceptionHandler({ MessagingException.class, TemplateNotFoundException.class, MalformedTemplateNameException.class, 
+          ParseException.class, IOException.class, TemplateException.class })
+    public void smtpException(
+      Exception ex, WebRequest request) {
+    	Response.setErr(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        //handle the error to bypass and do not send any response
+    }
 }

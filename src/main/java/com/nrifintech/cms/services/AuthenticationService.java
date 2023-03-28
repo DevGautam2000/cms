@@ -60,7 +60,7 @@ public class AuthenticationService {
         // }
         catch(BadCredentialsException e){
             // throw new Exception("Invalid Credentials "+e.getMessage());
-            throw new UsernameNotFoundException("Invalid Credentials "+e.getMessage());
+            throw new UsernameNotFoundException("Invalid Credentials ");
         }
         // catch(Exception e){
         //     e.printStackTrace();
@@ -93,7 +93,7 @@ public class AuthenticationService {
             throw new UserIsDisabledException();
 
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
-            throw new UsernameNotFoundException("token: "+token+" is not valid");
+            throw new UsernameNotFoundException("Invalid Token");
         }
 
         if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
@@ -132,7 +132,7 @@ public class AuthenticationService {
             throw new UserIsEnabledException();
 
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
-            throw new UsernameNotFoundException("token: "+token+" is not valid");
+            throw new UsernameNotFoundException("Invalid Token");
         }
 
         if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");

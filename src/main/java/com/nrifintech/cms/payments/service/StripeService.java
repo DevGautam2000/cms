@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 
 @Service
@@ -19,11 +20,11 @@ public class StripeService {
 
 	}
 
-	public String createCharge(String email, String token, int amount) {
+	public String createCharge(String email, String token, int amount) throws StripeException {
 
 		String chargeId = null;
 
-		try {
+	
 			Stripe.apiKey = API_SECRET_KEY;
 
 			Map<String, Object> chargeParams = new HashMap<>();
@@ -35,9 +36,7 @@ public class StripeService {
 			Charge charge = Charge.create(chargeParams);
 
 			chargeId = charge.getId();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		
 		return chargeId;
 	}
 
