@@ -1,6 +1,5 @@
 package com.nrifintech.cms.controllers;
 
-import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
-import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.EmailStatus;
@@ -28,7 +26,6 @@ import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
-import eu.bitwalker.useragentutils.Application;
 
 @CrossOrigin
 @RestController
@@ -86,9 +83,6 @@ public class UserController {
 
 	@GetMapping(Route.User.getOrders + "/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
-		
-		boolean i = userService.hasUserCartitem("aniket@3.com", 27);
-		System.out.println(i);
 
 		User user = userService.getuser(userId);
 		List<Order> orders = user.getRecords();
@@ -147,25 +141,5 @@ public class UserController {
 
 		return Response.setErr("Invalid user", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
-//	@GetMapping(Route.User.getAllUsersForOrderByDate + "/{date}")
-//	public List<String> getAllUsersForOrderByDate(@PathVariable Date date){
-//		
-//		List<String> users = userService.getOrdersByDate(date);
-//		return users;
-//		
-//		
-//	}
-	
-//	@GetMapping("uboi/{oId}")
-//	public Response getAllUsersForOrderByDate(@PathVariable Integer oId){
-//		
-//		String userEmail = userService.getUserByOrderId(oId);
-//		return Response.setMsg(userEmail, HttpStatus.OK);
-//		
-//		
-//	}
-
-
 
 }
