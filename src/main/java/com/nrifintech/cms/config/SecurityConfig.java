@@ -99,7 +99,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, Route.FeedBack.prefix + Route.FeedBack.addFeedback + "/{orderId}").access((authentication, object) -> aManagerAdapter.preCheckUserOrderId(authentication, object))
 
-                // .antMatchers(HttpMethod.POST,Route.Bill.prefix+"/**").hasAnyAuthority(Role.User.toString())
                 .antMatchers(Route.Inventory.prefix + Route.Inventory.getById + "{id}").hasAnyAuthority(Role.Canteen.toString(), Role.Admin.toString())
                 .antMatchers(Route.Inventory.prefix + Route.Inventory.get).hasAnyAuthority(Role.Canteen.toString(), Role.Admin.toString())
                 .antMatchers(Route.Inventory.prefix + Route.Inventory.getByName + "{name}").hasAnyAuthority(Role.Canteen.toString(), Role.Admin.toString())
@@ -135,7 +134,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // System.out.println("Fetching Password encoder");
         return new BCryptPasswordEncoder();
     }
 }
