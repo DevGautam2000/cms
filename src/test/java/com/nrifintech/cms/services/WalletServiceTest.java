@@ -6,6 +6,8 @@ import com.nrifintech.cms.entities.Wallet;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.payments.service.StripeService;
 import com.nrifintech.cms.repositories.WalletRepo;
+import com.stripe.exception.StripeException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,7 +90,7 @@ public class WalletServiceTest {
     }
 
     @Test
-    public void testAddMoneyToWallet() {
+    public void testAddMoneyToWallet() throws StripeException {
 
         int amount = 1000;
 
@@ -113,7 +115,7 @@ public class WalletServiceTest {
     }
 
     @Test
-    public void testAddMoneyToWalletRemarks() {
+    public void testAddMoneyToWalletRemarks() throws StripeException {
 
         int amount = 1000;
 

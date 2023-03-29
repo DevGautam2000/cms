@@ -22,7 +22,7 @@ public class MyUserDetailsService implements UserDetailsService {
 		com.nrifintech.cms.entities.User user=userRepo.findByEmail(username)
 			.orElseThrow(()->new  UsernameNotFoundException("USERNAME '"+username+"'' NOT FOUND"));
 		
-		return Optional.of(user).map(MyUserDetails::new).get();
+		return new MyUserDetails(user);
 	}
 
 }

@@ -133,7 +133,7 @@ public class AuthenticationServiceTest {
         Mockito.verify(tokenRepo).save(any());
         // Mockito.verify(userService).saveUser(users.get(0));
         Mockito.verify(userService).updatePassword(any(),any());
-        assertEquals("token: "+"inv-dummy-token"+" is not valid", thrown4.getMessage());
+        assertEquals("Invalid Token", thrown4.getMessage());
     }
 
     @Test
@@ -194,6 +194,6 @@ public class AuthenticationServiceTest {
         Mockito.verify(tokenRepo).save(any());
         Mockito.verify(userService).saveUser(users.get(2));
         Mockito.verify(userService).updatePassword(any(),any());
-        assertEquals("token: "+"inv-dummy-token"+" is not valid", thrown4.getMessage());
+        assertEquals("Invalid Token", thrown4.getMessage());
     }
 }

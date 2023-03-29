@@ -47,7 +47,7 @@ public class WalletController {
 		Wallet wallet = walletService.getWallet(user.getWallet().getId());
 		Wallet w = walletService.getWallet(walletId);
 
-		if(w.getId() != wallet.getId())
+		if( !( w.getId().equals(wallet.getId()) ) )
 		return Response.setErr("Wallet does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
 		
 		return Response.set(w, HttpStatus.OK);
