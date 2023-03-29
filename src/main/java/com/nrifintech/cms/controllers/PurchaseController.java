@@ -22,7 +22,6 @@ import com.nrifintech.cms.services.PurchaseService;
 import com.nrifintech.cms.types.Response;
 
 @RestController
-@CrossOrigin
 @RequestMapping(Route.Purchase.prefix)
 public class PurchaseController {
     

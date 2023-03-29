@@ -23,8 +23,6 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.Response;
 import com.stripe.exception.StripeException;
-
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Wallet.prefix)
 public class WalletController {

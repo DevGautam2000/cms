@@ -14,7 +14,6 @@ import com.nrifintech.cms.services.AnalyticsService;
 import com.nrifintech.cms.types.Response;
 
 @RestController
-@CrossOrigin
 @RequestMapping(Route.Analytics.prefix)
 public class AnalyticsController {
 

@@ -28,7 +28,6 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Menu.prefix)
 public class MenuController {

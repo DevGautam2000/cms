@@ -25,7 +25,6 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Cart.prefix)
 public class CartController {

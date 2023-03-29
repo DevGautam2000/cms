@@ -40,7 +40,6 @@ import com.stripe.model.Application;
 import io.jsonwebtoken.JwtException;
 
 @RestController
-@CrossOrigin
 @RequestMapping(Route.Authentication.prefix)
 public class AuthenticationController {
 	@Autowired

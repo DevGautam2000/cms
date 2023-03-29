@@ -26,8 +26,6 @@ import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
-
-@CrossOrigin
 @RestController
 @RequestMapping(Route.User.prefix)
 public class UserController {
