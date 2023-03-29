@@ -1,9 +1,7 @@
 package com.nrifintech.cms.controllers;
 
 import java.security.Principal;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -29,7 +27,6 @@ import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.types.Global;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
@@ -51,7 +48,6 @@ import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
-import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 
 @CrossOrigin
@@ -79,6 +75,8 @@ public class OrderController {
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
+
+	private String orderNotFoundMessage = "Order not found.";
 
 	@PostMapping(Route.Order.addOrders)
 	public Response addOrders(@RequestBody List<Order> orders) {
@@ -131,26 +129,9 @@ public class OrderController {
 			return Response.setMsg("Feedback added.", HttpStatus.OK);
 		}
 
-		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr(orderNotFoundMessage, HttpStatus.BAD_REQUEST);
 
 	}
-
-	// @PostMapping(Route.CartItem.addItems + "/{orderId}/{itemIds}")
-	// public Response addItems(@PathVariable Integer orderId, @PathVariable List<String> itemIds,
-	// 		@RequestBody List<String> quantities) {
-
-	// 	Object obj = orderService.addItemsToOrder(orderId, itemIds, quantities);
-
-	// 	if (orderService.isNotNull(obj) && obj instanceof Item)
-	// 		return Response.setErr("Items already exist.", HttpStatus.BAD_REQUEST);
-
-	// 	if (orderService.isNotNull(obj)) {
-	// 		return Response.setMsg("Items added.", HttpStatus.OK);
-	// 	}
-
-	// 	return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
-
-	// }
 
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
 	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {
@@ -180,14 +161,14 @@ public class OrderController {
 			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
 		}
 
-		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr(orderNotFoundMessage, HttpStatus.BAD_REQUEST);
 	}
 
 	// for Canteen users to add a new order for a normal user
 	@PostMapping(Route.Order.placeOrder + "/{id}")
 	public Response placeOrder(@PathVariable Integer id) {
 
-		if (!menuService.isServingToday())
+		if (Boolean.FALSE.equals(menuService.isServingToday()) )
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
 
@@ -222,7 +203,7 @@ public class OrderController {
 				// check sufficient wallet amount
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
-				if (!isPayable)
+				if (Boolean.FALSE.equals(isPayable))
 					return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 
 				Order lunchOrder = orderService.addNewOrder(MealType.Lunch);
@@ -409,11 +390,9 @@ public class OrderController {
 
 				Wallet wallet = user.getWallet();
 
-				if (walletService.isNotNull(wallet)) {
+				if (walletService.isNotNull(wallet) && wallet.getTransactions().contains(transaction)) {
 
-					if (wallet.getTransactions().contains(transaction)) {
-
-						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+					wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
 
 						// cancle the order
 						order.setStatus(Status.Cancelled);
@@ -424,14 +403,13 @@ public class OrderController {
 							System.out.println(order); //Warning: Invokes lazy init..
 							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new OrderToken(principal.getName(), order)));
 							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
-						}
 					}
 				}
 				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
             } 
 			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
 		}
-        return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
+        return Response.setErr(orderNotFoundMessage, HttpStatus.NOT_FOUND);
     }
 
 }
