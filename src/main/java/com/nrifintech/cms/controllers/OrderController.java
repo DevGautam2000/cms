@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -169,7 +168,7 @@ public class OrderController {
 
 		if (Boolean.FALSE.equals(menuService.isServingToday()) )
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
-//		***********************************************
+		//		***********************************************
 
 		// Get the current date and time
 		LocalDateTime currentDateTime = LocalDateTime.now();
@@ -185,9 +184,6 @@ public class OrderController {
 		}
 
         //		************************************************
-
-//		if (mealId > 1)
-//			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
 		User user = userService.getuser(id);
 
