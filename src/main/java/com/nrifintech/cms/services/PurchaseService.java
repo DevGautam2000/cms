@@ -6,16 +6,12 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.entities.Inventory;
 import com.nrifintech.cms.entities.Purchase;
-import com.nrifintech.cms.events.ApprovedQtyReqEvent;
 import com.nrifintech.cms.repositories.InventoryRepo;
 import com.nrifintech.cms.repositories.PurchaseRepo;
-import com.stripe.model.Application;
 
 @Service
 public class PurchaseService {

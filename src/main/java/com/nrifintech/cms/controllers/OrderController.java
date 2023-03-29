@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -151,12 +150,11 @@ public class OrderController {
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
 
 			order.setStatus(status[statusId]);
-			orderService.saveOrder(order);
-			// email code
-			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
-				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(principal.getName(), order)));
-			}
-
+			order = orderService.saveOrder(order);
+			System.out.println(order); // invokes lazy init...
+			// email 
+			this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(userService.getUserByOrderId(orderId) , order)));
+			System.out.println(principal.getName());
 			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
 		}
 

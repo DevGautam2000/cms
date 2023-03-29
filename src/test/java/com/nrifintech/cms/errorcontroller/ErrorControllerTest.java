@@ -1,20 +1,14 @@
 package com.nrifintech.cms.errorcontroller;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.nrifintech.cms.MockMvcSetup;
-import com.nrifintech.cms.errorhandler.NotFoundException;
-import com.nrifintech.cms.errorhandler.UserIsDisabledException;
-import com.nrifintech.cms.errorhandler.UserIsEnabledException;
-import com.nrifintech.cms.routes.Route;
-import com.nrifintech.cms.types.Response;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.impl.DefaultClaims;
-import io.jsonwebtoken.impl.DefaultHeader;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.file.AccessDeniedException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,18 +22,22 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.context.request.WebRequest;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.AccessDeniedException;
+import com.nrifintech.cms.MockMvcSetup;
+import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.errorhandler.UserIsEnabledException;
+import com.nrifintech.cms.types.Response;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.impl.DefaultClaims;
+import io.jsonwebtoken.impl.DefaultHeader;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ErrorControllerTest extends MockMvcSetup {
