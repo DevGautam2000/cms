@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors().and().csrf().disable().exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
                 .authorizeHttpRequests()
+                .antMatchers(Route.Authentication.prefix + Route.Authentication.currentUser ).hasAnyAuthority(Role.Admin.toString(), Role.Canteen.toString(), Role.User.toString())
                 .antMatchers(Route.Authentication.prefix + "**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
 

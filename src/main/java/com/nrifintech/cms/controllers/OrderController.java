@@ -167,7 +167,7 @@ public class OrderController {
 
 		if (Boolean.FALSE.equals(menuService.isServingToday()) )
 			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
-//		***********************************************
+		//		***********************************************
 
 		// Get the current date and time
 		LocalDateTime currentDateTime = LocalDateTime.now();
@@ -183,9 +183,6 @@ public class OrderController {
 		}
 
         //		************************************************
-
-//		if (mealId > 1)
-//			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
 
 		User user = userService.getuser(id);
 

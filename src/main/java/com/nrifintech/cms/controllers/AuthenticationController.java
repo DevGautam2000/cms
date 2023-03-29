@@ -66,8 +66,6 @@ public class AuthenticationController {
 		UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(jwtRequest.getUsername());
 		String token = this.jwtUtils.generateToken(userDetails);
 
-		System.out.println(userDetails);
-
 		return Response.set(new JwtResponse(token), HttpStatus.OK);
 	}
 
@@ -91,8 +89,6 @@ public class AuthenticationController {
 
 	@PostMapping(Route.Authentication.forgotPassword)
 	public Response forgotPassword(@RequestBody JwtRequest user) {
-		// System.out.println(user);
-
 		//authService.forgetPassword(user.getUsername());
 		HashMap<String,String> info = new HashMap<>();
         info.put("username",user.getUsername());
@@ -114,12 +110,10 @@ public class AuthenticationController {
 	
 	@PostMapping(Route.Authentication.setNewPassword)
 	public Response setNewPassword(@RequestBody JwtRequest user) {
-		// System.out.println(user);
 
 		authService.setNewPassword(user.getUsername());
 
 		return Response.setMsg("Email sent.", HttpStatus.OK);
-
 	}
 
 	@PostMapping(Route.Authentication.activateNewPassword)

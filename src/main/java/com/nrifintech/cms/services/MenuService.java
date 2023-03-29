@@ -196,7 +196,7 @@ public class MenuService implements Validator {
 		return menus;
 	}
 
-	public Boolean isServingToday() {
+	public boolean isServingToday() {
 		Date date = new Date(System.currentTimeMillis());
 
 		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
@@ -206,7 +206,7 @@ public class MenuService implements Validator {
 		return true;
 	}
 
-	public Boolean isServingToday(Date date) {
+	public boolean isServingToday(Date date) {
 		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
 			return false;
 		}
