@@ -7,7 +7,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
@@ -18,14 +17,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
 import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.dtos.WalletEmailResponse;
-import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
@@ -62,11 +60,14 @@ public class Listeners {
     @Autowired
     private AuthenticationService authenticationService;
 
+    private String timezone = "GMT+05:30";
+    private String subject = "Canteen Management System NRI Fintech India Pvt.Ltd.";
+
     @EventListener
     @Async
     public void onForgotPassword(ForgotPasswordEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         HashMap<String,String> body = (HashMap<String, String>) event.getSource();
-        body.put("timestamp", LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp", LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         body.put("actionurl","http://localhost:3000/resetPassword?link=" + body.get("forgotlink"));
         List<String> recipients = new ArrayList<>();
         recipients.add(body.get("username"));
@@ -85,8 +86,8 @@ public class Listeners {
         body.put("unsublink" , "...link to user page...");
         body.put("actionurl" , "http://localhost:3000/resetPassword?link=" +authenticationService.setNewPassword(user.getEmail()) + "&username=" + user.getEmail()  );
         body.put("username",user.getEmail());
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
-        EmailModel email = new EmailModel(recipients,"Welcome to Canteen Management System NRI Fintech India Pvt.Ltd." , body,"welcome-email.flth");
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
+        EmailModel email = new EmailModel(recipients,"Welcome to " + subject , body,"welcome-email.flth");
         this.smtpServices.sendMail(email);
     }
 
@@ -103,9 +104,9 @@ public class Listeners {
         HashMap<String,String> body = new HashMap<>();
         body.put("status", user.getStatus().toString());
         body.put("username",user.getEmail());
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
 
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,template);
+        EmailModel email = new EmailModel(recipients , subject , body,template);
         this.smtpServices.sendMail(email); 
     }
 
@@ -118,14 +119,13 @@ public class Listeners {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         body.put("username", placedOrderToken.getUsername());
         body.put("orderid",placedOrderToken.getOrder().getId()+"");
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> listCartItems = placedOrderToken.getOrder().getCartItems().stream().map(c->c.getName()).collect(Collectors.toList());
         String itemDetails = mapper.writeValueAsString(listCartItems);
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(placedOrderToken.getUsername());
-        System.out.println(placedOrderToken.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"placed-order.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"placed-order.flth");
         this.smtpServices.sendMail(email);
     }
 
@@ -138,34 +138,32 @@ public class Listeners {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         body.put("username", cancelledOrderToken.getUsername());
         body.put("orderid",cancelledOrderToken.getOrder().getId()+"");
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> listCartItems = cancelledOrderToken.getOrder().getCartItems().stream().map(c->c.getName()).collect(Collectors.toList());
         String itemDetails = mapper.writeValueAsString(listCartItems);
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(cancelledOrderToken.getUsername());
-        System.out.println(cancelledOrderToken.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"cancelled-order.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"cancelled-order.flth");
         this.smtpServices.sendMail(email);
     }
 
     @EventListener
     @Async
-    public void onDeliveredOrder(CancelledOrderEvent deliveredOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
+    public void onDeliveredOrder(DeliveredOrderEvent deliveredOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
         OrderToken deliveredOrderToken = (OrderToken) deliveredOrderEvent.getSource();
         HashMap<String,String> body = new HashMap<>();
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         body.put("username", deliveredOrderToken.getUsername());
         body.put("orderid",deliveredOrderToken.getOrder().getId()+"");
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> listCartItems =  deliveredOrderToken.getOrder().getCartItems().stream().map(c->c.getName()).collect(Collectors.toList());
         String itemDetails = mapper.writeValueAsString(listCartItems);
         body.put("items",itemDetails);
         List<String> recipients = new ArrayList<>();
         recipients.add(deliveredOrderToken.getUsername());
-        System.out.println(deliveredOrderToken.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"delivered-order.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"delivered-order.flth");
         this.smtpServices.sendMail(email);
     }
 
@@ -178,10 +176,10 @@ public class Listeners {
         body.put("curr", String.valueOf(w.getCurrentBalance()) );
         body.put("money", String.valueOf(w.getMoneyAdded()) );
         body.put("transactionId", w.getTransactionId());
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-recharge.flth");
+        EmailModel email = new EmailModel(recipients , subject, body,"wallet-recharge.flth");
         this.smtpServices.sendMail(email);
     }
 
@@ -194,10 +192,10 @@ public class Listeners {
         body.put("curr", String.valueOf(w.getCurrentBalance()) );
         body.put("money", String.valueOf(w.getMoneyAdded()) );
         body.put("transactionId", w.getTransactionId());
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-debit.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"wallet-debit.flth");
         this.smtpServices.sendMail(email);
     }
    
@@ -210,10 +208,10 @@ public class Listeners {
         body.put("curr", String.valueOf(w.getCurrentBalance()) );
         body.put("money", String.valueOf(w.getMoneyAdded()) );
         body.put("transactionId", w.getTransactionId());
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
         List<String> recipients = new ArrayList<>();
         recipients.add(w.getUsername());
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"wallet-refund.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"wallet-refund.flth");
         this.smtpServices.sendMail(email);
     }
 
@@ -231,9 +229,9 @@ public class Listeners {
         body.put("qtyInHand", String.valueOf(iMail.getQuantityInHand()) );
         body.put("qtyReq", String.valueOf(iMail.getQuantityRequested()) );
         body.put("qtypur" , String.valueOf(iMail.getQuantityPurchased()) );
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
 
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"approval-inventory.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"approval-inventory.flth");
         this.smtpServices.sendMail(email);
 
     }
@@ -251,9 +249,9 @@ public class Listeners {
         body.put("name" , iMail.getName() );
         body.put("qtyInHand", String.valueOf(iMail.getQuantityInHand()) );
         body.put("qtyReq", String.valueOf(iMail.getQuantityRequested()) );
-        body.put("timestamp",LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString());
+        body.put("timestamp",LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString());
 
-        EmailModel email = new EmailModel(recipients,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"request-inventory.flth");
+        EmailModel email = new EmailModel(recipients , subject , body,"request-inventory.flth");
         this.smtpServices.sendMail(email);
 
     }
@@ -274,12 +272,11 @@ public class Listeners {
         body.put("forday" , m.getDate().toString() );
         body.put("status" , m.getApproval().toString() );
         body.put("mealtype" , m.getMenuType().toString() );
-        body.put("timestamp" , LocalTime.now(ZoneId.of("GMT+05:30")).truncatedTo(ChronoUnit.MINUTES).toString() );
+        body.put("timestamp" , LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString() );
 
-        EmailModel email1 = new EmailModel(admins,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"menu-status-change.flth");
-        EmailModel email2 = new EmailModel(canteen,"Canteen Management System NRI Fintech India Pvt.Ltd." , body,"menu-status-change.flth");
+        EmailModel email1 = new EmailModel(admins , subject , body,"menu-status-change.flth");
+        EmailModel email2 = new EmailModel(canteen , subject , body,"menu-status-change.flth");
         this.smtpServices.sendMail(email1);
-        // System.out.println(email2);
         this.smtpServices.sendMail(email2);
 
     }
