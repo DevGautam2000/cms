@@ -63,7 +63,7 @@ public class SMTPservices {
 		return(flag);
     }
  
-    public String getContentFromTemplate(Map <String, String >model, String templateName) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException     { 
+    public String getContentFromTemplate(Map <String, String >model, String templateName) throws IOException, TemplateException     { 
         StringBuffer content = new StringBuffer();
  
         content.append(FreeMarkerTemplateUtils.processTemplateIntoString(fmConfiguration.getTemplate(templateName), model));
