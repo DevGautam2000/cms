@@ -3,12 +3,16 @@ package com.nrifintech.cms.repositories;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+
+import com.nrifintech.cms.MockMvcSetup;
+import com.nrifintech.cms.types.MealType;
+import com.nrifintech.cms.types.Status;
 
 import javax.persistence.Tuple;
 import java.util.ArrayList;
@@ -17,8 +21,9 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class OrderRepoTest {
+
 
     @Mock
     private OrderRepo orderRepo;
@@ -40,7 +45,7 @@ public class OrderRepoTest {
     @Test
     public void testGetOrderStats() {
         List<Tuple> tuples = new ArrayList<>();
-        tuples.add(null);
+        tuples.add(MockMvcSetup.tupleOf(Status.Delivered, 3,Integer.class));
 
         Mockito.when(orderRepo.getOrderStats(anyString(), anyString())).thenReturn(tuples);
         List<Tuple> tupleList = orderRepo.getOrderStats("2023-03-03", "2023-02-05");
@@ -51,7 +56,7 @@ public class OrderRepoTest {
     @Test
     public void testGetBreakFastVsLunchStats() {
         List<Tuple> tuples = new ArrayList<>();
-        tuples.add(null);
+        tuples.add(MockMvcSetup.tupleOf(MealType.Breakfast, 3,Integer.class));
 
         Mockito.when(orderRepo.getBreakfastVsLunchStats(anyString(), anyString())).thenReturn(tuples);
         List<Tuple> tupleList = orderRepo.getBreakfastVsLunchStats("2023-03-03", "2023-02-05");
@@ -62,7 +67,7 @@ public class OrderRepoTest {
     @Test
     public void testGetDayByDaySales() {
         List<Tuple> tuples = new ArrayList<>();
-        tuples.add(null);
+        tuples.add(MockMvcSetup.tupleOf("2023-03-02", 350,Integer.class));
 
         Mockito.when(orderRepo.getDaybyDaySales(anyString(), anyString())).thenReturn(tuples);
         List<Tuple> tupleList = orderRepo.getDaybyDaySales("2023-03-03", "2023-02-05");

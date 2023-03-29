@@ -19,7 +19,6 @@ import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.Status;
 import com.nrifintech.cms.types.UserStatus;
 
-@SpringBootTest
 public class UserRepoTest {
     @Autowired
     private UserRepo userRepo;
