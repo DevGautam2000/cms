@@ -34,12 +34,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import freemarker.core.ParseException;
 
-interface Message {
-	String payloadNotFound = "Required payload not found or wrongly passed.";
-	String pageNotFound = "Required page not found.";
-	String pathVariableNotFound = "Required path variable not found.";
-}
-
 @CrossOrigin
 @ControllerAdvice
 @RestController
@@ -54,14 +48,14 @@ public class ErrorController extends ResponseEntityExceptionHandler {
 	protected Response handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		return Response.setErr(Message.payloadNotFound, headers, status);
+		return Response.setErr(ErrorMessages.PAYLOADNOTFOUND, headers, status);
 
 	}
 
 	@Override
 	protected Response handleMissingPathVariable(MissingPathVariableException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-		return Response.setErr(Message.pathVariableNotFound, headers, status);
+		return Response.setErr(ErrorMessages.PATHVARIABLENOTFOUND, headers, status);
 	}
 
 //	@Override
