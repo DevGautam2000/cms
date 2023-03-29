@@ -3,17 +3,17 @@ package com.nrifintech.cms.config;
 import org.springframework.security.core.GrantedAuthority;
 
 public class Authority implements GrantedAuthority{
-    private String authority;
+    private String authorityName;
     public Authority(String authority){
-        this.authority=authority;
+        this.authorityName=authority;
     }
     @Override
     public String getAuthority() {
-        return this.authority;
+        return this.authorityName;
     }
     @Override
     public String toString() {
-        return super.toString()+authority;
+        return super.toString()+authorityName;
     }
     
 }
