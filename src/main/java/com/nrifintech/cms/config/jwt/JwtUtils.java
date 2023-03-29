@@ -57,13 +57,13 @@ public class JwtUtils {
 
 	    private String createToken(Map<String, Object> claims, String subject,long min) {
 
-	        String s= Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+	        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 	                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * min))
 	                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
-	        return s;
+	         
 	    }
 
-	    public Boolean validateToken(String token, UserDetails userDetails) {
+	    public boolean validateToken(String token, UserDetails userDetails) {
 	        final String username = extractUsername(token);
 			
 	        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
