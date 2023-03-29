@@ -1,7 +1,6 @@
 package com.nrifintech.cms.entities;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
