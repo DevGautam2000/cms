@@ -45,11 +45,7 @@ public class ItemController {
 	@PostMapping(Route.Item.addItem)
 	public Response addItem(@RequestBody Item item) {
 
-		System.out.println("ITEM: " + item);
-
-
 		Item i = itemService.addItem(item);
-		System.out.println("I: " + i);
 		if (itemService.isNotNull(i))
 			return Response.setMsg("Item added.", HttpStatus.OK);
 
