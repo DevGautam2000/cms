@@ -14,8 +14,9 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class EmailModel {
-    
+
     private static final String FROM = "cmsnriftb2@gmail.com";
+    @NonNull
     private List<String> to;
     @NonNull
     private String subject;
