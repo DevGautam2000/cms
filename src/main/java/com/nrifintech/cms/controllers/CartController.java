@@ -2,7 +2,6 @@ package com.nrifintech.cms.controllers;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +38,8 @@ public class CartController {
 
     @Autowired
     private UserService userService;
+
+    private String itemNotFoundErrorMsg = "CartItem not found. ";
 
     @PostMapping(Route.Cart.addToCart + "/{userId}")
     public Response addToCart(@PathVariable Integer userId, @RequestBody List<CartItemUpdateRequest> reqs) {
@@ -85,7 +86,7 @@ public class CartController {
             return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
         }
 
-        return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(Route.Cart.updateQuantity + "/dec/{itemId}/{factor}")
@@ -100,7 +101,7 @@ public class CartController {
             return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
         }
 
-        return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(Route.Cart.remove + "/{cartId}/{itemId}")
@@ -119,7 +120,7 @@ public class CartController {
             }
 
         }
-        return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(Route.Cart.clear + "/{cartId}")
@@ -136,14 +137,13 @@ public class CartController {
 
             return Response.setErr("Error clearing cart. ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
     @ErrorHandlerImplemented(handler = NotFoundException.class)
     @GetMapping(Route.Cart.getCart + "/{cartId}")
     public Response getCart(@PathVariable  Integer cartId) {
 
-        System.out.println(cartId);
         Cart cart = cartService.getCart(cartId);
 
         return Response.set(cart, HttpStatus.OK);
@@ -162,7 +162,7 @@ public class CartController {
 
         }
 
-        return Response.setErr("Cart does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.NOT_ACCEPTABLE);
     }
 
 }
