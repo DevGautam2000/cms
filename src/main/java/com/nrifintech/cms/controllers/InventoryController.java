@@ -2,10 +2,7 @@ package com.nrifintech.cms.controllers;
 
 import java.util.List;
 
-import javax.mail.Flags.Flag;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,7 +19,6 @@ import com.nrifintech.cms.events.UpdateQtyReqEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.types.Response;
-import com.stripe.model.Application;
 
 @CrossOrigin
 @RestController
@@ -69,7 +65,7 @@ public class InventoryController {
     @GetMapping(Route.Inventory.getByName + "{name}")
     public Response getByName(@PathVariable String name){
         List<Inventory> inventory = this.inventoryService.getInventoryByName(name);
-        if( inventory.size() == 0 ){
+        if( inventory.isEmpty() ){
             return Response.setErr("Not found", HttpStatus.NOT_FOUND);
         }
         else{
