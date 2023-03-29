@@ -1,7 +1,6 @@
 package com.nrifintech.cms.entities;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -13,7 +12,11 @@ import javax.persistence.ManyToMany;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.MealType;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

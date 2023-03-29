@@ -3,10 +3,8 @@ package com.nrifintech.cms.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,15 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.InventoryMail;
-import com.nrifintech.cms.entities.Inventory;
 import com.nrifintech.cms.entities.Purchase;
 import com.nrifintech.cms.events.ApprovedQtyReqEvent;
-import com.nrifintech.cms.repositories.InventoryRepo;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.services.PurchaseService;
 import com.nrifintech.cms.types.Response;
-import com.stripe.model.Application;
 
 @RestController
 @CrossOrigin

@@ -3,7 +3,6 @@ package com.nrifintech.cms.controllers;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +23,6 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.Response;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Application;
 
 @CrossOrigin
 @RestController
@@ -47,8 +45,8 @@ public class WalletController {
 		Wallet wallet = walletService.getWallet(user.getWallet().getId());
 		Wallet w = walletService.getWallet(walletId);
 
-		if(w.getId() != wallet.getId())
-		return Response.setErr("Wallet does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
+		if( !( w.getId().equals(wallet.getId()) ) )
+			return Response.setErr("Wallet does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
 		
 		return Response.set(w, HttpStatus.OK);
 	}

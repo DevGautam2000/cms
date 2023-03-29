@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @RequiredArgsConstructor
 public class EmailModel {
-    private final String from = "cmsbatch2@gmail.com";
+    private static final String from = "cmsbatch2@gmail.com";
     @NonNull
     private List<String> to;
     @NonNull
@@ -24,4 +24,8 @@ public class EmailModel {
     @NonNull
     private String templateUsed;
     private String embeddedHTML;
+
+    public String getFrom() {
+        return EmailModel.from;
+    }
 }

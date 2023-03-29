@@ -1,6 +1,8 @@
 package com.nrifintech.cms.payments.service;
 
 import com.nrifintech.cms.entities.User;
+import com.stripe.exception.StripeException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -22,7 +24,7 @@ public class StripeServiceTest{
     }
 
     @Test
-    public void testCreateCharge() {
+    public void testCreateCharge() throws StripeException {
 
         User user = User.builder().email("test@example.com").build();
         String token = "stripe_token";

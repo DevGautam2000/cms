@@ -27,7 +27,6 @@ import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
-import com.stripe.model.Application;
 
 @CrossOrigin
 @RestController
@@ -175,9 +174,8 @@ public class MenuController {
 	@GetMapping(Route.Menu.getByDate + "/{date}")
 	public Response getMenuByDate(@PathVariable Date date, Principal principal) {
 
-		//TODO:
-		// if (!menuService.isServingToday(date))
-		// 	return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+		if (!menuService.isServingToday(date))
+			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
 
 		List<Menu> menus = menuService.getMenuByDate(date,principal);
 
