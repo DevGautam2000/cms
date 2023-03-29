@@ -84,7 +84,7 @@ public class ErrorControllerTest extends MockMvcSetup {
     public void testHandleHttpMessageNotReadable() throws IOException {
         httpStatus = HttpStatus.NOT_FOUND;
         HttpMessageNotReadableException httpMessageNotReadableException =
-                new HttpMessageNotReadableException(Message.payloadNotFound);
+                new HttpMessageNotReadableException(ErrorMessages.PAYLOADNOTFOUND);
         Response.JsonEntity res =
                 createException(
                         errorController
@@ -113,7 +113,7 @@ public class ErrorControllerTest extends MockMvcSetup {
 
 
         assertThat(HttpStatus.NOT_FOUND.value(), is(res.getStatus()));
-        assertThat(Message.pathVariableNotFound, is(res.getMessage()));
+        assertThat(ErrorMessages.PATHVARIABLENOTFOUND, is(res.getMessage()));
 
     }
 
