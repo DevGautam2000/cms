@@ -50,7 +50,6 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
 import com.nrifintech.cms.utils.SameRoute;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Order.prefix)
 public class OrderController {

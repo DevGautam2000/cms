@@ -34,7 +34,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import freemarker.core.ParseException;
 
-@CrossOrigin
 @ControllerAdvice
 @RestController
 public class ErrorController extends ResponseEntityExceptionHandler {

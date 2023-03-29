@@ -19,7 +19,6 @@ import com.nrifintech.cms.services.ItemService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Item.prefix)
 public class ItemController {

@@ -20,7 +20,6 @@ import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.types.Response;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Inventory.prefix)
 public class InventoryController {
