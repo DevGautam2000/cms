@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.UserInDto;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
@@ -38,8 +38,8 @@ public class UserController {
 	private PasswordEncoder passwordEncoder;
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
-	public Response addUser(@RequestBody User user) {
-
+	public Response addUser(@RequestBody UserInDto userDto) {
+		User user= new User(userDto);
 		if (user.getRole().ordinal() > Role.values().length)
 			return Response.setErr("Invalid role for user.", HttpStatus.BAD_REQUEST);
 
@@ -67,9 +67,9 @@ public class UserController {
 	}
 
 	@PostMapping(Route.User.removeUser)
-	public Response removeUser(@RequestBody User user) {
-
-		User u = userService.removeUser(user.getEmail());
+	public Response removeUser(@RequestBody UserInDto userDto) {
+		
+		User u = userService.removeUser(userDto.getEmail());
 
 		if (userService.isNotNull(u)) {
 			return Response.setMsg("User removed.", HttpStatus.OK);

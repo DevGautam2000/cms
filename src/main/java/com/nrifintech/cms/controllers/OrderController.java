@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.FeedBackDto;
 import com.nrifintech.cms.dtos.OrderResponseRequest;
 import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.dtos.WalletEmailResponse;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
+import com.nrifintech.cms.types.Feedback;
 import com.nrifintech.cms.types.Global;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.Transaction;
@@ -116,8 +118,8 @@ public class OrderController {
 	}
 
 	@PostMapping(Route.FeedBack.addFeedback + "/{orderId}")
-	public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBack feedBack) {
-
+	public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBackDto feedBackDto) {
+		FeedBack feedBack = new FeedBack(feedBackDto);
 		Object obj = orderService.addFeedBackToOrder(orderId, feedBack);
 
 		if (orderService.isNotNull(obj) && obj instanceof FeedBack)

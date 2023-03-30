@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.nrifintech.cms.dtos.InventoryDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,5 +37,15 @@ public class Inventory {
 	@OneToMany(mappedBy = "inventoryRef",cascade = CascadeType.MERGE)
 	@JsonManagedReference
 	private List<Purchase> purchases;
+
+	public Inventory(InventoryDto inventory) {
+		this.id=inventory.getId();
+		this.name=inventory.getName();
+		this.quantityInHand=inventory.getQuantityInHand();
+		this.quantityRequested=inventory.getQuantityRequested();
+		this.purchases=inventory.getPurchases();
+	
+	}
+	
 	
 }

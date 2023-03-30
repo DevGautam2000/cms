@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import com.nrifintech.cms.dtos.MenuDto;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.MealType;
 
@@ -29,6 +30,7 @@ public class Menu {
 	@Id
 	@GeneratedValue
 	private Integer id;
+	@Builder.Default
 	private Approval approval = Approval.Incomplete;
 
 	private Date date;
@@ -38,4 +40,11 @@ public class Menu {
 	@ManyToMany(fetch = FetchType.EAGER)
 	private List<Item> items;
 
+	public Menu(MenuDto menu) {
+		this.id=menu.getId();
+		this.approval=menu.getApproval();
+		this.date=menu.getDate();
+		this.menuType=menu.getMenuType();
+		this.items=menu.getItems();
+	}
 }

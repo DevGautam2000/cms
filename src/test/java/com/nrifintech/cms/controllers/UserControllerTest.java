@@ -39,7 +39,7 @@ import com.nrifintech.cms.types.UserStatus;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UserControllerTest extends MockMvcSetup{
     private List<User> users = new ArrayList<>();
     private MockMvc mockMvc;

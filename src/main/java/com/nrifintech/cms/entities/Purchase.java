@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.nrifintech.cms.dtos.PurchaseDto;
 
 import lombok.*;
 
@@ -29,4 +30,13 @@ public class Purchase {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JsonBackReference
     private Inventory inventoryRef;
+
+    public Purchase(PurchaseDto purchase) {
+        this.refId=purchase.getRefId();
+        this.quantity=purchase.getQuantity();
+        this.amount=purchase.getAmount();
+        this.time=purchase.getTime();
+    }
+
+    
 }

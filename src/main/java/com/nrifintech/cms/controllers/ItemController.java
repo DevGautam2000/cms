@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.ItemDto;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
@@ -42,8 +43,8 @@ public class ItemController {
 	}
 
 	@PostMapping(Route.Item.addItem)
-	public Response addItem(@RequestBody Item item) {
-
+	public Response addItem(@RequestBody ItemDto itemDto) {
+		Item item = new Item(itemDto);
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))
 			return Response.setMsg("Item added.", HttpStatus.OK);

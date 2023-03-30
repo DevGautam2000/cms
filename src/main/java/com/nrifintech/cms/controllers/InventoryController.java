@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.InventoryDto;
 import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.entities.Inventory;
 import com.nrifintech.cms.events.UpdateQtyReqEvent;
@@ -30,7 +31,8 @@ public class InventoryController {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @PostMapping(Route.Inventory.saveOne)
-    public Response saveOne(@RequestBody Inventory inventory){
+    public Response saveOne(@RequestBody InventoryDto inventoryDto){
+        Inventory inventory = new Inventory(inventoryDto);
         Inventory i = this.inventoryService.addToInventory(inventory);
         if( i == null ){
             return( Response.setErr("Unable to save", HttpStatus.BAD_REQUEST));
