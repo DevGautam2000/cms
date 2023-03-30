@@ -1,96 +1,141 @@
 package com.nrifintech.cms.repositories;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 
-import java.security.Timestamp;
-import java.util.Date;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-import org.apache.tomcat.jni.Time;
-import org.aspectj.lang.annotation.After;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.assertj.core.util.Arrays;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import com.nrifintech.cms.entities.Cart;
+import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.User;
-import com.nrifintech.cms.types.EmailStatus;
-import com.nrifintech.cms.types.Role;
-import com.nrifintech.cms.types.Status;
-import com.nrifintech.cms.types.UserStatus;
+import com.nrifintech.cms.types.MealType;
 
+@RunWith(MockitoJUnitRunner.class)
 public class UserRepoTest {
-    @Autowired
+    @Mock
     private UserRepo userRepo;
 
-    @BeforeEach
-    void setup(){
-        String email="abcdzx@gmail.com";
-        User userIn= new User(999, null, email, 
-        "123",  "9876543210", Role.Admin, UserStatus.Active ,EmailStatus.subscribed, null
-        , null, null,null);
-        userRepo.save(userIn);
+    @Before
+    public void setup(){
+       MockitoAnnotations.openMocks(this);
     }
 
-    @AfterEach
-    void destroy(){
-        userRepo.deleteById(999);
-    }
 
     @Test
-    void testFindByEmail() {
-        String user="abcd@gmail.com";
-        User userActual = userRepo.findByEmail(user).orElse(null);
-        assert(userActual.getEmail().equals(user));
-    }
+    public void testFindByEmail() {
+        Optional<User> user= Optional.of(User.builder().email("abcd@gmail.com").build());
 
-    @Test
-    void testGetUserByOrderDate() {
 
-    }
+        Mockito.when(userRepo.findByEmail(anyString())).thenReturn(user);
 
-    @Test
-    void testHasUserCartitem() {
-
-    }
-
-    @org.junit.Test
-    public void testFindByEmail2() {
+        Optional<User> userActual = userRepo.findByEmail(user.get().getEmail());
         
+        assertEquals(userActual.get().getEmail(), user.get().getEmail());
     }
 
-    @org.junit.Test
+
+    
+    @Test
+    public void testGetUserByOrderDate() {
+
+        User user = User.builder().id(10).email("use@test").build();
+
+        List<String> users = new ArrayList<>(); 
+        users.add(user.getEmail());
+
+        Mockito.when(userRepo.getUserByOrderDate(any(Date.class)))
+        .thenReturn(users);
+
+        List<String> res = userRepo.getUserByOrderDate(new Date(System.currentTimeMillis()));
+
+        assertNotNull(res);
+        assertEquals(user.getEmail(), res.get(0));
+    }
+
+    @Test
+    public void testHasUserCartitem() {
+
+
+        List<CartItem> cartItems =  new ArrayList<>();
+        cartItems.add(CartItem.builder()
+        .id(90)
+        .name("Chicken")
+        .build());
+
+        User user = User.builder().id(10).email("use@test").cart(
+            Cart.builder().id(13).cartItems(cartItems).build()
+        ).build();
+
+       
+        Mockito.when(userRepo.hasUserCartitem(anyString(),anyInt()))
+        .thenReturn(1);
+
+        int res = userRepo.hasUserCartitem(user.getEmail(),
+        // user.getCart().getCartItems().get(0).getId());
+12);
+        assertNotNull(res);
+        assertEquals(1, res);
+    }
+
+   
+    @Test
     public void testGetAllConsumers() {
         
     }
 
-    @org.junit.Test
+    @Test
     public void testGetAllUserGroup() {
         
     }
 
-    @org.junit.Test
-    public void testGetUserByOrderDate2() {
-        
-    }
 
-    @org.junit.Test
+    @Test
     public void testGetUserByOrderDateAndType() {
-        
+        User user = User.builder().id(10).email("use@test").build();
+
+        List<String> users = new ArrayList<>(); 
+        users.add(user.getEmail());
+
+        Mockito.when(userRepo.getUserByOrderDateAndType(any(Date.class),anyInt()))
+        .thenReturn(users);
+
+        List<String> res = userRepo.getUserByOrderDateAndType(new Date(System.currentTimeMillis()) , MealType.Breakfast.ordinal());
+
+        assertNotNull(res);
+        assertEquals(user.getEmail(), res.get(0));
     }
 
-    @org.junit.Test
+    @Test
     public void testGetUserByOrderId() {
+        User user = User.builder().id(10).email("use@test").build();
+
+        Mockito.when(userRepo.getUserByOrderId(anyInt()))
+        .thenReturn(user.getEmail());
+
+        String res = userRepo.getUserByOrderId(121);
+
+        assertNotNull(res);
+        assertEquals(user.getEmail(), res);
         
     }
 
-    @org.junit.Test
+    @Test
     public void testGetUserEmailsByRole() {
-        
-    }
-
-    @org.junit.Test
-    public void testHasUserCartitem2() {
         
     }
 }

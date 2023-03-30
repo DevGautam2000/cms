@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -433,5 +434,14 @@ public class OrderController {
 		}
         return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
     }
+
+	@GetMapping(Route.Order.getOrderQuantity + "/{date}")
+	public Response getOrderQuantity(@PathVariable Date date){
+		Map<String,Integer> responseMap = this.orderService.getOrderQuantity(date);
+		if(responseMap.isEmpty()){
+			return( Response.setErr("Sorry no orders as of now", HttpStatus.NOT_FOUND));
+		}
+		return( Response.set(responseMap,HttpStatus.OK) );
+	}
 
 }
