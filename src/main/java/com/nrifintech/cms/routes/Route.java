@@ -70,6 +70,8 @@ public class Route {
 
 		String cancelOrder = "cancelorder";
 
+		String getOrderQuantity  = "getorderquantity";
+
 	
 	}
 

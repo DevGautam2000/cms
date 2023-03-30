@@ -1,5 +1,6 @@
 package com.nrifintech.cms.repositories;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,4 +32,7 @@ public interface OrderRepo extends JpaRepository<Order,Integer>{
 
     @Query(value = "select order_type , count(id) from orders where cast(order_delivered as date) between :date1 and :date2 group by order_type" , nativeQuery=true)
     public List<Tuple> getBreakfastVsLunchStats(@Param("date1") String date1 , @Param("date2") String date2 );
+
+    @Query(value = "select * from orders where Cast(order_placed as date) = :date" , nativeQuery = true)
+    public List<Order> findByOrderPlaced(@Param("date") String date);
 }

@@ -83,6 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(Route.User.prefix + Route.User.getOrders + "/{id}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object, Role.Admin.toString(), Role.Canteen.toString()))
                 .antMatchers(HttpMethod.POST, Route.Order.prefix + Route.Order.updateStatus + "/**").hasAnyAuthority(Role.Canteen.toString())
                 .antMatchers(HttpMethod.POST, Route.Order.prefix + Route.Order.placeOrder + "/{id}/{mealId}").access((authentication, object) -> aManagerAdapter.preCheckUserWithId(authentication, object))
+                .antMatchers( Route.Order.prefix + Route.Order.getOrderQuantity + "/*").hasAnyAuthority(Role.Canteen.toString())
 
 
                 .antMatchers(Route.Cart.prefix + Route.Cart.getCart + "/{cartId}").access((authentication, object) -> aManagerAdapter.preCheckUserCartId(authentication, object))

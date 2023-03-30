@@ -1,9 +1,13 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -141,7 +145,20 @@ public class OrderService implements Validator {
 //		Timestamp prev = Timestamp.valueOf("2023-03-12 12:00:00");
 
 		return curr.getTime() - prev.getTime() <= SERVER_LIMIT_MILLIS;
+		
+	}
 
+	public Map<String, Integer> getOrderQuantity(Date date){
+
+		Map<String , Integer> result = new HashMap<>();
+
+		List<Order>  orders = orderRepo.findByOrderPlaced(date.toString());
+		if(!orders.isEmpty()) {
+			orders.stream().forEach(o -> o.getCartItems().forEach(item->{
+				result.put(item.getName(), result.getOrDefault(item.getName(), 0) + item.getQuantity());
+			}));
+		}
+		return(result);
 	}
 
 }
