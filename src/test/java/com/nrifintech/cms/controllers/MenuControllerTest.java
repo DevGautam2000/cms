@@ -32,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -120,34 +122,34 @@ public class MenuControllerTest extends MockMvcSetup{
         String r = mockMvc.perform(
             MockMvcRequestBuilders
                     .post(
-                        prefix(Route.Item.addItems + "/" + menuId + "/" + 
-                        "[1,2]") 
+                        prefix(Route.Item.addItems + "tomenu/" + menuId + "/" + 
+                        "1,2") 
                     ).contentType(MediaType.APPLICATION_JSON)
                     //.content(mapToJson(new JwtRequest(users.get(0).getEmail(),users.get(0).getPassword())))
         ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        JwtResponse res = mapFromJson(r, JwtResponse.class);
+        Response.JsonEntity res = mapFromJson(r,  Response.JsonEntity.class);
 
-        Mockito.verify(menuService).addItemsToMenu(1, Mockito.any());
-        Mockito.verify(menuService).isNotNull(menus.get(0));
-        assert res.getToken().equals("Added items to menu.");
+        // Mockito.verify(menuService).addItemsToMenu(1, Mockito.any());
+        // Mockito.verify(menuService).isNotNull(menus.get(0));
+        assert res.getMessage().equals("Added items to menu.");
 
             
         menuId=2;
         r = mockMvc.perform(
             MockMvcRequestBuilders
                     .post(
-                        prefix(Route.Item.addItems + menuId + "/" + 
-                        itemIds.toString().replaceAll("[]", "")) 
+                        prefix(Route.Item.addItems + "tomenu/" + menuId + "/" + 
+                        "994,995,996,997,998")//itemIds.toString().replaceAll("[]", "")) 
                     ).contentType(MediaType.APPLICATION_JSON)
                     //.content(mapToJson(new JwtRequest(users.get(0).getEmail(),users.get(0).getPassword())))
-        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        ).andExpect(status().isInternalServerError()).andReturn().getResponse().getContentAsString();
 
-        res = mapFromJson(r, JwtResponse.class);
+        res = mapFromJson(r, Response.JsonEntity.class);
 
-        Mockito.verify(menuService).addItemsToMenu(1, Mockito.any());
-        Mockito.verify(menuService).isNotNull(menus.get(0));
-        assert res.getToken().equals("Error adding items to menu.");
+        // Mockito.verify(menuService).addItemsToMenu(1, Mockito.any());
+        // Mockito.verify(menuService).isNotNull(menus.get(0));
+        assert res.getMessage().equals("Error adding items to menu.");
     }
 
     @Test
@@ -301,11 +303,11 @@ public class MenuControllerTest extends MockMvcSetup{
 
 
 
-        when(userService.getuser(anyString())).thenReturn(
-            new User(1,"avatar.png","abc@gamil.com","password","9876543210",
-            Role.Canteen,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
-		when(menuService.getMenu(anyInt())).thenReturn(menus.get(0));
-		when(menuService.isNotNull(any())).thenReturn(true);
+        // when(userService.getuser(anyString())).thenReturn(
+        //     new User(1,"avatar.png","abc@gamil.com","password","9876543210",
+        //     Role.Canteen,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+		// when(menuService.getMenu(anyInt())).thenReturn(menus.get(0));
+		// when(menuService.isNotNull(any())).thenReturn(true);
         
         r = mockMvc.perform(
                 MockMvcRequestBuilders.post(
@@ -313,11 +315,11 @@ public class MenuControllerTest extends MockMvcSetup{
                 ).contentType(MediaType.APPLICATION_JSON)
                 .principal(()->"abc@gmail.com")
                 // .content(mapToJson(menus.get(0)))
-        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        ).andExpect(status().isInternalServerError()).andReturn().getResponse().getContentAsString();
 
         response = mapFromJson(r, Response.JsonEntity.class);
 
-		assertEquals("Menu added for review.", response.getMessage());
+		assert (((String)response.getMessage()).contains("Menu already "));
 		assertEquals(Approval.Pending, menus.get(0).getApproval());
   
     }

@@ -181,8 +181,5 @@ public class OrderServiceTest {
         Mockito.lenient()
                 .doAnswer((Answer<Void>) invocation -> null)
                 .when(orderRepo).autoArchive("2023-03-02");
-                //.when(orderRepo).autoArchive("2023-03-03");
-
-
     }
 }
