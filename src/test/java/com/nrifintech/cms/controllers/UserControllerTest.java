@@ -1,6 +1,5 @@
 package com.nrifintech.cms.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -10,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.service.spi.InjectService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +25,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nrifintech.cms.MockMvcSetup;
-import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
@@ -66,8 +62,6 @@ public class UserControllerTest extends MockMvcSetup{
         
         for(User u:users){
             Mockito.when(userService.getuser(u.getId())).thenReturn(u);
-            Mockito.when(userService.getuser(u.getEmail())).thenReturn(u);
-
         }
 
             Mockito.when(userService.saveUser(any())).thenReturn(users.get(0));
@@ -180,7 +174,7 @@ public class UserControllerTest extends MockMvcSetup{
                     // .content(mapToJson( users.get(0)))
         ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        when(userService.isNotNull(users.get(0))).thenReturn(false);
+        
         r = mockMvc.perform(
             MockMvcRequestBuilders
                 .get(prefix(Route.User.subscriptionToggler + "/" + 

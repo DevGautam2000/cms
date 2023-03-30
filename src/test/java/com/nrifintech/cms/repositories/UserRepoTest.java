@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.util.Arrays;
+import javax.persistence.Tuple;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,10 +21,12 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import com.nrifintech.cms.MockMvcSetup;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.types.MealType;
+import com.nrifintech.cms.types.Role;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserRepoTest {
@@ -86,20 +89,64 @@ public class UserRepoTest {
         .thenReturn(1);
 
         int res = userRepo.hasUserCartitem(user.getEmail(),
-        // user.getCart().getCartItems().get(0).getId());
-12);
+        user.getCart().getCartItems().get(0).getId());
         assertNotNull(res);
         assertEquals(1, res);
     }
 
-   
+
+    @Test
+    public void testHasUserCartitemFailure() {
+
+
+        List<CartItem> cartItems =  new ArrayList<>();
+        cartItems.add(CartItem.builder()
+        .id(90)
+        .name("Chicken")
+        .build());
+
+        User user = User.builder().id(10).email("use@test").cart(
+            Cart.builder().id(13).cartItems(cartItems).build()
+        ).build();
+
+       
+        Mockito.when(userRepo.hasUserCartitem(anyString(),anyInt()))
+        .thenReturn(0);
+
+        int res = userRepo.hasUserCartitem(user.getEmail(),12);
+        assertNotNull(res);
+        assertEquals(0, res);
+    }
+
     @Test
     public void testGetAllConsumers() {
-        
+        List<String> consumers =new ArrayList<>();
+        consumers.add("user@test");
+
+        Mockito.when(userRepo.getAllConsumers()).thenReturn(Optional.of(consumers));
+
+        Optional<List<String>> res = userRepo.getAllConsumers();
+
+        assertNotNull(res);
+        assertEquals(consumers.get(0), res.get().get(0));
     }
 
     @Test
     public void testGetAllUserGroup() {
+
+        List<Tuple> tuples = new ArrayList<>();
+        Tuple tuple = MockMvcSetup.tupleOf(Role.Admin, 3, Integer.class);
+
+        tuples.add(tuple);
+
+
+        Mockito.when(userRepo.getAllUserGroup()).thenReturn(tuples);
+
+        List<Tuple> res = userRepo.getAllUserGroup();
+
+        assertNotNull(res);
+        assertEquals(Role.Admin, res.get(0).get(0));
+        assertEquals(3, res.get(0).get(1));
         
     }
 
@@ -136,6 +183,24 @@ public class UserRepoTest {
 
     @Test
     public void testGetUserEmailsByRole() {
-        
+        List<String> emails = new ArrayList<>();
+
+        emails.add("user@test");
+        emails.add("user2@test");
+
+        List<Tuple> tuples = new ArrayList<>();
+        Tuple tuple = MockMvcSetup.tupleOf(emails, null, Integer.class);
+
+        tuples.add(tuple);
+
+
+        Mockito.when(userRepo.getUserEmailsByRole(anyInt())).thenReturn(tuples);
+
+        List<Tuple> res = userRepo.getUserEmailsByRole(Role.User.ordinal());
+
+        List<String> actualEmails = (List<String>) res.get(0).get(0);
+
+        assertNotNull(res);
+        assertEquals(emails.get(0), actualEmails.get(0));
     }
 }

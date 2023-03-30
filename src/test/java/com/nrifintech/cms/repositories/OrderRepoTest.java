@@ -11,14 +11,23 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import com.nrifintech.cms.MockMvcSetup;
+import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Status;
 
 import javax.persistence.Tuple;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -81,7 +90,35 @@ public class OrderRepoTest {
         Mockito.lenient()
                 .doAnswer((Answer<Void>) invocation -> null)
                 .when(orderRepo).autoArchive("2023-03-03");
+    }
 
+
+     @Test
+    public void testFindByOrderPlaced() {
+ 
+        List<Order> orders = new ArrayList<>();
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date date;
+        List<Order> res = null;
+
+        try {
+
+            date = dateFormat.parse("2023-03-03");
+
+            orders.add(Order.builder().orderPlaced(new Timestamp(date.getTime())).build());
+
+            Mockito.when(orderRepo.findByOrderPlaced(anyString())).thenReturn(orders);
+
+            res = orderRepo.findByOrderPlaced("2023-03-03");
+
+        } catch (ParseException e) {
+            
+            //do nothing
+        }
+
+        assertNotNull(res);
+        assertEquals(orders, res);
     }
 }
 

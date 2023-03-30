@@ -437,7 +437,7 @@ public class OrderController {
 
 	@GetMapping(Route.Order.getOrderQuantity + "/{date}")
 	public Response getOrderQuantity(@PathVariable Date date){
-		Map<String,Integer> responseMap = this.orderService.getOrderQuantity(date);
+		Map<String,Integer> responseMap = orderService.getOrderQuantity(date);
 		if(responseMap.isEmpty()){
 			return( Response.setErr("Sorry no orders as of now", HttpStatus.NOT_FOUND));
 		}

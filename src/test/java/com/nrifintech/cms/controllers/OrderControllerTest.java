@@ -2,14 +2,12 @@ package com.nrifintech.cms.controllers;
 
 
 import com.nrifintech.cms.MockMvcSetup;
-import com.nrifintech.cms.dtos.OrderResponseRequest;
 import com.nrifintech.cms.entities.*;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.*;
 import com.nrifintech.cms.types.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,19 +20,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.lang.reflect.Array;
 import java.security.Principal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -919,6 +918,27 @@ public class OrderControllerTest extends MockMvcSetup {
 
         assertThat(HttpStatus.NOT_FOUND.value(), is(res.getStatus()));
         assertThat("order not found.", is(res.getMessage().toString().trim().toLowerCase()));
+    }
+
+    @Test
+    public void testgetOrderQuantity() throws Exception {
+
+
+       Map<String,Integer> orderDetails = new HashMap<>();
+
+       orderDetails.put("chicken", 3);
+
+        Mockito.when(orderService.getOrderQuantity(any(Date.class))).thenReturn(orderDetails);
+
+        String r = mockMvc.perform(
+                        MockMvcRequestBuilders.get(prefix(Route.Order.getOrderQuantity + "/{date}"), "2023-03-16")
+                                .contentType(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+         Map<String,Integer>  res = mapFromJson(r, Map.class);
+
+        assertEquals(orderDetails, res);
     }
 
 }

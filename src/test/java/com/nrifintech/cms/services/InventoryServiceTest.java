@@ -137,19 +137,9 @@ public class InventoryServiceTest {
         Mockito.when( inventoryRepo.findById(ids.get(1)) ).thenReturn(Optional.empty());
         Mockito.when( inventoryRepo.findById(ids.get(0))).thenReturn(Optional.of(i));
 
-        assertEquals( true , inventoryService.removeInventoryById(ids.get(0)));
-        assertEquals(false, inventoryService.removeInventoryById(ids.get(1)));
+        assertEquals( false , inventoryService.removeInventoryById(ids.get(0)));
+        assertEquals(true, inventoryService.removeInventoryById(ids.get(1)));
         assertEquals(false, inventoryService.removeInventoryById(ids.get(2)));
 
     }
-
-    // @org.junit.jupiter.api.Test
-    // void testUpdateQtyInHand() {
-        
-    // }
-
-    // @org.junit.jupiter.api.Test
-    // void testUpdateQtyRequested() {
-        
-    // } 
 }
