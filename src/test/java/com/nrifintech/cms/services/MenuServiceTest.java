@@ -1,15 +1,19 @@
 package com.nrifintech.cms.services;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +26,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.ItemType;
 import com.nrifintech.cms.types.MealType;
+import com.nrifintech.cms.types.Role;
+import com.stripe.param.PlanCreateParams.TransformUsage.Round;
 
 @SpringBootTest
 public class MenuServiceTest {
@@ -38,6 +45,9 @@ public class MenuServiceTest {
 
 	@Mock
 	private ItemService itemService;
+
+    @Mock
+	private UserService userService;
 
     @InjectMocks
     private MenuService menuService;
@@ -54,6 +64,7 @@ public class MenuServiceTest {
         menues.add(new Menu(1,Approval.Pending,new Date(System.currentTimeMillis()),MealType.Breakfast,items.subList(0, 3)));
         menues.add(new Menu(2,Approval.Pending,new Date(System.currentTimeMillis()),MealType.Lunch,items.subList(3, 6)));
         menues.add(new Menu(3,Approval.Approved,new Date(System.currentTimeMillis()),MealType.Lunch,items));
+        menues.add(new Menu(4,Approval.Incomplete,new Date(System.currentTimeMillis()),MealType.Lunch,items.subList(2, 6)));
         
         // Mockito.when(itemService.saveAll(items)).thenReturn( items);
         Mockito.when(menuRepo.findAll()).thenReturn( menues);
@@ -72,12 +83,8 @@ public class MenuServiceTest {
             // Mockito.when(itemService.save( Mockito.eq(i))).thenReturn( i);
             Mockito.when(itemService.getItem(  Mockito.eq(i.getId()))).thenReturn( i );
         }
-        // Mockito.when(itemService.findById( Mockito.eq(11))).thenThrow(NotFoundException.class);
-        // Mockito.when(itemService.findById( Mockito.eq(12))).thenThrow(NotFoundException.class);
 
-        // when(ItemService.getItems("abc2@gamil.com")).thenReturn( items.get(1));
-        // when(ItemService.getItems("abc3@gamil.com")).thenReturn( items.get(2));
-        // when(ItemService.getItems("abc4@gamil.com")).thenReturn( items.get(3));
+        
     }
     
     @AfterEach
@@ -148,8 +155,10 @@ public class MenuServiceTest {
 
     @Test
     void testGetAllMenu() {
-        // Principal principal = users.get(0)::getn
-        // assertArrayEquals(menues.toArray() , menuService.getAllMenu().toArray());
+        when(userService.getuser(anyString())).thenReturn(
+            User.builder().email("testuser").role(Role.Admin).build());
+        assertEquals(menues.size() , 
+            menuService.getAllMenu(()->"testuser").size());
     }
 
     @Test
@@ -165,7 +174,16 @@ public class MenuServiceTest {
 
     @Test
     void testGetMenuByDate() {
-
+        when(userService.getuser(anyString())).thenReturn(
+            User.builder().email("testuser").role(Role.Admin).build());
+        List<Menu> menuOut = menuService.getMenuByDate(new Date(2023,3,28), ()->"testuser");
+        assert( menuOut.stream().allMatch((e)->e.getApproval().equals(Approval.Incomplete)));
+    
+        when(userService.getuser(anyString())).thenReturn(
+            User.builder().email("testuser").role(Role.User).build());
+        menuOut = menuService.getMenuByDate(new Date(2023,3,28), ()->"testuser");
+        assert( menuOut.stream().allMatch((e)->e.getApproval().equals(Approval.Approved)));
+    
     }
 
     @Test
