@@ -1,4 +1,4 @@
-// package com.nrifintech.cms.repositories;
+package com.nrifintech.cms.repositories;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
