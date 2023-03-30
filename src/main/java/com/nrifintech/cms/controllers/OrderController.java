@@ -152,12 +152,11 @@ public class OrderController {
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
 
 			order.setStatus(status[statusId]);
-			orderService.saveOrder(order);
-			// email code
-			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
-				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(principal.getName(), order)));
-			}
-
+			order = orderService.saveOrder(order);
+			System.out.println(order); // invokes lazy init...
+			// email 
+			this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(userService.getUserByOrderId(orderId) , order)));
+			System.out.println(principal.getName());
 			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
 		}
 

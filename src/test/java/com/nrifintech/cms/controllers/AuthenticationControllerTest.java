@@ -2,13 +2,8 @@ package com.nrifintech.cms.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,20 +15,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.nrifintech.cms.MockMvcSetup;
 import com.nrifintech.cms.config.MyUserDetailsService;
 import com.nrifintech.cms.config.jwt.JwtRequest;
 import com.nrifintech.cms.config.jwt.JwtResponse;
 import com.nrifintech.cms.config.jwt.JwtUtils;
-import com.nrifintech.cms.dtos.UserDto;
 import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.User;

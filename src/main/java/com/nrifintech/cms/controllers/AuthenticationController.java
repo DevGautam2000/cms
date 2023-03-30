@@ -33,7 +33,6 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
-
 import io.jsonwebtoken.JwtException;
 
 @RestController

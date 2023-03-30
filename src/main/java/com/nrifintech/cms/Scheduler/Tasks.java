@@ -26,8 +26,6 @@ import com.nrifintech.cms.events.MenuStatusChangeEvent;
 import com.nrifintech.cms.events.PromotionalEvent;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.repositories.TokenBlacklistRepo;
-import com.nrifintech.cms.repositories.UserRepo;
-import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Approval;
