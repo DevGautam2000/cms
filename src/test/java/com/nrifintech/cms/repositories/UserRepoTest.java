@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.assertj.core.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,11 +84,11 @@ public class UserRepoTest {
         Mockito.when(userRepo.hasUserCartitem(anyString(),anyInt()))
         .thenReturn(1);
 
-        int res = userRepo.hasUserCartitem(user.getEmail(),
+        Integer res = userRepo.hasUserCartitem(user.getEmail(),
         // user.getCart().getCartItems().get(0).getId());
 12);
         assertNotNull(res);
-        assertEquals(1, res);
+        assertEquals(1, (int)res);
     }
 
    

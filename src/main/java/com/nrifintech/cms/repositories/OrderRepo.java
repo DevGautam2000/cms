@@ -1,6 +1,5 @@
 package com.nrifintech.cms.repositories;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
