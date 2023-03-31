@@ -1,4 +1,5 @@
 package com.nrifintech.cms.services;
+import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,9 @@ public class UserService implements Validator {
 
 	@Autowired
 	private UserRepo userRepo;
+
+	@Autowired
+	private ImageService imageService;
 	
 	@Autowired
 	private WalletService walletService;
@@ -33,7 +37,7 @@ public class UserService implements Validator {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
-	public User addUser(User user) {
+	public User addUser(User user) throws IOException {
 		User exUser = this.getExistingUser(user.getEmail());
 
 	
@@ -45,6 +49,8 @@ public class UserService implements Validator {
 			
 			if(isNotNull(w)) {
 				user.setWallet(w); 
+				String url = this.imageService.uploadImage(user.getEmail(), user.getRole().toString() , user.getAvatar() , 0);
+				user.setAvatar(url);
 				userRepo.save(user);
 				
 			}
@@ -61,11 +67,12 @@ public class UserService implements Validator {
 		return false;
 	}
 
-	public User removeUser(String email) {
+	public User removeUser(String email) throws IOException {
 
 		User exUser = this.getuser(email);
 		if (isNotNull(exUser)) {
 			userRepo.delete(exUser);
+			imageService.deleteImage(exUser.getEmail(), exUser.getRole().toString() , 0);
 		}
 		return exUser;
 	}

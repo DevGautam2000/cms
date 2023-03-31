@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class UserController {
 	private PasswordEncoder passwordEncoder;
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
-	public Response addUser(@RequestBody UserInDto userDto) {
+	public Response addUser(@RequestBody UserInDto userDto) throws IOException {
 		User user= new User(userDto);
 		if (user.getRole().ordinal() > Role.values().length)
 			return Response.setErr("Invalid role for user.", HttpStatus.BAD_REQUEST);
@@ -50,7 +51,6 @@ public class UserController {
 		if (userService.isNotNull(u))
 			return Response.setErr("User already exists.", HttpStatus.BAD_REQUEST);
 		this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
-		
 		
 		
 		return Response.setMsg("User added.", HttpStatus.OK);
@@ -67,7 +67,7 @@ public class UserController {
 	}
 
 	@PostMapping(Route.User.removeUser)
-	public Response removeUser(@RequestBody UserInDto userDto) {
+	public Response removeUser(@RequestBody UserInDto userDto) throws IOException {
 		
 		User u = userService.removeUser(userDto.getEmail());
 

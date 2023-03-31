@@ -15,7 +15,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//@ToString
+@ToString
 @Entity
 public class Item {
 
@@ -35,6 +35,7 @@ public class Item {
 
 	public Item(ItemDto item) {
 		this.id=item.getId();
+		this.name=item.getName();
 		this.quantity=item.getQuantity();
 		this.price=item.getPrice();
 		this.itemType=item.getItemType();

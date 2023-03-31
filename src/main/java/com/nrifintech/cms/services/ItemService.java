@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,9 +22,11 @@ public class ItemService implements Validator {
     @Autowired
     private CartItemRepo cartItemRepo;
 
-    // add a food
-    public Item addItem(Item i) {
+    @Autowired
+    private ImageService imageService;
 
+    // add a food
+    public Item addItem(Item i) throws IOException {
         List<Item> items = this.getItems();
 
 
@@ -31,7 +34,8 @@ public class ItemService implements Validator {
             if (item.getName().trim().equalsIgnoreCase(i.getName().trim()))
                 return null;
         }
-
+        String url = imageService.uploadImage( i.getName() , i.getItemType().toString() , i.getImagePath() , 1 );
+        i.setImagePath(url);
         return itemRepo.save(i);
     }
 

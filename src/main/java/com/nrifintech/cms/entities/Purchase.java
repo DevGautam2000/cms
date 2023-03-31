@@ -36,6 +36,7 @@ public class Purchase {
         this.quantity=purchase.getQuantity();
         this.amount=purchase.getAmount();
         this.time=purchase.getTime();
+        this.inventoryRef = purchase.getInventoryRef();
     }
 
     

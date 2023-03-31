@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public  void testAddItemSuccess(){
+    public  void testAddItemSuccess() throws IOException{
 
         Item item = mock(Item.class);
         item.setId(20);
@@ -55,7 +56,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public  void testAddItemFailure(){
+    public  void testAddItemFailure() throws IOException{
 
         Item item = mock(Item.class);
         item.setId(20);

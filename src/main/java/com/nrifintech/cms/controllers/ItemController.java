@@ -1,5 +1,6 @@
 package com.nrifintech.cms.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class ItemController {
 	}
 
 	@PostMapping(Route.Item.addItem)
-	public Response addItem(@RequestBody ItemDto itemDto) {
+	public Response addItem(@RequestBody ItemDto itemDto) throws IOException {
 		Item item = new Item(itemDto);
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))
