@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -31,6 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,6 +56,9 @@ public class MenuControllerTest extends MockMvcSetup{
 
 	@Mock
 	private UserService userService;
+
+    @Mock
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@InjectMocks
     private MenuController menuController;
@@ -150,7 +156,24 @@ public class MenuControllerTest extends MockMvcSetup{
     }
 
     @Test
-    public void testApproveMenu() {
+    public void testApproveMenu() throws UnsupportedEncodingException, Exception {
+        when(menuService.getMenu(menus.get(1).getId())).thenReturn(menus.get(1));
+        when(menuService.approveMenu(any(), Mockito.any())).thenReturn(menus.get(1));
+        when(menuService.isNotNull(any())).thenReturn(true);
+
+        int menuId = menus.get(1).getId();
+
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .post(
+                        prefix(Route.Menu.approveMenu + "/" + menuId + "/" + 
+                        "2") 
+                    ).contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        Response.JsonEntity res = mapFromJson(r,  Response.JsonEntity.class);
+
+        assert res.getMessage().toString().contains("Menu ");
 
     }
 
@@ -174,8 +197,21 @@ public class MenuControllerTest extends MockMvcSetup{
     }
 
     @Test
-    public void testGetMenuByDate() {
+    public void testGetMenuByDate() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+        when(menuService.getMenuByDate(any(),any())).thenReturn(menus);
+        when(menuService.isServingToday(any())).thenReturn(true);
+        String r = mockMvc.perform(
+                MockMvcRequestBuilders.get(
+                        prefix(Route.Menu.getByDate + "/" + (new Date(30,3,2023)).toString())
+                ).contentType(MediaType.APPLICATION_JSON)
+                .principal(()->"abc@gmail.com")                
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
+        List<Menu> res = mapFromJson(r, List.class);
+
+        assertEquals( menus.size() , res.size());
+        // Mockito.verify(menuService,times(1)).getMenu(Mockito.any());
+    
     }
 
     @Test
@@ -236,27 +272,38 @@ public class MenuControllerTest extends MockMvcSetup{
     }
 
     @Test
-    public void testRemoveItemFromMenu() {
+    public void testRemoveItemFromMenu() throws UnsupportedEncodingException, Exception {
+        when(menuService.removeItemFromMenu(anyInt(), anyInt())).thenReturn(menus.get(0));
+        when(menuService.isNotNull(any())).thenReturn(true);
+        
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders.post(
+                    prefix(Route.Menu.removeFromMenu + "/1/2")
+            ).contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
+    Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+    assertEquals( "Item removed from menu." , res.getMessage());
+    
     }
 
     @Test
     public void testRemoveMenu() throws JsonProcessingException, UnsupportedEncodingException, Exception {
         //httpStatus OK
         when(menuService.removeMenu(Mockito.any())).thenReturn(Optional.of(menus.get(0)));
+        when(menuService.getMenu(Mockito.anyInt())).thenReturn(menus.get(0));
         
         String r = mockMvc.perform(
                 MockMvcRequestBuilders.post(
                         prefix(Route.Menu.removeMenu + "/" + "1")
                 ).contentType(MediaType.APPLICATION_JSON)
-                // .content(mapToJson(menus.get(0)))
         ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
 
         assertEquals( "Menu removed." , res.getMessage());
-        // Mockito.verify(menuService).addMenu(Mockito.any());
-        // Mockito.verify(menuService).isNotNull(Mockito.any());
+
 
 
         //httpStatus INTERNAL_SERVER_ERROR
@@ -266,7 +313,6 @@ public class MenuControllerTest extends MockMvcSetup{
                 MockMvcRequestBuilders.post(
                         prefix(Route.Menu.removeMenu + "/" + "1")
                 ).contentType(MediaType.APPLICATION_JSON)
-                // .content(mapToJson(menus.get(0)))
         ).andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value())).andReturn().getResponse().getContentAsString();
 
         res = mapFromJson(r, Response.JsonEntity.class);
@@ -281,21 +327,25 @@ public class MenuControllerTest extends MockMvcSetup{
         when(userService.getuser(anyString())).thenReturn(
             new User(1,"avatar.png","abc@gamil.com","password","9876543210",
             Role.Canteen,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
-		when(menuService.getMenu(anyInt())).thenReturn(menus.get(0));
+		
+        when(menuService.getMenu(anyInt())).thenReturn(menus.get(0));
 		when(menuService.isNotNull(any())).thenReturn(true);
+		when(menuService.saveMenu(any())).thenReturn(menus.get(0));
         
         String r = mockMvc.perform(
                 MockMvcRequestBuilders.post(
                         prefix(Route.Menu.submitMenu + "/"+menus.get(0).getId())
                 ).contentType(MediaType.APPLICATION_JSON)
                 .principal(()->"abc@gmail.com")
-                // .content(mapToJson(menus.get(0)))
         ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         Response.JsonEntity response = mapFromJson(r, Response.JsonEntity.class);
 
 		assertEquals("Menu added for review.", response.getMessage());
 		assertEquals(Approval.Pending, menus.get(0).getApproval());
+
+
+
 
         // when(userService.getuser(anyString())).thenReturn(
         //     new User(1,"avatar.png","abc@gamil.com","password","9876543210",
@@ -308,7 +358,6 @@ public class MenuControllerTest extends MockMvcSetup{
                         prefix(Route.Menu.submitMenu + "/"+menus.get(0).getId())
                 ).contentType(MediaType.APPLICATION_JSON)
                 .principal(()->"abc@gmail.com")
-                // .content(mapToJson(menus.get(0)))
         ).andExpect(status().isInternalServerError()).andReturn().getResponse().getContentAsString();
 
         response = mapFromJson(r, Response.JsonEntity.class);
