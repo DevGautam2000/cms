@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nrifintech.cms.MockMvcSetup;
-import com.nrifintech.cms.config.jwt.JwtResponse;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.entities.User;
@@ -32,8 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -299,9 +296,6 @@ public class MenuControllerTest extends MockMvcSetup{
 
 		assertEquals("Menu added for review.", response.getMessage());
 		assertEquals(Approval.Pending, menus.get(0).getApproval());
-
-
-
 
         // when(userService.getuser(anyString())).thenReturn(
         //     new User(1,"avatar.png","abc@gamil.com","password","9876543210",
