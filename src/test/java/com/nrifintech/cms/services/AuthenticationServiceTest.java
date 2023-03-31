@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,20 +35,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.eq;
 
-@SpringBootTest
+
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceTest {
     private List<User> users = new ArrayList<>();
 
-    @MockBean
+    @Mock(lenient = true)
     private AuthenticationManager authenticationManager;
-    @MockBean
+    @Mock(lenient = true)
     private UserService userService;
-    @MockBean
+    @Mock(lenient = true)
     private JwtUtils jwtUtils;
-    @MockBean
+    @Mock(lenient = true)
     private ApplicationEventPublisher applicationEventPublisher;
-    @MockBean
+    @Mock(lenient = true)
     private TokenBlacklistRepo tokenRepo;
     @InjectMocks
     private AuthenticationService authService;
