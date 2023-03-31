@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +84,7 @@ public class UserServiceTest {
 
     @DisplayName("add user test")
     @Test
-    void testAddUserCase1() throws IOException {
+    void testAddUserCase1() throws IOException, NoSuchAlgorithmException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -94,7 +95,7 @@ public class UserServiceTest {
         assertEquals(user1, created);
     }
     @Test
-    void testAddUserCase2() throws IOException {
+    void testAddUserCase2() throws IOException, NoSuchAlgorithmException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -105,7 +106,7 @@ public class UserServiceTest {
         assertEquals(user1, created);
     }
     @Test
-    void testAddUserCase3() throws IOException {
+    void testAddUserCase3() throws IOException, NoSuchAlgorithmException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);

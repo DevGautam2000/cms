@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public  void testAddItemSuccess() throws IOException{
+    public  void testAddItemSuccess() throws IOException, NoSuchAlgorithmException{
 
         Item item = mock(Item.class);
         item.setId(20);
@@ -56,7 +57,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public  void testAddItemFailure() throws IOException{
+    public  void testAddItemFailure() throws IOException, NoSuchAlgorithmException{
 
         Item item = mock(Item.class);
         item.setId(20);

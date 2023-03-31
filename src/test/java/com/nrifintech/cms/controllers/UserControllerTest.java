@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,12 +51,12 @@ public class UserControllerTest extends MockMvcSetup{
     private UserController userController;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws IOException, NoSuchAlgorithmException, NoSuchAlgorithmException {
         this.mockMvc = MockMvcSetup.setUp(Route.User.prefix, this, userController);
         loadData();
     }
 
-    private void loadData() throws IOException {        
+    private void loadData() throws IOException, NoSuchAlgorithmException {        
         users.add(new User(999,"avatar1.png","abcd@gamil.com","password1","9876543211",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
         users.add(new User(998,"avatar2.png","abc2@gamil.com","password2","9876543212",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
         users.add(new User(997,"avatar3.png","abc3@gamil.com","password3","9876543213",Role.User,UserStatus.InActive,EmailStatus.unsubscribed,null,null,null,null));

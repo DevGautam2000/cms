@@ -1,6 +1,7 @@
 package com.nrifintech.cms.controllers;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class ItemController {
 	}
 
 	@PostMapping(Route.Item.addItem)
-	public Response addItem(@RequestBody ItemDto itemDto) throws IOException {
+	public Response addItem(@RequestBody ItemDto itemDto) throws IOException, NoSuchAlgorithmException {
 		Item item = new Item(itemDto);
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))

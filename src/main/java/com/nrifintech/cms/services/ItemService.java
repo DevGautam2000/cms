@@ -1,6 +1,7 @@
 package com.nrifintech.cms.services;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class ItemService implements Validator {
     private ImageService imageService;
 
     // add a food
-    public Item addItem(Item i) throws IOException {
+    public Item addItem(Item i) throws IOException, NoSuchAlgorithmException {
         List<Item> items = this.getItems();
 
 

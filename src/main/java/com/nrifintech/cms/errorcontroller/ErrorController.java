@@ -144,4 +144,11 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     	Response.setErr(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         //handle the error to bypass and do not send any response
     }
+    
+    @ExceptionHandler({ javax.servlet.ServletException.class})
+    public void servletException(
+      Exception ex, WebRequest request) {
+      Response.setErr(ex.getMessage(), HttpStatus.NOT_FOUND);
+        //handle the error to bypass and do not send any response
+    }
 }

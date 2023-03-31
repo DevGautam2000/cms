@@ -1,5 +1,6 @@
 package com.nrifintech.cms.services;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class UserService implements Validator {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
-	public User addUser(User user) throws IOException {
+	public User addUser(User user) throws IOException, NoSuchAlgorithmException {
 		User exUser = this.getExistingUser(user.getEmail());
 
 	
@@ -67,7 +68,7 @@ public class UserService implements Validator {
 		return false;
 	}
 
-	public User removeUser(String email) throws IOException {
+	public User removeUser(String email) throws IOException, NoSuchAlgorithmException {
 
 		User exUser = this.getuser(email);
 		if (isNotNull(exUser)) {

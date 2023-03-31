@@ -1,6 +1,7 @@
 package com.nrifintech.cms.controllers;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class UserController {
 	private PasswordEncoder passwordEncoder;
 	@ForDevelopmentOnly
 	@PostMapping(Route.User.addUser)
-	public Response addUser(@RequestBody UserInDto userDto) throws IOException {
+	public Response addUser(@RequestBody UserInDto userDto) throws IOException, NoSuchAlgorithmException {
 		User user= new User(userDto);
 		if (user.getRole().ordinal() > Role.values().length)
 			return Response.setErr("Invalid role for user.", HttpStatus.BAD_REQUEST);
@@ -67,7 +68,7 @@ public class UserController {
 	}
 
 	@PostMapping(Route.User.removeUser)
-	public Response removeUser(@RequestBody UserInDto userDto) throws IOException {
+	public Response removeUser(@RequestBody UserInDto userDto) throws IOException, NoSuchAlgorithmException {
 		
 		User u = userService.removeUser(userDto.getEmail());
 
