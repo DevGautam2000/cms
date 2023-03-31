@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nrifintech.cms.MockMvcSetup;
-import com.nrifintech.cms.config.jwt.JwtResponse;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.entities.User;
@@ -34,7 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -349,6 +347,12 @@ public class MenuControllerTest extends MockMvcSetup{
 
 
 
+        // when(userService.getuser(anyString())).thenReturn(
+        //     new User(1,"avatar.png","abc@gamil.com","password","9876543210",
+        //     Role.Canteen,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+		// when(menuService.getMenu(anyInt())).thenReturn(menus.get(0));
+		// when(menuService.isNotNull(any())).thenReturn(true);
+        
         r = mockMvc.perform(
                 MockMvcRequestBuilders.post(
                         prefix(Route.Menu.submitMenu + "/"+menus.get(0).getId())

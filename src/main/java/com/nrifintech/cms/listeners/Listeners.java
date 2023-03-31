@@ -41,6 +41,7 @@ import com.nrifintech.cms.events.WalletRefundEvent;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.SMTPservices;
+import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.UserStatus;
 
 import freemarker.core.ParseException;
@@ -261,6 +262,7 @@ public class Listeners {
     public void onMenuStatusChange(MenuStatusChangeEvent menuStatusChangeEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
 
         Menu m = (Menu) menuStatusChangeEvent.getSource();
+        String template = "";
 
         List<Tuple> resAdmins = userRepo.getUserEmailsByRole(0);
         List<Tuple> resCanteen = userRepo.getUserEmailsByRole(1);
@@ -274,8 +276,17 @@ public class Listeners {
         body.put("mealtype" , m.getMenuType().toString() );
         body.put("timestamp" , LocalTime.now(ZoneId.of(timezone)).truncatedTo(ChronoUnit.MINUTES).toString() );
 
-        EmailModel email1 = new EmailModel(admins , subject , body,"menu-status-change.flth");
-        EmailModel email2 = new EmailModel(canteen , subject , body,"menu-status-change.flth");
+        if( m.getApproval() == Approval.Pending ){
+            template = "menu-added.flth";
+        }
+        if( m.getApproval() == Approval.Rejected ){
+            template = "menu-status-rejected.flth";
+        }
+        if( m.getApproval() == Approval.Approved ){
+            template = "menu-status-approve.flth";
+        }
+        EmailModel email1 = new EmailModel(admins , subject , body,template);
+        EmailModel email2 = new EmailModel(canteen , subject , body,template);
         this.smtpServices.sendMail(email1);
         this.smtpServices.sendMail(email2);
 
