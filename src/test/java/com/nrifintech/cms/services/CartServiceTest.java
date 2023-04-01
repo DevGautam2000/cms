@@ -3,7 +3,6 @@ package com.nrifintech.cms.services;
 import com.nrifintech.cms.dtos.CartItemUpdateRequest;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.CartRepo;
 import com.nrifintech.cms.types.MealType;

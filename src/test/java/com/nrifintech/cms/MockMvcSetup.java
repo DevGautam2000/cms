@@ -5,8 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.nrifintech.cms.controllers.CartController;
-import com.nrifintech.cms.controllers.CartControllerTest;
 import com.nrifintech.cms.errorcontroller.ErrorController;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;

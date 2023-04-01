@@ -1,15 +1,14 @@
 package com.nrifintech.cms.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.nrifintech.cms.MockMvcSetup;
-import com.nrifintech.cms.entities.Item;
-import com.nrifintech.cms.errorhandler.NotFoundException;
-import com.nrifintech.cms.repositories.ItemRepo;
-import com.nrifintech.cms.routes.Route;
-import com.nrifintech.cms.services.ItemService;
-import com.nrifintech.cms.types.ItemType;
-import com.nrifintech.cms.types.Response;
-import lombok.var;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,19 +16,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import com.nrifintech.cms.MockMvcSetup;
+import com.nrifintech.cms.entities.Item;
+import com.nrifintech.cms.errorhandler.NotFoundException;
+import com.nrifintech.cms.routes.Route;
+import com.nrifintech.cms.services.ItemService;
+import com.nrifintech.cms.types.ItemType;
+import com.nrifintech.cms.types.Response;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ItemControllerTest extends MockMvcSetup {

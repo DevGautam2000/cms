@@ -6,7 +6,6 @@ import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.types.ItemType;
 import com.nrifintech.cms.types.TransactionType;
-import org.apache.catalina.connector.Response;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +14,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ExcelReportGenerator {
@@ -56,7 +51,6 @@ public class ExcelReportGenerator {
                 workbook.write(byteArrayOutputStream);
                 return new ByteArrayResource(byteArrayOutputStream.toByteArray());
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new RuntimeException
                         ("Error while generating excel.");
             }
@@ -211,7 +205,6 @@ public class ExcelReportGenerator {
                 workbook.write(byteArrayOutputStream);
                 return new ByteArrayResource(byteArrayOutputStream.toByteArray());
             } catch (IOException e) {
-                e.printStackTrace();
                 throw new RuntimeException
                         ("Error while generating excel.");
             }

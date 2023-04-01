@@ -90,8 +90,9 @@ public class UserRepoTest {
 
         int res = userRepo.hasUserCartitem(user.getEmail(),
         user.getCart().getCartItems().get(0).getId());
+        
         assertNotNull(res);
-        assertEquals(1, res);
+        assertEquals(1, (int)res);
     }
 
 

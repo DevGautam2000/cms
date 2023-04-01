@@ -2,9 +2,16 @@ package com.nrifintech.cms.services;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +70,12 @@ public class UserServiceTest {
         Mockito.when(userRepo.save(users.get(3))).thenReturn(users.get(3));
 
         Mockito.when(userRepo.findAll()).thenReturn(users);
+
+        for(User u : users){
+            when(userRepo.getUserByOrderId(u.getId())).thenReturn(u.getEmail());
+    
+        }
+    
     }
     @AfterEach
     void destroy(){
@@ -71,7 +84,7 @@ public class UserServiceTest {
 
     @DisplayName("add user test")
     @Test
-    void testAddUserCase1() {
+    void testAddUserCase1() throws IOException, NoSuchAlgorithmException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -82,7 +95,7 @@ public class UserServiceTest {
         assertEquals(user1, created);
     }
     @Test
-    void testAddUserCase2() {
+    void testAddUserCase2() throws IOException, NoSuchAlgorithmException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -93,7 +106,7 @@ public class UserServiceTest {
         assertEquals(user1, created);
     }
     @Test
-    void testAddUserCase3() {
+    void testAddUserCase3() throws IOException, NoSuchAlgorithmException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -111,21 +124,34 @@ public class UserServiceTest {
 
     @Test
     void testGetAllConsumers() {
+        List<String> emails=Arrays.asList("test1","test2");
+        when(userRepo.getAllConsumers()).thenReturn(Optional.ofNullable(emails));
+        assertEquals(emails.size(), userService.getAllConsumers().size());
 
+        
+        when(userRepo.getAllConsumers()).thenReturn(Optional.ofNullable(null));
+        assertEquals(0, userService.getAllConsumers().size());
     }
 
+    //TODO: wrong func. name 
     @Test
     void testGetOrdersByDate() {
-
+        List<String> emails=Arrays.asList("test1","test2");
+        when(userRepo.getUserByOrderDate(any())).thenReturn(emails);
+        assertArrayEquals(emails.toArray(), userService.getOrdersByDate(new Date(2023,3,28)).toArray());
+    
     }
 
     @Test
     void testGetOrdersByDateAndOrderType() {
-
+        List<String> emails=Arrays.asList("test1","test2");
+        when(userRepo.getUserByOrderDateAndType(any(),anyInt())).thenReturn(emails);
+        assertArrayEquals(emails.toArray(), userService.getOrdersByDateAndOrderType(new Date(2023,3,28), 1).toArray());
     }
 
     @Test
     void testGetUserByOrderId() {
+        assertEquals(users.get(0).getEmail(), userService.getUserByOrderId(users.get(0).getId()) );
 
     }
 
@@ -154,13 +180,14 @@ public class UserServiceTest {
 
     @Test
     void testHasUserCartitem() {
+        when(userRepo.hasUserCartitem(anyString(),anyInt())).thenReturn(1);
+        assertEquals(true, userService.hasUserCartitem("testuser", 12));
 
+        when(userRepo.hasUserCartitem(anyString(),anyInt())).thenReturn(0);
+        assertEquals(false, userService.hasUserCartitem("testuser", 12));
+    
     }
 
-    @Test
-    void testRemoveUser() {
-
-    }
 
     @Test
     void testSaveUser() {

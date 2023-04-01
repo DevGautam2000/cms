@@ -18,17 +18,13 @@ public class MyUserDetails implements UserDetails{
     private List<GrantedAuthority> authorities;
 
 	private UserStatus status;
-	private String phoneNumber;
-	
-	// private Role role = Role.User;
 
     public MyUserDetails(User user) {
         this.username = user.getEmail();
         this.password = user.getPassword();
 		this.status = user.getStatus();
-        // this.active = user.isActive();
         
-        this.authorities = new ArrayList<GrantedAuthority>();
+        this.authorities = new ArrayList<>();
         this.authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
 
     }

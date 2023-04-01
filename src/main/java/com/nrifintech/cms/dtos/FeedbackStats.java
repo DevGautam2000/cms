@@ -1,7 +1,4 @@
 package com.nrifintech.cms.dtos;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 import lombok.AllArgsConstructor;

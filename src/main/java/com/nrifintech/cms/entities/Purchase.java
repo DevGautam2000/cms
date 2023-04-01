@@ -3,16 +3,13 @@ package com.nrifintech.cms.entities;
 import java.sql.Timestamp;
 
 import javax.persistence.CascadeType;
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.SqlResultSetMapping;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.nrifintech.cms.dtos.PurchaseDto;
 
 import lombok.*;
 
@@ -33,4 +30,14 @@ public class Purchase {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JsonBackReference
     private Inventory inventoryRef;
+
+    public Purchase(PurchaseDto purchase) {
+        this.refId=purchase.getRefId();
+        this.quantity=purchase.getQuantity();
+        this.amount=purchase.getAmount();
+        this.time=purchase.getTime();
+        this.inventoryRef = purchase.getInventoryRef();
+    }
+
+    
 }

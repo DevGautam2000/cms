@@ -26,8 +26,6 @@ import com.nrifintech.cms.events.MenuStatusChangeEvent;
 import com.nrifintech.cms.events.PromotionalEvent;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.repositories.TokenBlacklistRepo;
-import com.nrifintech.cms.repositories.UserRepo;
-import com.nrifintech.cms.services.MenuService;
 import com.nrifintech.cms.services.OrderService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Approval;
@@ -55,31 +53,33 @@ public class Tasks {
     @Autowired
     MenuRepo menuRepo;
 
+    private String dateFormat = "yyyy-MM-dd";
+
     @Scheduled( fixedDelay = 10000)
     public void promotionalEvent(){
         List<String> recipients = userService.getAllConsumers();
-        if( recipients.size()!=0 ){
+        if( !recipients.isEmpty() ){
             applicationEventPublisher.publishEvent(new PromotionalEvent(recipients));
         }
     }
 
     @Scheduled(fixedDelay = 10000)
     //@Scheduled(cron = "0 30 3 ? * MON,TUE,WED,THU,FRI *")
-    public void BreakfastStart(){
-        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+    public void breakfastStart(){
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern(dateFormat);  
         LocalDateTime now = LocalDateTime.now();  
-        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Breakfast.ordinal());
-        if(recipients.size()>0){
+        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now)) , MealType.Breakfast.ordinal());
+        if(!recipients.isEmpty()){
             applicationEventPublisher.publishEvent(new BreakfastStartEvent(recipients));
         } 
     }
     @Scheduled(fixedDelay = 10000)
     //@Scheduled(cron = "0 30 6 ? * MON,TUE,WED,THU,FRI *")
-    public void LunchStart(){
-        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+    public void lunchStart(){
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern(dateFormat);  
         LocalDateTime now = LocalDateTime.now();  
-        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now).toString()) , MealType.Lunch.ordinal());
-        if( recipients.size()>0 ){
+        List<String> recipients = userService.getOrdersByDateAndOrderType( Date.valueOf(dtf.format(now)) , MealType.Lunch.ordinal());
+        if( !recipients.isEmpty() ){
             applicationEventPublisher.publishEvent(new LunchStartEvent(recipients));
         } 
     }
@@ -87,9 +87,9 @@ public class Tasks {
     @Scheduled(fixedDelay = 10000)
     // @Scheduled(cron = "0 30 18 ? * MON,TUE,WED,THU,FRI,SAT *" )
     public void autoArchive(){
-        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern("yyyy-MM-dd");  
+        DateTimeFormatter dtf =  DateTimeFormatter.ofPattern(dateFormat);  
         LocalDateTime now = LocalDateTime.now();
-        orderService.autoArchive( (Date.valueOf(dtf.format(now).toString())).toString() );
+        orderService.autoArchive( (Date.valueOf(dtf.format(now))).toString() );
     }
 
     @Scheduled(fixedDelay = 10000)
@@ -121,7 +121,7 @@ public class Tasks {
     @Scheduled(fixedDelay = 10000)
     //@Scheduled(cron = "0 30 11 ? * SUN,MON,TUE,WED,THU *")
     public void menuAutoApprove() throws ParseException{
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
         Calendar c = Calendar.getInstance();
         c.setTime(Calendar.getInstance().getTime()); 
         c.add(Calendar.DATE, 1); 

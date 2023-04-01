@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.nrifintech.cms.dtos.UserInDto;
 import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
@@ -72,5 +73,20 @@ public class User {
 		this.password = password;
 		this.role = role;
 		this.cart = cart;
+	}
+
+	public User(UserInDto user) {
+		this.id=user.getId();
+		this.avatar=user.getAvatar();
+		this.email = user.getEmail();
+		this.password = user.getPassword();
+		this.phoneNumber=user.getPhoneNumber();
+		this.role = user.getRole();
+		this.status=user.getStatus();
+		this.emailStatus=user.getEmailStatus();
+		this.created=user.getCreated();
+		this.records=user.getRecords();
+		this.wallet=user.getWallet();
+		this.cart = user.getCart();
 	}
 }

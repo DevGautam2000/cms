@@ -22,12 +22,8 @@ import com.nrifintech.cms.repositories.InventoryRepo;
 import com.nrifintech.cms.repositories.PurchaseRepo;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 
 
 @ExtendWith(MockitoExtension.class)

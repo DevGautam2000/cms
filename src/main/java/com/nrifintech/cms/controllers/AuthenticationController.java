@@ -4,14 +4,12 @@ import java.security.Principal;
 import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,12 +33,9 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
-import com.stripe.model.Application;
-
 import io.jsonwebtoken.JwtException;
 
 @RestController
-@CrossOrigin
 @RequestMapping(Route.Authentication.prefix)
 public class AuthenticationController {
 	@Autowired
@@ -71,8 +66,6 @@ public class AuthenticationController {
 		UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(jwtRequest.getUsername());
 		String token = this.jwtUtils.generateToken(userDetails);
 
-		System.out.println(userDetails);
-
 		return Response.set(new JwtResponse(token), HttpStatus.OK);
 	}
 
@@ -96,8 +89,6 @@ public class AuthenticationController {
 
 	@PostMapping(Route.Authentication.forgotPassword)
 	public Response forgotPassword(@RequestBody JwtRequest user) {
-		// System.out.println(user);
-
 		//authService.forgetPassword(user.getUsername());
 		HashMap<String,String> info = new HashMap<>();
         info.put("username",user.getUsername());
@@ -119,12 +110,10 @@ public class AuthenticationController {
 	
 	@PostMapping(Route.Authentication.setNewPassword)
 	public Response setNewPassword(@RequestBody JwtRequest user) {
-		// System.out.println(user);
 
 		authService.setNewPassword(user.getUsername());
 
 		return Response.setMsg("Email sent.", HttpStatus.OK);
-
 	}
 
 	@PostMapping(Route.Authentication.activateNewPassword)

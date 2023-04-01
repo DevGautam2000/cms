@@ -1,10 +1,11 @@
 package com.nrifintech.cms.controllers;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.ItemDto;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
@@ -19,7 +21,6 @@ import com.nrifintech.cms.services.ItemService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Item.prefix)
 public class ItemController {
@@ -43,13 +44,9 @@ public class ItemController {
 	}
 
 	@PostMapping(Route.Item.addItem)
-	public Response addItem(@RequestBody Item item) {
-
-		System.out.println("ITEM: " + item);
-
-
+	public Response addItem(@RequestBody ItemDto itemDto) throws IOException, NoSuchAlgorithmException {
+		Item item = new Item(itemDto);
 		Item i = itemService.addItem(item);
-		System.out.println("I: " + i);
 		if (itemService.isNotNull(i))
 			return Response.setMsg("Item added.", HttpStatus.OK);
 

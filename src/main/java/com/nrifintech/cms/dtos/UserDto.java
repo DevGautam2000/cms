@@ -14,6 +14,10 @@ import lombok.NoArgsConstructor;
 
 public class UserDto{
 
+	private UserDto() {
+		throw new IllegalStateException("Utility class");
+	  }
+	  
 	@Data
 	public static class Privileged{
 		

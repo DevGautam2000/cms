@@ -3,7 +3,6 @@ package com.nrifintech.cms.controllers;
 import java.security.Principal;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.FeedBackDto;
 import com.nrifintech.cms.dtos.OrderResponseRequest;
 import com.nrifintech.cms.dtos.OrderToken;
 import com.nrifintech.cms.dtos.WalletEmailResponse;
@@ -30,7 +29,6 @@ import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
 import com.nrifintech.cms.types.Global;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.Transaction;
 import com.nrifintech.cms.entities.User;
@@ -52,10 +50,8 @@ import com.nrifintech.cms.services.WalletService;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
-import com.nrifintech.cms.types.WeekDay;
 import com.nrifintech.cms.utils.SameRoute;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Order.prefix)
 public class OrderController {
@@ -80,6 +76,8 @@ public class OrderController {
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
+
+	private String orderNotFoundMessage = "Order not found.";
 
 	@PostMapping(Route.Order.addOrders)
 	public Response addOrders(@RequestBody List<Order> orders) {
@@ -121,8 +119,8 @@ public class OrderController {
 	}
 
 	@PostMapping(Route.FeedBack.addFeedback + "/{orderId}")
-	public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBack feedBack) {
-
+	public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBackDto feedBackDto) {
+		FeedBack feedBack = new FeedBack(feedBackDto);
 		Object obj = orderService.addFeedBackToOrder(orderId, feedBack);
 
 		if (orderService.isNotNull(obj) && obj instanceof FeedBack)
@@ -132,26 +130,9 @@ public class OrderController {
 			return Response.setMsg("Feedback added.", HttpStatus.OK);
 		}
 
-		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr(orderNotFoundMessage, HttpStatus.BAD_REQUEST);
 
 	}
-
-	// @PostMapping(Route.CartItem.addItems + "/{orderId}/{itemIds}")
-	// public Response addItems(@PathVariable Integer orderId, @PathVariable List<String> itemIds,
-	// 		@RequestBody List<String> quantities) {
-
-	// 	Object obj = orderService.addItemsToOrder(orderId, itemIds, quantities);
-
-	// 	if (orderService.isNotNull(obj) && obj instanceof Item)
-	// 		return Response.setErr("Items already exist.", HttpStatus.BAD_REQUEST);
-
-	// 	if (orderService.isNotNull(obj)) {
-	// 		return Response.setMsg("Items added.", HttpStatus.OK);
-	// 	}
-
-	// 	return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
-
-	// }
 
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
 	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {
@@ -172,16 +153,15 @@ public class OrderController {
 				order.setOrderDelivered(new Timestamp(System.currentTimeMillis()));
 
 			order.setStatus(status[statusId]);
-			orderService.saveOrder(order);
-			// email code
-			if (order.getStatus().toString().equalsIgnoreCase(Status.Delivered.toString())) {
-				this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(principal.getName(), order)));
-			}
-
+			order = orderService.saveOrder(order);
+			System.out.println(order); // invokes lazy init...
+			// email 
+			this.applicationEventPublisher.publishEvent(new DeliveredOrderEvent(new OrderToken(userService.getUserByOrderId(orderId) , order)));
+			System.out.println(principal.getName());
 			return Response.setMsg("Order " + status[statusId].toString() + ".", HttpStatus.OK);
 		}
 
-		return Response.setErr("Order not found.", HttpStatus.BAD_REQUEST);
+		return Response.setErr(orderNotFoundMessage, HttpStatus.BAD_REQUEST);
 	}
 
 	// for Canteen users to add a new order for a normal user
@@ -191,6 +171,7 @@ public class OrderController {
 		if (!menuService.isServingToday())
 			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
+
 
 		// Get the current date and time
 		LocalDateTime currentDateTime = LocalDateTime.now();
@@ -207,9 +188,6 @@ public class OrderController {
 
         //		************************************************
 
-//		if (mealId > 1)
-//			return Response.setErr("Invalid meal type requested.", HttpStatus.BAD_REQUEST);
-
 		User user = userService.getuser(id);
 
 		if (userService.isNotNull(user)) {
@@ -223,7 +201,7 @@ public class OrderController {
 				// check sufficient wallet amount
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
-				if (!isPayable)
+				if (Boolean.FALSE.equals(isPayable))
 					return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 
 				Order lunchOrder = orderService.addNewOrder(MealType.Lunch);
@@ -410,11 +388,9 @@ public class OrderController {
 
 				Wallet wallet = user.getWallet();
 
-				if (walletService.isNotNull(wallet)) {
+				if (walletService.isNotNull(wallet) && wallet.getTransactions().contains(transaction)) {
 
-					if (wallet.getTransactions().contains(transaction)) {
-
-						wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
+					wallet = walletService.refundToWallet(wallet, transaction.getAmount(), order.getId());
 
 						// cancle the order
 						order.setStatus(Status.Cancelled);
@@ -425,14 +401,13 @@ public class OrderController {
 							System.out.println(order); //Warning: Invokes lazy init..
 							this.applicationEventPublisher.publishEvent(new CancelledOrderEvent(new OrderToken(principal.getName(), order)));
 							return Response.setMsg("Order Cancelled.", HttpStatus.OK);
-						}
 					}
 				}
 				return Response.setErr("Wallet not found.", HttpStatus.NOT_FOUND);
             } 
 			return Response.setErr("Order does not exist for user.", HttpStatus.UNAUTHORIZED);
 		}
-        return Response.setErr("Order not found.", HttpStatus.NOT_FOUND);
+        return Response.setErr(orderNotFoundMessage, HttpStatus.NOT_FOUND);
     }
 
 	@GetMapping(Route.Order.getOrderQuantity + "/{date}")

@@ -5,12 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Tuple;
-import javax.persistence.TupleElement;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -36,7 +36,7 @@ public class InventoryService {
         return( this.inventoryRepo.findAll() );
     }
     public boolean removeInventoryById(Integer id){
-        if( id == null || this.inventoryRepo.findById(id).isPresent() ){
+        if( id == null || this.inventoryRepo.findById(id).isEmpty() ){
             return(false);
         }
         this.inventoryRepo.deleteById(id);

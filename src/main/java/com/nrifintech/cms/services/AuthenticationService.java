@@ -1,38 +1,23 @@
 package com.nrifintech.cms.services;
 
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
-import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.TokenBlacklist;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.errorhandler.UserIsEnabledException;
-import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.repositories.TokenBlacklistRepo;
-import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.UserStatus;
 
-import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.JwtException;
 
 @Service
@@ -60,7 +45,7 @@ public class AuthenticationService {
         // }
         catch(BadCredentialsException e){
             // throw new Exception("Invalid Credentials "+e.getMessage());
-            throw new UsernameNotFoundException("Invalid Credentials "+e.getMessage());
+            throw new UsernameNotFoundException("Invalid Credentials ");
         }
         // catch(Exception e){
         //     e.printStackTrace();
@@ -93,7 +78,7 @@ public class AuthenticationService {
             throw new UserIsDisabledException();
 
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
-            throw new UsernameNotFoundException("token: "+token+" is not valid");
+            throw new UsernameNotFoundException("Invalid Token");
         }
 
         if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
@@ -132,7 +117,7 @@ public class AuthenticationService {
             throw new UserIsEnabledException();
 
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
-            throw new UsernameNotFoundException("token: "+token+" is not valid");
+            throw new UsernameNotFoundException("Invalid Token");
         }
 
         if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");

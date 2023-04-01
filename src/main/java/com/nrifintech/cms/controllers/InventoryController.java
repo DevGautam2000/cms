@@ -2,13 +2,9 @@ package com.nrifintech.cms.controllers;
 
 import java.util.List;
 
-import javax.mail.Flags.Flag;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,15 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.InventoryDto;
 import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.entities.Inventory;
 import com.nrifintech.cms.events.UpdateQtyReqEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.types.Response;
-import com.stripe.model.Application;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Inventory.prefix)
 public class InventoryController {
@@ -36,7 +31,8 @@ public class InventoryController {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @PostMapping(Route.Inventory.saveOne)
-    public Response saveOne(@RequestBody Inventory inventory){
+    public Response saveOne(@RequestBody InventoryDto inventoryDto){
+        Inventory inventory = new Inventory(inventoryDto);
         Inventory i = this.inventoryService.addToInventory(inventory);
         if( i == null ){
             return( Response.setErr("Unable to save", HttpStatus.BAD_REQUEST));
@@ -69,7 +65,7 @@ public class InventoryController {
     @GetMapping(Route.Inventory.getByName + "{name}")
     public Response getByName(@PathVariable String name){
         List<Inventory> inventory = this.inventoryService.getInventoryByName(name);
-        if( inventory.size() == 0 ){
+        if( inventory.isEmpty() ){
             return Response.setErr("Not found", HttpStatus.NOT_FOUND);
         }
         else{

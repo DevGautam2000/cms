@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nrifintech.cms.dtos.MenuDto;
 import com.nrifintech.cms.entities.Menu;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
@@ -27,9 +27,7 @@ import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
-import com.stripe.model.Application;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Menu.prefix)
 public class MenuController {
@@ -44,8 +42,8 @@ public class MenuController {
 	private ApplicationEventPublisher applicationEventPublisher;
 
 	@PostMapping(Route.Menu.addMenu)
-	public Response newMenu(@RequestBody Menu menu) {
-
+	public Response newMenu(@RequestBody MenuDto menuDto) {
+		Menu menu = new Menu(menuDto);
 		if (menuService.isNotNull(menuService.addMenu(menu))) {
 			return Response.setMsg("Added new menu.", HttpStatus.OK);
 		}
@@ -178,8 +176,8 @@ public class MenuController {
 		if (!menuService.isServingToday(date))
 			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 
-		List<Menu> menus = menuService.getMenuByDate(date,principal);
-
+List<Menu> menus = menuService.getMenuByDate(date,principal);
+			
 		if (!menus.isEmpty())
 			return Response.set(menus, HttpStatus.OK);
 

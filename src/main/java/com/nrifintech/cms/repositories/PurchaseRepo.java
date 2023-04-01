@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.nrifintech.cms.dtos.AnalyticsResponseDate;
 import com.nrifintech.cms.entities.Purchase;
 
 public interface PurchaseRepo extends JpaRepository<Purchase,Integer> {

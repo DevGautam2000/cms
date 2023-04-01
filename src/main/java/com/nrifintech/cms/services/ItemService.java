@@ -1,12 +1,13 @@
 package com.nrifintech.cms.services;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.CartItemRepo;
@@ -22,9 +23,11 @@ public class ItemService implements Validator {
     @Autowired
     private CartItemRepo cartItemRepo;
 
-    // add a food
-    public Item addItem(Item i) {
+    @Autowired
+    private ImageService imageService;
 
+    // add a food
+    public Item addItem(Item i) throws IOException, NoSuchAlgorithmException {
         List<Item> items = this.getItems();
 
 
@@ -32,7 +35,8 @@ public class ItemService implements Validator {
             if (item.getName().trim().equalsIgnoreCase(i.getName().trim()))
                 return null;
         }
-
+        String url = imageService.uploadImage( i.getName() , i.getItemType().toString() , i.getImagePath() , 1 );
+        i.setImagePath(url);
         return itemRepo.save(i);
     }
 

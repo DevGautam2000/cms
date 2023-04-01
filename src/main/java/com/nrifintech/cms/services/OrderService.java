@@ -4,19 +4,14 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.OrderRepo;
