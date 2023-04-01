@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -144,7 +145,7 @@ public class UserControllerTest extends MockMvcSetup{
 
         // Mockito.verify(applicationEventPublisher).publishEvent(any());
         // assertArrayEquals(users.toArray(), res.toArray());
-        when(userService.getUsers()).thenReturn(List.of());
+        when(userService.getUsers()).thenReturn(Arrays.asList());
         r = mockMvc.perform(
             MockMvcRequestBuilders
                     .get(prefix(Route.User.getUsers))                        

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,16 +121,16 @@ public class MenuServiceTest {
     void testAddItemsToMenu() {
         assertEquals(menues.get(0).getItems().size()+2, 
         menuService.addItemsToMenu(
-            menues.get(0).getId(),List.of("994","995"))
+            menues.get(0).getId(),Arrays.asList("994","995"))
                 .getItems().size());// items.get(4).getId())));
     
     assertEquals(menues.get(0).getItems().size(), 
         menuService.addItemsToMenu(
-            menues.get(0).getId(), List.of("8")).getItems().size());
+            menues.get(0).getId(), Arrays.asList("8")).getItems().size());
 
     assertEquals(menues.get(0).getItems().size(), 
         menuService.addItemsToMenu(
-            menues.get(0).getId(), List.of(items.get(1).getId().toString())).getItems().size());
+            menues.get(0).getId(), Arrays.asList(items.get(1).getId().toString())).getItems().size());
     }
 
     @Test
