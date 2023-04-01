@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -64,8 +65,6 @@ public class UserControllerTest extends MockMvcSetup{
         
         for(User u:users){
             Mockito.when(userService.getuser(u.getId())).thenReturn(u);
-            Mockito.when(userService.getuser(u.getEmail())).thenReturn(u);
-
         }
 
             Mockito.when(userService.saveUser(any())).thenReturn(users.get(0));
@@ -148,7 +147,7 @@ public class UserControllerTest extends MockMvcSetup{
 
         // Mockito.verify(applicationEventPublisher).publishEvent(any());
         // assertArrayEquals(users.toArray(), res.toArray());
-        when(userService.getUsers()).thenReturn(List.of());
+        when(userService.getUsers()).thenReturn(Arrays.asList());
         r = mockMvc.perform(
             MockMvcRequestBuilders
                     .get(prefix(Route.User.getUsers))                        
@@ -178,7 +177,7 @@ public class UserControllerTest extends MockMvcSetup{
                     // .content(mapToJson( users.get(0)))
         ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        when(userService.isNotNull(users.get(0))).thenReturn(false);
+        
         r = mockMvc.perform(
             MockMvcRequestBuilders
                 .get(prefix(Route.User.subscriptionToggler + "/" + 

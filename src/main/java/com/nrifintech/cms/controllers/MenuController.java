@@ -174,9 +174,9 @@ public class MenuController {
 	public Response getMenuByDate(@PathVariable Date date, Principal principal) {
 
 		if (!menuService.isServingToday(date))
-			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 
-		List<Menu> menus = menuService.getMenuByDate(date,principal);
+List<Menu> menus = menuService.getMenuByDate(date,principal);
 			
 		if (!menus.isEmpty())
 			return Response.set(menus, HttpStatus.OK);
