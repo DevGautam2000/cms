@@ -189,7 +189,7 @@ public class OrderController {
 	public Response placeOrder(@PathVariable Integer id) {
 
 		if (!menuService.isServingToday())
-			return Response.setErr("No food will be served today.", HttpStatus.NOT_ACCEPTABLE);
+			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
 
 		// Get the current date and time
@@ -201,7 +201,7 @@ public class OrderController {
 
 		// Check if the current time is before 8:00 PM on the same day
 		if (!currentDateTime.isBefore(cutoffDateTime)) {
-			return Response.setErr("Order cannot be placed after " + Global.PLACE_ORDER_FREEZE_TIME + ".",
+			return Response.setErr("Order cannot be placed after 8:00 PM"+ ".",
 					HttpStatus.NOT_ACCEPTABLE);
 		}
 
@@ -439,7 +439,7 @@ public class OrderController {
 	public Response getOrderQuantity(@PathVariable Date date){
 		Map<String,Integer> responseMap = orderService.getOrderQuantity(date);
 		if(responseMap.isEmpty()){
-			return( Response.setErr("Sorry no orders as of now", HttpStatus.NOT_FOUND));
+			return( Response.setErr("S no orders as of now", HttpStatus.NOT_FOUND));
 		}
 		return( Response.set(responseMap,HttpStatus.OK) );
 	}
