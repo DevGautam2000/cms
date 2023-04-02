@@ -19,8 +19,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * It's a class that generates excel reports for users and menus
+ */
 public class ExcelReportGenerator {
 
+  /**
+   * It's a service class that exports users to an excel file
+   */
     @Service
     @Transactional
     public static class UserReport {
@@ -28,6 +34,11 @@ public class ExcelReportGenerator {
         private UserRepo userRepository;
 
 
+       /**
+        * It takes a list of users, converts it to an excel file, and returns it as a ResourceDTO
+        * 
+        * @return A ResourceDTO object.
+        */
         public ResourceDTO exportUsers() {
             List<User> userList = userRepository.findAll();
             Resource resource = prepareExcel(userList);
@@ -35,6 +46,13 @@ public class ExcelReportGenerator {
                     ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).build();
         }
 
+        /**
+         * It takes a list of users and returns a resource object which can be used to download the
+         * excel file
+         * 
+         * @param userList List of users to be exported
+         * @return A resource object is being returned.
+         */
         private Resource prepareExcel(List<User> userList) {
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("USERS");
@@ -56,6 +74,13 @@ public class ExcelReportGenerator {
             }
         }
 
+        /**
+         * It takes a list of users, iterates over it, and populates the data in the excel sheet
+         * 
+         * @param workbook The workbook object that we created in the previous step.
+         * @param sheet The sheet in which the data is to be populated.
+         * @param users List of users to be exported
+         */
         private void populateUserData(Workbook workbook, Sheet sheet, List<User> users) {
 
             int rowNo = 1;
@@ -113,25 +138,16 @@ public class ExcelReportGenerator {
             }
         }
 
-        private void populateOrderData(Workbook workbook, Sheet sheet,
-                                       List<Order> orders) {
-
-            int rowNo = 1;
-
-            for (Order obj : orders) {
-
-                int columnNo = 0;
-                Row row = sheet.createRow(rowNo);
-                populateCell(sheet, row, columnNo++, String.valueOf((obj.getId())));
-                populateCell(sheet, row, columnNo++, obj.getStatus().toString());
-                populateCell(sheet, row, columnNo++, String.valueOf(obj.getCartItems().size()));
-                populateCell(sheet, row, columnNo++, obj.getFeedBack().toString());
-                populateCell(sheet, row, columnNo, obj.getOrderPlaced().toString());
-
-                rowNo++;
-            }
-        }
-
+      
+        /**
+         * It creates a cell in the row, sets the value of the cell to the value passed in, and then
+         * auto-sizes the column to fit the cell
+         * 
+         * @param sheet The sheet to which the row is to be added.
+         * @param row The row to populate
+         * @param columnNo The column number in the row.
+         * @param value The value to be populated in the cell
+         */
         private void populateCell(Sheet sheet, Row row, int columnNo,
                                   String value) {
 
@@ -141,26 +157,19 @@ public class ExcelReportGenerator {
 
         }
 
-        private void populateCell(Sheet sheet, Row row, int columnNo,
-                                  String value, Hyperlink link) {
-
-            Cell cell = row.createCell(columnNo);
-            cell.setCellValue(value);
-            sheet.autoSizeColumn(columnNo);
-
-
-            cell.setHyperlink(link);
-//        cell.setCellStyle();
-
-        }
-
+        /**
+         * It creates a row, creates a font, creates a cell style, and then creates a cell for each
+         * header
+         * 
+         * @param workbook The workbook object that we created in the previous step.
+         * @param sheet The sheet to which the headers are to be added.
+         */
         private void prepareHeaders(Workbook workbook,
                                     Sheet sheet, String... headers) {
 
             Row headerRow = sheet.createRow(0);
             Font font = workbook.createFont();
             font.setBold(true);
-//        font.setFontName("Arial");
 
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setFont(font);
@@ -175,6 +184,7 @@ public class ExcelReportGenerator {
     }
 
 
+   // It's a service class that exports users to an excel file
     @Service
     @Transactional
     public static class MenuReport {
@@ -182,6 +192,12 @@ public class ExcelReportGenerator {
         private MenuRepo menuRepo;
 
 
+        /**
+         * > It takes a list of menus, converts it to an excel file, and returns a ResourceDTO object
+         * containing the excel file
+         * 
+         * @return A ResourceDTO object is being returned.
+         */
         public ResourceDTO exportMenus() {
             List<Menu> menus = menuRepo.findAll();
             Resource resource = prepareExcel(menus);
@@ -189,6 +205,13 @@ public class ExcelReportGenerator {
                     ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")).build();
         }
 
+        /**
+         * It creates a workbook, creates a sheet, creates headers, populates data and returns a
+         * resource
+         * 
+         * @param menus List of Menu objects
+         * @return A ByteArrayResource
+         */
         private Resource prepareExcel(List<Menu> menus) {
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("MENUS");
@@ -210,6 +233,13 @@ public class ExcelReportGenerator {
             }
         }
 
+        /**
+         * It takes a list of Menu objects, iterates over it, and populates the data in the excel sheet
+         * 
+         * @param workbook The workbook object that we created in the previous step.
+         * @param sheet The sheet in which the data is to be populated.
+         * @param menus List of Menu objects to be exported
+         */
         private void populateMenuData(Workbook workbook, Sheet sheet, List<Menu> menus) {
 
             int rowNo = 1;
@@ -242,6 +272,15 @@ public class ExcelReportGenerator {
         }
 
 
+        /**
+         * It creates a cell in the row, sets the value of the cell to the value passed in, and then
+         * auto sizes the column
+         * 
+         * @param sheet The sheet to which the row is to be added.
+         * @param row The row to populate
+         * @param columnNo The column number in the row.
+         * @param value The value to be populated in the cell
+         */
         private void populateCell(Sheet sheet, Row row, int columnNo,
                                   String value) {
 
@@ -251,13 +290,20 @@ public class ExcelReportGenerator {
 
         }
 
+        /**
+         * It creates a row, creates a font, creates a cell style, and then creates a cell for each
+         * header
+         * 
+         * @param workbook The workbook object that we created earlier.
+         * @param sheet The sheet to which the headers are to be added.
+         */
         private void prepareHeaders(Workbook workbook,
                                     Sheet sheet, String... headers) {
 
             Row headerRow = sheet.createRow(0);
             Font font = workbook.createFont();
             font.setBold(true);
-//        font.setFontName("Arial");
+
 
             CellStyle cellStyle = workbook.createCellStyle();
             cellStyle.setFont(font);
