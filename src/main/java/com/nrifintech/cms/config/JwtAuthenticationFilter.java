@@ -26,17 +26,33 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 
 @Component
+/**
+ * > This class is a filter that will intercept all requests and check for a
+ * valid JWT in the
+ * Authorization header
+ */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired 
-    private MyUserDetailsService userDetailsServiceImple;
-    @Autowired
-    private JwtUtils jutUtil;
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver resolver;
-    @Autowired
-    private TokenBlacklistRepo blacklistRepo;
+	@Autowired
+	private MyUserDetailsService userDetailsServiceImple;
 
+	@Autowired
+	private JwtUtils jutUtil;
+	
+	@Autowired
+	@Qualifier("handlerExceptionResolver")
+	private HandlerExceptionResolver resolver;
+	
+	@Autowired
+	private TokenBlacklistRepo blacklistRepo;
+
+	/**
+	 * It checks if the request has a valid token, if it does, it sets the authentication context and
+	 * allows the request to proceed
+	 * 
+	 * @param request The request object.
+	 * @param response The response object.
+	 * @param filterChain This is the filter chain that the request will pass through.
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException, JwtException, UserIsDisabledException {
@@ -57,12 +73,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		} else {
 			System.out.println("Invalid Token , not start with Bearer string");
 		}
-		
-        if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null && blacklistRepo.findById(jwtToken).orElse(null)==null){
-            final UserDetails userDetails= this.userDetailsServiceImple.loadUserByUsername(username);
-            
-            if(!userDetails.isEnabled())
-                resolver.resolveException(request, response, null, new UserIsDisabledException("InActive User"));
+
+		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null
+				&& blacklistRepo.findById(jwtToken).orElse(null) == null) {
+			final UserDetails userDetails = this.userDetailsServiceImple.loadUserByUsername(username);
+
+			if (!userDetails.isEnabled())
+				resolver.resolveException(request, response, null, new UserIsDisabledException("InActive User"));
 
 			else if (this.jutUtil.validateToken(jwtToken, userDetails)) {
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
