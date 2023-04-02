@@ -207,8 +207,8 @@ public class OrderController {
 	@PostMapping(Route.Order.placeOrder + "/{id}")
 	public Response placeOrder(@PathVariable Integer id) {
 
-		if (!menuService.isServingToday())
-			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
+		// if (!menuService.isServingToday())
+		// 	return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
 
 
