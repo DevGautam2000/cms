@@ -86,7 +86,7 @@ public class OrderController {
 	 * It takes a list of orders, adds them to the database, and returns a response
 	 * 
 	 * @param orders A list of orders to be added.
-	 * @return A list of orders.
+	 * @return A response object with a message and a status code.
 	 */
 	@PostMapping(Route.Order.addOrders)
 	public Response addOrders(@RequestBody List<Order> orders) {
@@ -98,7 +98,6 @@ public class OrderController {
 		}
 
 		return Response.setErr("Error adding orders.", HttpStatus.INTERNAL_SERVER_ERROR);
-
 	}
 
 	/**
@@ -161,6 +160,14 @@ public class OrderController {
 
 	}
 
+	/**
+	 * > It updates the status of an order and sends an email to the user if the order is delivered
+	 * 
+	 * @param orderId the id of the order to be updated
+	 * @param statusId the status id of the order.
+	 * @param principal This is the user who is logged in.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
 	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {
 
@@ -191,7 +198,6 @@ public class OrderController {
 		return Response.setErr(orderNotFoundMessage, HttpStatus.BAD_REQUEST);
 	}
 
-	// for Canteen users to add a new order for a normal user
 	/**
 	 * It places an order for the user with the given id
 	 * 
