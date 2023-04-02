@@ -24,6 +24,9 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
+/**
+ * > This class  handles requests to the `/cart` endpoint
+ */
 @RestController
 @RequestMapping(Route.Cart.prefix)
 public class CartController {
@@ -39,6 +42,13 @@ public class CartController {
 
     private String itemNotFoundErrorMsg = "CartItem not found. ";
 
+    /**
+     * It adds the items to the cart
+     * 
+     * @param userId The id of the user whose cart is to be updated.
+     * @param reqs List of CartItemUpdateRequest objects
+     * @return A Response object is being returned.
+     */
     @PostMapping(Route.Cart.addToCart + "/{userId}")
     public Response addToCart(@PathVariable Integer userId, @RequestBody List<CartItemUpdateRequest> reqs) {
 
@@ -73,6 +83,13 @@ public class CartController {
 
     }
 
+   /**
+    * It increases the quantity of a cart item by a factor
+    * 
+    * @param itemId The id of the cart item to be updated.
+    * @param factor The amount by which the quantity is to be increased.
+    * @return A Response object.
+    */
     @PostMapping(Route.Cart.updateQuantity + "/inc/{itemId}/{factor}")
     public Response updateQuantityIncrease(@PathVariable Integer itemId, @PathVariable Integer factor) {
         CartItem cartItem = cartItemService.getItem(itemId);
@@ -87,6 +104,13 @@ public class CartController {
         return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * It decreases the quantity of a cart item by a factor
+     * 
+     * @param itemId The id of the cart item to be updated.
+     * @param factor The amount by which the quantity is to be decreased.
+     * @return A Response object.
+     */
     @PostMapping(Route.Cart.updateQuantity + "/dec/{itemId}/{factor}")
     public Response updateQuantityDecrease(@PathVariable Integer itemId, @PathVariable Integer factor) {
         CartItem cartItem = cartItemService.getItem(itemId);
@@ -102,6 +126,13 @@ public class CartController {
         return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
+   /**
+    * > Removes a cart item from a cart
+    * 
+    * @param cartId The id of the cart you want to remove the item from.
+    * @param itemId The id of the item to be removed from the cart.
+    * @return A Response object.
+    */
     @PostMapping(Route.Cart.remove + "/{cartId}/{itemId}")
     public Response removeFromCart(@PathVariable Integer cartId, @PathVariable Integer itemId) {
         Cart cart = cartService.getCart(cartId);
@@ -121,6 +152,12 @@ public class CartController {
         return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * It clears the cart by removing all the items in the cart
+     * 
+     * @param cartId The id of the cart to be cleared.
+     * @return A Response object.
+     */
     @PostMapping(Route.Cart.clear + "/{cartId}")
     public Response removeFromCart(@PathVariable Integer cartId) {
         Cart cart = cartService.getCart(cartId);
@@ -138,6 +175,12 @@ public class CartController {
         return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * It returns a cart with the given cartId.
+     * 
+     * @param cartId The id of the cart you want to get.
+     * @return Response object
+     */
     @ErrorHandlerImplemented(handler = NotFoundException.class)
     @GetMapping(Route.Cart.getCart + "/{cartId}")
     public Response getCart(@PathVariable  Integer cartId) {
@@ -148,6 +191,12 @@ public class CartController {
 
     }
 
+    /**
+     * It gets the cart of the user who is logged in
+     * 
+     * @param principal This is the user object that is passed to the controller.
+     * @return A cart object
+     */
     @GetMapping(Route.Cart.getCart)
     public Response getCart(Principal principal) {
 
