@@ -26,6 +26,10 @@ import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateNotFoundException;
 
+/**
+ * > This class is a Spring component that contains methods that are annotated with the @Scheduled
+ * annotation
+ */
 @Component
 public class CRONListeners {
 
@@ -38,6 +42,13 @@ public class CRONListeners {
     private String timezone = "GMT+05:30";
     private String subject = "Canteen Management System NRI Fintech India Pvt.Ltd.";
 
+    /**
+     * > This function is triggered by the `PromotionalEvent` event, which is fired by the
+     * `PromotionalEventPublisher` class. The function then sends an email to the recipients of the
+     * event
+     * 
+     * @param event The event that was fired.
+     */
     @EventListener
     @Async
     public void onPromotionalEvent(PromotionalEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -49,6 +60,12 @@ public class CRONListeners {
         this.smtpServices.sendMail(emailModel);
     }
 
+    /**
+     * > This function is an event listener that listens for the BreakfastStartEvent event. When the
+     * event is triggered, the function will send an email to the recipients specified in the event
+     * 
+     * @param event The event that triggered the listener
+     */
     @EventListener
     @Async
     public void onBreakfastStart(BreakfastStartEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -60,6 +77,12 @@ public class CRONListeners {
         this.smtpServices.sendMail(emailModel);
     }
 
+    /**
+     * > This function is an event listener that listens for the LunchStartEvent event. When the event
+     * is triggered, the function will send an email to the recipients specified in the event
+     * 
+     * @param event The event that triggered the listener
+     */
     @EventListener
     @Async
     public void onLunchStart(LunchStartEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{

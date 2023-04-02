@@ -49,6 +49,10 @@ import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateNotFoundException;
 
+/**
+ * It's a Spring component that contains a method that listens for events of type `MyEvent` and logs
+ * the event payload
+ */
 @Component
 public class Listeners {
 
@@ -64,6 +68,12 @@ public class Listeners {
     private String timezone = "GMT+05:30";
     private String subject = "Canteen Management System NRI Fintech India Pvt.Ltd.";
 
+    /**
+     * An event listener that listens to the forgot password event. It then sends an email to the user
+     * with a link to reset the password.
+     * 
+     * @param event The event object that is passed to the listener.
+     */
     @EventListener
     @Async
     public void onForgotPassword(ForgotPasswordEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -76,6 +86,11 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+    /**
+     * It sends an email to the user when a new user is added.
+     * 
+     * @param event The event that was triggered
+     */
     @EventListener
     @Async
     public void onAddedNewUser(AddedNewUserEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -92,6 +107,12 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+    /**
+     * > This function is an event listener that listens to the `UpdateUserStatusEvent` event and sends
+     * an email to the user whose status has been updated
+     * 
+     * @param event The event that was triggered
+     */
     @EventListener
     @Async
     public void onUpdateUserStatus(UpdateUserStatusEvent event) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -111,6 +132,12 @@ public class Listeners {
         this.smtpServices.sendMail(email); 
     }
 
+    /**
+     * > This function is an event listener for the `PlacedOrderEvent` event. It is triggered when the
+     * event is published. It then sends an email to the user who placed the order
+     * 
+     * @param placedOrderEvent This is the event that is being listened to.
+     */
     @EventListener
     @Async
     public void onPlacedOrder(PlacedOrderEvent placedOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -130,6 +157,11 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+    /**
+     * It sends an email to the user when the order is cancelled.
+     * 
+     * @param cancelledOrderEvent This is the event that is being listened to.
+     */
     @EventListener
     @Async
     public void onCancelledOrder(CancelledOrderEvent cancelledOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -149,6 +181,11 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+    /**
+     * It sends an email to the user when the order is delivered.
+     * 
+     * @param deliveredOrderEvent This is the event that is being listened to.
+     */
     @EventListener
     @Async
     public void onDeliveredOrder(DeliveredOrderEvent deliveredOrderEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -168,6 +205,11 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+    /**
+     * It sends an email to the user when the wallet is recharged.
+     * 
+     * @param walletRechargeEvent The event that is being listened to.
+     */
     @EventListener
     @Async
     public void onRecharge(WalletRechargeEvent walletRechargeEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -184,6 +226,12 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+   /**
+    * An event listener that listens to the WalletDebitEvent. When the event is triggered, it sends an
+    * email to the user.
+    * 
+    * @param walletDebitEvent The event that is being listened to.
+    */
     @EventListener
     @Async
     public void onDebit(WalletDebitEvent walletDebitEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -200,6 +248,11 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
    
+    /**
+     * It sends an email to the user when the wallet is refunded.
+     * 
+     * @param walletRefundEvent The event that is being listened to.
+     */
     @EventListener
     @Async
     public void onRefund(WalletRefundEvent walletRefundEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -216,6 +269,13 @@ public class Listeners {
         this.smtpServices.sendMail(email);
     }
 
+    /**
+     * > This function is triggered when an event of type `ApprovedQtyReqEvent` is fired. It fetches
+     * the email addresses of all the users with role `1` (i.e. `ADMIN`) and sends them an email with
+     * the details of the inventory item whose quantity was requested
+     * 
+     * @param approvedQtyReqEvent This is the event that is being listened to.
+     */
     @EventListener
     @Async
     public void onApproval(ApprovedQtyReqEvent approvedQtyReqEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -237,6 +297,13 @@ public class Listeners {
 
     }
 
+    /**
+     * > This function is triggered when an event of type `UpdateQtyReqEvent` is published. It fetches
+     * the email addresses of all the users with role `0` (i.e. admin) and sends them an email with the
+     * details of the inventory item whose quantity was requested to be updated
+     * 
+     * @param updateQtyReqEvent The event that is being listened to.
+     */
     @EventListener
     @Async
     public void onRequest(UpdateQtyReqEvent updateQtyReqEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
@@ -257,6 +324,12 @@ public class Listeners {
 
     }
 
+    /**
+     * > This function is triggered when a menu is added, approved or rejected. It sends an email to
+     * all the admins and canteen managers
+     * 
+     * @param menuStatusChangeEvent The event that is being listened to.
+     */
     @EventListener
     @Async
     public void onMenuStatusChange(MenuStatusChangeEvent menuStatusChangeEvent) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, MessagingException, IOException, TemplateException{
