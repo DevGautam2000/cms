@@ -13,16 +13,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.nrifintech.cms.dtos.UserInDto;
 import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
@@ -30,6 +26,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Data
+@Builder
 @Entity
 public class User {
 
@@ -39,11 +36,14 @@ public class User {
 	
 	private String avatar;
 
+
 	@Column(unique = true)
 	private String email;
+
+
 	private String password;
 	private String phoneNumber;
-	
+
 	private Role role = Role.User;
 
 	private UserStatus status = UserStatus.InActive;
@@ -67,4 +67,26 @@ public class User {
 		return this.email;
 	}
 
+	public User(Integer id,String email, String password, Role role,Cart cart) {
+		this.id=id;
+		this.email = email;
+		this.password = password;
+		this.role = role;
+		this.cart = cart;
+	}
+
+	public User(UserInDto user) {
+		this.id=user.getId();
+		this.avatar=user.getAvatar();
+		this.email = user.getEmail();
+		this.password = user.getPassword();
+		this.phoneNumber=user.getPhoneNumber();
+		this.role = user.getRole();
+		this.status=user.getStatus();
+		this.emailStatus=user.getEmailStatus();
+		this.created=user.getCreated();
+		this.records=user.getRecords();
+		this.wallet=user.getWallet();
+		this.cart = user.getCart();
+	}
 }

@@ -1,7 +1,4 @@
 package com.nrifintech.cms.dtos;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -12,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class FeedbackStats {
-    private BigInteger totalCount;
-    private BigDecimal avgRating;
+    private Object totalCount;
+    private Object avgRating;
     private List<FeedBackRatingStats> feedbackRaingStats;
 }

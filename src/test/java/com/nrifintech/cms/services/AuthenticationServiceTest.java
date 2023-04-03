@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.aspectj.weaver.ast.Var;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,19 +13,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.multipart.support.RequestPartServletServerHttpRequest;
-
 import com.nrifintech.cms.config.jwt.JwtUtils;
-import com.nrifintech.cms.entities.MyUserDetails;
-import com.nrifintech.cms.entities.TokenBlacklist;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.errorhandler.UserIsEnabledException;
@@ -38,25 +30,23 @@ import com.nrifintech.cms.types.UserStatus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.eq;
 
-@SpringBootTest
+
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceTest {
     private List<User> users = new ArrayList<>();
 
-    @MockBean
+    @Mock(lenient = true)
     private AuthenticationManager authenticationManager;
-    @MockBean
+    @Mock(lenient = true)
     private UserService userService;
-    @MockBean
+    @Mock(lenient = true)
     private JwtUtils jwtUtils;
-    @MockBean
+    @Mock(lenient = true)
     private ApplicationEventPublisher applicationEventPublisher;
-    @MockBean
+    @Mock(lenient = true)
     private TokenBlacklistRepo tokenRepo;
     @InjectMocks
     private AuthenticationService authService;
@@ -133,7 +123,7 @@ public class AuthenticationServiceTest {
         Mockito.verify(tokenRepo).save(any());
         // Mockito.verify(userService).saveUser(users.get(0));
         Mockito.verify(userService).updatePassword(any(),any());
-        assertEquals("token: "+"inv-dummy-token"+" is not valid", thrown4.getMessage());
+        assertEquals("Invalid Token", thrown4.getMessage());
     }
 
     @Test
@@ -194,6 +184,6 @@ public class AuthenticationServiceTest {
         Mockito.verify(tokenRepo).save(any());
         Mockito.verify(userService).saveUser(users.get(2));
         Mockito.verify(userService).updatePassword(any(),any());
-        assertEquals("token: "+"inv-dummy-token"+" is not valid", thrown4.getMessage());
+        assertEquals("Invalid Token", thrown4.getMessage());
     }
 }

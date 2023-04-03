@@ -1,14 +1,15 @@
 package com.nrifintech.cms.controllers;
 
 import java.security.Principal;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,17 +26,16 @@ import com.nrifintech.cms.dtos.UserDto.Privileged;
 import com.nrifintech.cms.dtos.UserDto.Unprivileged;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
+import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.AuthenticationService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
-
 import io.jsonwebtoken.JwtException;
 
 @RestController
-@CrossOrigin
 @RequestMapping(Route.Authentication.prefix)
 public class AuthenticationController {
 	@Autowired
@@ -53,6 +53,9 @@ public class AuthenticationController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
 
 	@ErrorHandlerImplemented(
 		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
@@ -86,9 +89,11 @@ public class AuthenticationController {
 
 	@PostMapping(Route.Authentication.forgotPassword)
 	public Response forgotPassword(@RequestBody JwtRequest user) {
-		// System.out.println(user);
-
-		authService.forgetPassword(user.getUsername());
+		//authService.forgetPassword(user.getUsername());
+		HashMap<String,String> info = new HashMap<>();
+        info.put("username",user.getUsername());
+        info.put("forgotlink",authService.forgetPassword(user.getUsername()));
+        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(info));
 
 		return Response.setMsg("Email sent.", HttpStatus.OK);
 
@@ -105,12 +110,10 @@ public class AuthenticationController {
 	
 	@PostMapping(Route.Authentication.setNewPassword)
 	public Response setNewPassword(@RequestBody JwtRequest user) {
-		// System.out.println(user);
 
 		authService.setNewPassword(user.getUsername());
 
 		return Response.setMsg("Email sent.", HttpStatus.OK);
-
 	}
 
 	@PostMapping(Route.Authentication.activateNewPassword)

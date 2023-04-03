@@ -70,6 +70,8 @@ public class Route {
 
 		String cancelOrder = "cancelorder";
 
+		String getOrderQuantity  = "getorderquantity";
+
 	
 	}
 
@@ -144,6 +146,13 @@ public class Route {
 		String getOrderStats = "orderstats";
 		String getFeedbackStats = "feedbackstats";
 		String getUserStats = "userstats";
+	}
+
+	public interface Excel {
+		String prefix  = "/excel/";
+
+		String getUserReports = "getuserreports";
+		String getMenuReports = "getmenureports";
 	}
 
 

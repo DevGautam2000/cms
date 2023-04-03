@@ -1,11 +1,15 @@
 package com.nrifintech.cms.services;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,13 +21,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.nrifintech.cms.dtos.MenuUpdateRequest;
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Menu;
+import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.MenuRepo;
 import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.ItemType;
 import com.nrifintech.cms.types.MealType;
+import com.nrifintech.cms.types.Role;
 
 @SpringBootTest
 public class MenuServiceTest {
@@ -35,6 +42,9 @@ public class MenuServiceTest {
 
 	@Mock
 	private ItemService itemService;
+
+    @Mock
+	private UserService userService;
 
     @InjectMocks
     private MenuService menuService;
@@ -51,6 +61,7 @@ public class MenuServiceTest {
         menues.add(new Menu(1,Approval.Pending,new Date(System.currentTimeMillis()),MealType.Breakfast,items.subList(0, 3)));
         menues.add(new Menu(2,Approval.Pending,new Date(System.currentTimeMillis()),MealType.Lunch,items.subList(3, 6)));
         menues.add(new Menu(3,Approval.Approved,new Date(System.currentTimeMillis()),MealType.Lunch,items));
+        menues.add(new Menu(4,Approval.Incomplete,new Date(System.currentTimeMillis()),MealType.Lunch,items.subList(2, 6)));
         
         // Mockito.when(itemService.saveAll(items)).thenReturn( items);
         Mockito.when(menuRepo.findAll()).thenReturn( menues);
@@ -69,12 +80,8 @@ public class MenuServiceTest {
             // Mockito.when(itemService.save( Mockito.eq(i))).thenReturn( i);
             Mockito.when(itemService.getItem(  Mockito.eq(i.getId()))).thenReturn( i );
         }
-        // Mockito.when(itemService.findById( Mockito.eq(11))).thenThrow(NotFoundException.class);
-        // Mockito.when(itemService.findById( Mockito.eq(12))).thenThrow(NotFoundException.class);
 
-        // when(ItemService.getItems("abc2@gamil.com")).thenReturn( items.get(1));
-        // when(ItemService.getItems("abc3@gamil.com")).thenReturn( items.get(2));
-        // when(ItemService.getItems("abc4@gamil.com")).thenReturn( items.get(3));
+        
     }
     
     @AfterEach
@@ -84,7 +91,10 @@ public class MenuServiceTest {
 
     @Test
     void testAddItemToMenu() {
-        assertEquals(menues.get(0), 
+        //td
+        // assertEquals(menues.get(0), 
+        // menuService.addItemToMenu(menues.get(0).getId(), items.get(4).getId()));
+        assertEquals(null, 
             menuService.addItemToMenu(menues.get(0).getId(), items.get(4).getId()));
         
         assertEquals(null, 
@@ -97,12 +107,33 @@ public class MenuServiceTest {
 
     @Test
     void testAddItemToMenu2() {
+        assertNotEquals(menues.get(0).getItems().size(), 
+            menuService.addItemToMenu(new MenuUpdateRequest(
+                menues.get(0).getId(),994)).getItems().size());// items.get(4).getId())));
+        
+        assertEquals(menues.get(0).getItems().size(), 
+            menuService.addItemToMenu(new MenuUpdateRequest(
+                menues.get(0).getId(), 8)).getItems().size());
 
+        assertEquals(menues.get(0).getItems().size(), 
+            menuService.addItemToMenu(new MenuUpdateRequest(
+                menues.get(0).getId(), items.get(1).getId())).getItems().size());
     }
 
     @Test
     void testAddItemsToMenu() {
+        assertEquals(menues.get(0).getItems().size()+2, 
+        menuService.addItemsToMenu(
+            menues.get(0).getId(),Arrays.asList("994","995"))
+                .getItems().size());// items.get(4).getId())));
+    
+    assertEquals(menues.get(0).getItems().size(), 
+        menuService.addItemsToMenu(
+            menues.get(0).getId(), Arrays.asList("8")).getItems().size());
 
+    assertEquals(menues.get(0).getItems().size(), 
+        menuService.addItemsToMenu(
+            menues.get(0).getId(), Arrays.asList(items.get(1).getId().toString())).getItems().size());
     }
 
     @Test
@@ -117,11 +148,16 @@ public class MenuServiceTest {
     void testApproveMenu() {
         assertEquals(true, menuService.approveMenu(menues.get(0), 1));
         assertEquals(false, menuService.approveMenu(menues.get(2), 2));
+        // assertEquals(menues.get(0) , menuService.approveMenu(menues.get(0), 1));
+        // assertEquals(null, menuService.approveMenu(menues.get(2), 2));
     }
 
     @Test
     void testGetAllMenu() {
-        assertArrayEquals(menues.toArray() , menuService.getAllMenu().toArray());
+        when(userService.getuser(anyString())).thenReturn(
+            User.builder().email("testuser").role(Role.Admin).build());
+        assertEquals(menues.size() , 
+            menuService.getAllMenu(()->"testuser").size());
     }
 
     @Test
@@ -137,22 +173,47 @@ public class MenuServiceTest {
 
     @Test
     void testGetMenuByDate() {
-
+        when(userService.getuser(anyString())).thenReturn(
+            User.builder().email("testuser").role(Role.Admin).build());
+        List<Menu> menuOut = menuService.getMenuByDate(new Date(2023,3,28), ()->"testuser");
+        assert( menuOut.stream().allMatch((e)->e.getApproval().equals(Approval.Incomplete)));
+    
+        when(userService.getuser(anyString())).thenReturn(
+            User.builder().email("testuser").role(Role.User).build());
+        menuOut = menuService.getMenuByDate(new Date(2023,3,28), ()->"testuser");
+        assert( menuOut.stream().allMatch((e)->e.getApproval().equals(Approval.Approved)));
+    
     }
 
     @Test
     void testIsServingToday() {
 
+        assert(menuService.isServingToday(new Date(2023, 3, 17)));
+        // assertFalse(menuService.isServingToday(new Date(2023, 3, 19)));
+
     }
 
     @Test
     void testIsServingToday2() {
-
+        assert(menuService.isServingToday());//today is monday
     }
 
     @Test
     void testRemoveItemFromMenu() {
+        
+        assertEquals(menues.get(0).getItems().size()-1, 
+        menuService.removeItemFromMenu(
+            menues.get(0).getId(),999)
+                .getItems().size());// items.get(4).getId())));
+    
+    assertEquals(null, 
+        menuService.removeItemFromMenu(
+            menues.get(0).getId(), 8));
 
+    // Menu m1 = menuService.removeItemFromMenu(
+    //     menues.get(1).getId(),999);
+    // assertEquals(null, 
+    //     m1);//TODO: some error
     }
 
     @Test

@@ -5,16 +5,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import com.nrifintech.cms.dtos.ItemDto;
 import com.nrifintech.cms.types.ItemType;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
@@ -34,4 +32,16 @@ public class Item {
 	
 	@Column(unique=true)
 	private String name = "";
+
+	public Item(ItemDto item) {
+		this.id=item.getId();
+		this.name=item.getName();
+		this.quantity=item.getQuantity();
+		this.price=item.getPrice();
+		this.itemType=item.getItemType();
+		this.imagePath=item.getImagePath();
+		this.description=item.getDescription();
+	}
+
+	
 }

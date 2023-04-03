@@ -6,16 +6,12 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.dtos.InventoryMail;
 import com.nrifintech.cms.entities.Inventory;
 import com.nrifintech.cms.entities.Purchase;
-import com.nrifintech.cms.events.ApprovedQtyReqEvent;
 import com.nrifintech.cms.repositories.InventoryRepo;
 import com.nrifintech.cms.repositories.PurchaseRepo;
-import com.stripe.model.Application;
 
 @Service
 public class PurchaseService {
@@ -29,6 +25,9 @@ public class PurchaseService {
     @Transactional
     public Purchase initiateNewPurchase(Purchase purchase)throws IllegalArgumentException{
         Inventory i = purchase.getInventoryRef();
+        if( i == null ){
+            return(null);
+        }
         purchase.setInventoryRef(inventoryRepo.findById(i.getId()).orElse(null));
         if(purchase.getInventoryRef() == null){
             return(null);
@@ -42,8 +41,14 @@ public class PurchaseService {
 
     @Transactional
     public Purchase rollbackPurchase(Integer purchaseID)throws IllegalArgumentException{
+        if(purchaseID == null){
+            return(null);
+        }
         Purchase purchase = purchaseRepo.findById(purchaseID).orElse(null);
         if( purchase==null ){
+            return(null);
+        }
+        if( inventoryRepo.findById(purchase.getInventoryRef().getId()).isPresent() ){
             return(null);
         }
         purchaseRepo.delete(purchase);

@@ -50,17 +50,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				jwtToken = requestTokenHeader.substring(7);
 				username = this.jutUtil.extractUsername(jwtToken);
 			} catch (ExpiredJwtException e) {
-				// e.printStackTrace();
 				resolver.resolveException(request, response, null, e);
-				// System.out.println("Jwt token has expired");
 			} catch (Exception e) {
-				// e.printStackTrace();
-				// System.out.println("error");
 				resolver.resolveException(request, response, null, e);
 			}
 		} else {
 			System.out.println("Invalid Token , not start with Bearer string");
-//			resolver.resolveException(request, response, null, new AccessDeniedException("Access Denied."));
 		}
 		
         if(username!=null && SecurityContextHolder.getContext().getAuthentication()==null && blacklistRepo.findById(jwtToken).orElse(null)==null){
@@ -79,13 +74,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 		} else {
 			System.out.println("Token is not valid!!");
-			
 		}
 
 		try {
 			filterChain.doFilter(request, response);
 		} catch (AccessDeniedException e) {
-
 			resolver.resolveException(request, response, null, e);
 		} catch (Exception e) {
 			resolver.resolveException(request, response, null, e);

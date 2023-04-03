@@ -45,11 +45,9 @@ public class MenuService implements Validator {
 	}
 
 	public Menu getMenu(Integer menuId) {
-		
-		
 
-		Menu m = menuRepo.findById(menuId).orElseThrow(() -> new NotFoundException("Menu"));
-		return m;
+		return menuRepo.findById(menuId)
+			.orElseThrow(() -> new NotFoundException("Menu"));
 	}
 
 	public List<Menu> getAllMenu(Principal principal) {
@@ -57,10 +55,7 @@ public class MenuService implements Validator {
 		User user = userService.getuser(principal.getName());
 		List<Menu> menus = menuRepo.findAll();
 		
-		if(userService.isNotNull(user)) {
-			
-			
-			if (user.getRole().equals(Role.Admin))
+		if(userService.isNotNull(user) && user.getRole().equals(Role.Admin)){
 				menus = menus.stream().filter(m -> !m.getApproval().equals(Approval.Incomplete))
 						.collect(Collectors.toList());
 		}
@@ -99,10 +94,10 @@ public class MenuService implements Validator {
 
 			if (isNotNull(f)) {
 				// instead get the food id of the food as a request as add the food to the menu
-				if (!m.getItems().contains(f)) {
+				if (m.getItems()!=null && !m.getItems().contains(f)) {
+
 					m.getItems().add(f);
 
-					// m.getFoods().add(menu.getFoods().get(0));
 					menuRepo.save(m);
 				}
 					return null;
@@ -122,14 +117,11 @@ public class MenuService implements Validator {
 			// get the food using the id
 			Item f = itemService.getItem(menuUpdateRequest.getItemId());
 
-			if (isNotNull(f)) {
-				// instead get the food id of the food as a request as add the food to the menu
-				if (!m.getItems().contains(f)) {
+			// instead get the food id of the food as a request as add the food to the menu
+			if (isNotNull(f) && !m.getItems().contains(f)) {
 					m.getItems().add(f);
 
-					// m.getFoods().add(menu.getFoods().get(0));
 					menuRepo.save(m);
-				}
 			}
 
 		}
@@ -145,7 +137,7 @@ public class MenuService implements Validator {
 			Item item = itemService.getItem(itemId);
 
 			if (isNotNull(item)) {
-				if (!m.getItems().isEmpty()) {
+				if (m.getItems()!=null && !m.getItems().isEmpty()) {
 					int index = m.getItems().indexOf(item);
 
 					m.getItems().remove(index);
@@ -163,7 +155,7 @@ public class MenuService implements Validator {
 
 		Menu m = menuRepo.findById(menuId).orElse(null);
 
-		if (isNotNull(m)) {
+		if (isNotNull(m) && m.getItems()!=null) {
 
 			List<Item> exItems = m.getItems();
 			List<Item> items = new ArrayList<>();
@@ -204,7 +196,7 @@ public class MenuService implements Validator {
 		return menus;
 	}
 
-	public Boolean isServingToday() {
+	public boolean isServingToday() {
 		Date date = new Date(System.currentTimeMillis());
 
 		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
@@ -214,7 +206,7 @@ public class MenuService implements Validator {
 		return true;
 	}
 
-	public Boolean isServingToday(Date date) {
+	public boolean isServingToday(Date date) {
 		if (date.getDay() == WeekDay.Saturday.ordinal() || date.getDay() == WeekDay.Sunday.ordinal()) {
 			return false;
 		}

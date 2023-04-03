@@ -1,109 +1,161 @@
 package com.nrifintech.cms.services;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
 import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.ItemRepo;
-import com.nrifintech.cms.types.ItemType;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.mock;
+
+@ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
-    private List<Item> items= new ArrayList<>();
+
     @Mock
-	private ItemRepo itemRepo;
+    private ItemRepo itemRepo;
 
     @InjectMocks
     private ItemService itemService;
 
-    @BeforeEach
-    void setup(){
-        items.add(new Item(999,12,10.0,ItemType.Veg,"abc.png","tasty","food1"));
-        items.add(new Item(998,13,10.0,ItemType.Veg,"abc.png","tasty","food2"));
-        items.add(new Item(997,14,10.0,ItemType.Veg,"abc.png","tasty","food3"));
-        items.add(new Item(996,15,10.0,ItemType.NonVeg,"abc.png","yum","food4"));
-        items.add(new Item(995,16,10.0,ItemType.NonVeg,"abc.png","yum","food5"));
-        items.add(new Item(994,17,10.0,ItemType.NonVeg,"abc.png","yum","food6"));
-         
-        Mockito.when(itemRepo.saveAll(items)).thenReturn( items);
-        Mockito.when(itemRepo.findAll()).thenReturn( items);
-        for(Item i:items){
-            Mockito.when(itemRepo.save( Mockito.eq(i))).thenReturn( i);
-            Mockito.when(itemRepo.findById(  Mockito.eq(i.getId()))).thenReturn( Optional.of(i));
+
+    @Before
+    public void setup(){
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    public  void testAddItemSuccess() throws IOException, NoSuchAlgorithmException{
+
+        Item item = mock(Item.class);
+        item.setId(20);
+        item.setName("Chicken");
+
+        ItemService mock = mock(ItemService.class);
+        Mockito.when(mock.getItems()).thenReturn(new ArrayList<>());
+        Mockito.when(itemRepo.save(any(Item.class))).thenReturn(item);
+
+        Item expectedItem = itemService.addItem(item);
+
+        assertEquals(item,expectedItem);
+
+    }
+
+    @Test
+    public  void testAddItemFailure() throws IOException, NoSuchAlgorithmException{
+
+        Item item = mock(Item.class);
+        item.setId(20);
+        item.setName("Chicken");
+
+        List<Item> exItems = new ArrayList<>();
+        exItems.add(Item.builder().id(22).name("Chicken").build());
+
+        ItemService mock = mock(ItemService.class);
+        Mockito.when(mock.getItems()).thenReturn(exItems);
+        Mockito.when(itemRepo.save(any(Item.class))).thenReturn(null);
+
+        Item expectedItem = itemService.addItem(item);
+
+        assertNull(expectedItem);
+
+    }
+
+    @Test
+    public void testGetItemSuccess(){
+
+        int itemId = 10;
+        Item item = mock(Item.class);
+
+        Mockito.when(itemRepo.findById(itemId)).thenReturn(Optional.ofNullable(item));
+
+        Item expectedItem = itemService.getItem(itemId);
+
+        assertEquals(item,expectedItem);
+
+    }
+
+
+    @Test
+    public void testGetItemFailure(){
+
+
+        int itemId = 10;
+        Item item = mock(Item.class);
+
+        NotFoundException notFoundException = new NotFoundException("Item");
+        Mockito.when(itemRepo.findById(itemId)).thenThrow(notFoundException);
+
+        Exception expected = null;
+        try {
+            Item expectedItem= itemService.getItem(itemId);
+        }catch (NotFoundException ex){
+            expected=ex;
         }
-        Mockito.when(itemRepo.findById( Mockito.eq(11))).thenThrow(NotFoundException.class);
-        Mockito.when(itemRepo.findById( Mockito.eq(12))).thenThrow(NotFoundException.class);
 
-        // when(ItemService.getItems("abc2@gamil.com")).thenReturn( items.get(1));
-        // when(ItemService.getItems("abc3@gamil.com")).thenReturn( items.get(2));
-        // when(ItemService.getItems("abc4@gamil.com")).thenReturn( items.get(3));
-    }
-    
-    @AfterEach
-    void destroy(){
-        items.clear();
-    }
-
-    @Test
-    void testAddItem() {
-        for(Item i:items){
-            assertEquals(null,itemService.addItem(i));
-        }
-        Item i1=new Item(99,16,10.0,ItemType.NonVeg,"abc.png","yum","food54");
-        Item i2=new Item(91,16,10.0,ItemType.NonVeg,"abc.png","yum","food55");
-        assertEquals( i1, i1);
-        assertEquals( i2, i2);
-    }
-
-    @Test
-    void testAddItems() {
-        assertArrayEquals( items.toArray() , itemService.addItems(items).toArray()  );
-        assertArrayEquals( new Item[0] , itemService.addItems(null).toArray()  );
+        assert expected != null;
+        assertEquals(notFoundException.getMessage() , expected.getMessage() );
 
     }
 
     @Test
-    void testGetItem() {
-        assertEquals( items.get(0) , itemService.getItem(items.get(0).getId()));
-        NotFoundException e1 = assertThrows( NotFoundException.class , ()-> itemService.getItem(11));
-        NotFoundException e2 = assertThrows( NotFoundException.class , ()-> itemService.getItem(12));
+    public void testAddItems(){
 
+        List<Item> items = new ArrayList<>();
+        items.add(Item.builder().id(10).name("Chicken").build());
+
+        Mockito.when(itemRepo.saveAll(anyList())).thenReturn(items);
+
+        List<Item> expectedList = itemService.addItems(items);
+
+        assertEquals(items, expectedList);
     }
 
     @Test
-    void testGetItems() {
-        assertArrayEquals( items.toArray() , itemService.getItems().toArray()  );
+    public void testGetItems(){
 
+        List<Item> items = new ArrayList<>();
+        items.add(Item.builder().id(10).name("Chicken").build());
+
+        Mockito.when(itemRepo.findAll()).thenReturn(items);
+
+        List<Item> expectedList = itemService.getItems();
+
+        assertEquals(items, expectedList);
     }
 
     @Test
-    void testGetItems2() {
-        assertArrayEquals( 
-            List.of(items.get(0),items.get(1),items.get(2)).toArray(),
-            itemService.getItems(
-                List.of("999","998","997")).toArray()
-        );
-        
-        assertArrayEquals( 
-            List.of(items.get(0),items.get(1)).toArray(),
-            itemService.getItems(
-                List.of("999","998","9974")).toArray()
-        );
+    public void testGetItemsForItemIds(){
+
+        List<String> itemIds = new ArrayList<>();
+        itemIds.add("10");
+        itemIds.add("13");
+
+        List<Item> items = new ArrayList<>();
+        items.add(Item.builder().id(10).name("Chicken").build());
+        items.add(Item.builder().id(13).name("Dahi").build());
+
+        Mockito.when(itemService.getItems()).thenReturn(items);
+        List<Item> expectedList = itemService.getItems(itemIds);
+
+        assert expectedList != null;
+        assertEquals(expectedList.size(), itemIds.size());
+        assertEquals(items.get(0).getId(), expectedList.get(0).getId());
+        assertEquals(items.get(1).getId(), expectedList.get(1).getId());
     }
 }

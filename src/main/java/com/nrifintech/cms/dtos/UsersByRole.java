@@ -1,7 +1,5 @@
 package com.nrifintech.cms.dtos;
 
-import java.math.BigInteger;
-
 import com.nrifintech.cms.types.Role;
 
 import lombok.AllArgsConstructor;
@@ -13,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class UsersByRole {
     Role role;
-    BigInteger count;
+    Object count;
 }

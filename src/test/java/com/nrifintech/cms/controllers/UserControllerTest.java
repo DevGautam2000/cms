@@ -1,29 +1,33 @@
 package com.nrifintech.cms.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import org.apache.tomcat.util.http.parser.MediaType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nrifintech.cms.MockMvcSetup;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
@@ -32,101 +36,173 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class UserControllerTest {
-    @Autowired
-	private MockMvc mockMvc;
-
+@RunWith(MockitoJUnitRunner.Silent.class)
+public class UserControllerTest extends MockMvcSetup{
+    private List<User> users = new ArrayList<>();
+    private MockMvc mockMvc;
+    @Mock
+	private UserService userService;
+	@Mock
+	private ApplicationEventPublisher applicationEventPublisher;
+	@Mock
+	private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserController userController;
 
-    @Mock(lenient = true)
-    private UserService userService;
+    @Before
+    public void setUp() throws IOException, NoSuchAlgorithmException, NoSuchAlgorithmException {
+        this.mockMvc = MockMvcSetup.setUp(Route.User.prefix, this, userController);
+        loadData();
+    }
 
-    @Mock(lenient = true)
-    private ApplicationEventPublisher applicationEventPublisher;
+    private void loadData() throws IOException, NoSuchAlgorithmException {        
+        users.add(new User(999,"avatar1.png","abcd@gamil.com","password1","9876543211",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+        users.add(new User(998,"avatar2.png","abc2@gamil.com","password2","9876543212",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null));
+        users.add(new User(997,"avatar3.png","abc3@gamil.com","password3","9876543213",Role.User,UserStatus.InActive,EmailStatus.unsubscribed,null,null,null,null));
+        users.add(new User(996,"avatar4.png","abc4@gamil.com","password4","9876543214",Role.User,UserStatus.InActive,EmailStatus.unsubscribed,null,null,null,null));
+        
+        for(User u:users){
+            Mockito.when(userService.getuser(u.getId())).thenReturn(u);
+        }
 
-    @Mock(lenient = true)
-    private PasswordEncoder passwordEncoder;
+            Mockito.when(userService.saveUser(any())).thenReturn(users.get(0));
+            Mockito.when(userService.addUser(any())).thenReturn(users.get(0));
+            Mockito.when(passwordEncoder.encode(anyString())).thenReturn("password");
+            Mockito.when(userService.getUsers()).thenReturn(users);
 
-    @BeforeEach
-    void setup(){
-        User user = new User(999,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,
-        null,null,null);
+            
+    }
+    @Test
+    public void testAddUser() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+        when(userService.isNotNull(users.get(0))).thenReturn(false);
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .post(prefix(Route.User.addUser ))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapToJson( users.get(0)))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        // when(passwordEncoder.encode(any())).thenReturn("password");
-        when(userService.addUser(user)).thenReturn(user);
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+
+        Mockito.verify(applicationEventPublisher).publishEvent(any());
+        assertEquals("User added.", res.getMessage().toString().trim());
+
+
+        when(userService.isNotNull(users.get(0))).thenReturn(true);
+        r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .post(prefix(Route.User.addUser ))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapToJson( users.get(0)))
+        ).andExpect(status().is(HttpStatus.BAD_REQUEST.value())).andReturn().getResponse().getContentAsString();
+
+        res = mapFromJson(r, Response.JsonEntity.class);
+
+        // Mockito.verify(applicationEventPublisher).publishEvent(any());
+        assertEquals("User already exists.", res.getMessage().toString().trim());
+    }
+
+    @Test
+    public void testGetEmailStatus() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+        when(userService.isNotNull(users.get(0))).thenReturn(true);
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .get(prefix(Route.User.getEmailStatus + "/" + users.get(0).getId() ))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+
+        when(userService.isNotNull(users.get(0))).thenReturn(false);
+        r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .get(prefix(Route.User.getEmailStatus + "/" + users.get(0).getId() ))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().is( HttpStatus.INTERNAL_SERVER_ERROR.value())).andReturn().getResponse().getContentAsString();
+        // EmailStatus res = mapFromJson(r, User.class).getEmailStatus();
+
+        // Mockito.verify(applicationEventPublisher).publishEvent(any());
+        // assert(res.getMessage().toString().trim().contains("User status updated to: "));
+        
+    }
+
+    @Test
+    public void testGetOrders() {
 
     }
 
     @Test
-    public void testAddUser() {
-        MockitoAnnotations.initMocks(this);
+    public void testGetUsers() throws UnsupportedEncodingException, Exception {
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .get(prefix(Route.User.getUsers ))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        User user = new User(999,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,
-        null,null,null);
+        // Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
+        List res = mapFromJson(r, List.class);
 
-        when(passwordEncoder.encode(any())).thenReturn("password");
-        when(userService.addUser(user)).thenReturn(user);
-        // when(applicationEventPublisher.publishEvent(any())).thenReturn(any());
+        // Mockito.verify(applicationEventPublisher).publishEvent(any());
+        // assertArrayEquals(users.toArray(), res.toArray());
+        when(userService.getUsers()).thenReturn(Arrays.asList());
+        r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .get(prefix(Route.User.getUsers))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().is(HttpStatus.BAD_REQUEST.value())).andReturn().getResponse().getContentAsString();
 
-        Response response = userController.addUser(user);
+        Response.JsonEntity res1 = mapFromJson(r, Response.JsonEntity.class);
 
-        verify(passwordEncoder, times(1)).encode(any());
-        verify(userService, times(1)).addUser(user);
-        // verify(applicationEventPublisher, times(0)).publishEvent(any());
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Response.JsonEntity(message=User added., status=200)", response.getBody().toString());
+        // Mockito.verify(applicationEventPublisher).publishEvent(any());
+        assertEquals("No users found.", res1.getMessage().toString().trim());
     }
 
     @Test
-    void testGetEmailStatus() throws Exception {
-
-
-
-        this.mockMvc.perform(get(Route.User.prefix + Route.User.getEmailStatus))
-        .andDo(print()).andExpect(status().isOk())
-		.andExpect(content().string(containsString("Hello, Mock")));
-
-        // mockMvc.perform(MockMvcRequestBuilders
-        // .get(Route.User.getEmailStatus)
-        // .accept(MediaType.APPLICATION_JSON)
-        // .andDo(print())
-        // .andExpect(status().isOk())
-        // .andExpect(MockMvcResultMatchers.jsonPath("$.employees").exists())
-        // .andExpect(MockMvcResultMatchers.jsonPath("$.employees[*].employeeId").isNotEmpty());
-    }
-
-    @Test
-    void testGetOrders() {
+    public void testRemoveUser() {
 
     }
 
     @Test
-    void testGetUsers() {
+    public void testSubsciptionToggler() throws UnsupportedEncodingException, Exception {
+        when(userService.isNotNull(users.get(0))).thenReturn(true);
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .get(prefix(Route.User.subscriptionToggler + "/" + 
+                    users.get(0).getId() + "/1" ))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
+        
+        r = mockMvc.perform(
+            MockMvcRequestBuilders
+                .get(prefix(Route.User.subscriptionToggler + "/" + 
+                users.get(0).getId() + "/3" ))   
+                .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().is( HttpStatus.BAD_REQUEST.value())).andReturn().getResponse().getContentAsString();
+        
     }
 
     @Test
-    void testRemoveUser() {
+    public void testUpdateUserStatus() throws JsonProcessingException, UnsupportedEncodingException, Exception {
+        when(userService.isNotNull(users.get(0))).thenReturn(true);
+        String r = mockMvc.perform(
+            MockMvcRequestBuilders
+                    .post(prefix(Route.User.updateStatus + "/" + users.get(0).getId() +
+                    "/1"))                        
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // .content(mapToJson( users.get(0)))
+        ).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-    }
+        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
 
-    @Test
-    void testSubsciptionToggler() {
-
-    }
-
-    @Test
-    void testUpdateUserStatus() {
+        Mockito.verify(applicationEventPublisher).publishEvent(any());
+        assert(res.getMessage().toString().trim().contains("User status updated to: "));
 
     }
 }

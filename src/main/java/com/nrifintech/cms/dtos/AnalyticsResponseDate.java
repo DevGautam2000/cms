@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class AnalyticsResponseDate {
     private String date;
-    private double value;
+    private Object value;
 }

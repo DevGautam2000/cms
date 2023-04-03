@@ -1,7 +1,6 @@
 package com.nrifintech.cms.entities;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,14 +8,12 @@ import javax.persistence.Id;
 
 import com.nrifintech.cms.types.TransactionType;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 @Setter
 public class Transaction {

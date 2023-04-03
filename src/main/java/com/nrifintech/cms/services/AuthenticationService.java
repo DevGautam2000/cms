@@ -1,36 +1,23 @@
 package com.nrifintech.cms.services;
 
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.nrifintech.cms.config.jwt.JwtUtils;
-import com.nrifintech.cms.dtos.EmailModel;
 import com.nrifintech.cms.entities.MyUserDetails;
 import com.nrifintech.cms.entities.TokenBlacklist;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.errorhandler.UserIsDisabledException;
 import com.nrifintech.cms.errorhandler.UserIsEnabledException;
-import com.nrifintech.cms.events.ForgotPasswordEvent;
 import com.nrifintech.cms.repositories.TokenBlacklistRepo;
-import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.types.UserStatus;
 
-import eu.bitwalker.useragentutils.UserAgent;
 import io.jsonwebtoken.JwtException;
 
 @Service
@@ -41,8 +28,6 @@ public class AuthenticationService {
     private UserService userService;
     @Autowired
     private JwtUtils jwtUtils;
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     private TokenBlacklistRepo tokenRepo;
     
@@ -60,7 +45,7 @@ public class AuthenticationService {
         // }
         catch(BadCredentialsException e){
             // throw new Exception("Invalid Credentials "+e.getMessage());
-            throw new UsernameNotFoundException("Invalid Credentials "+e.getMessage());
+            throw new UsernameNotFoundException("Invalid Credentials ");
         }
         // catch(Exception e){
         //     e.printStackTrace();
@@ -68,27 +53,21 @@ public class AuthenticationService {
     }
 
 
-    public void forgetPassword(String email){
+    public String forgetPassword(String email){
         User user=userService.getuser(email);
 
         if(!(user.getStatus().equals(UserStatus.Active)))
             throw new UserIsDisabledException();
             
-        resetPasswordEmail(user);
+        return(resetPasswordEmail(user));
     }
 
-    private void resetPasswordEmail(User user){
+    private String resetPasswordEmail(User user){
         System.out.println(user);
         MyUserDetails myUser = new MyUserDetails(user);
         String token = jwtUtils.generateResetToken(myUser);
-        //TODO : ** url needs to be changed **
         String url="/auth/change-password?token="+token;
-        System.out.println(url);
-        //code here
-        HashMap<String,String> info = new HashMap<>();
-        info.put("username",user.getEmail());
-        info.put("token",token);
-        applicationEventPublisher.publishEvent(new ForgotPasswordEvent(info));
+        return(url);
     }
 
     public void changePassword(String email,String token,String newPassword) {
@@ -99,7 +78,7 @@ public class AuthenticationService {
             throw new UserIsDisabledException();
 
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
-            throw new UsernameNotFoundException("token: "+token+" is not valid");
+            throw new UsernameNotFoundException("Invalid Token");
         }
 
         if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");
@@ -110,22 +89,23 @@ public class AuthenticationService {
 
     }
 
-    public void setNewPassword(String email){
+    @Transactional
+    public String setNewPassword(String email){
         User user=userService.getuser(email);
         
         if(!(user.getStatus().equals(UserStatus.InActive)))
             throw new UserIsEnabledException();
         
-        setNewPasswordEmail(user);
+        return(setNewPasswordEmail(user));
     }
 
-    private void setNewPasswordEmail(User user){
+    @Transactional
+    private String setNewPasswordEmail(User user){
         System.out.println(user);
         String token = jwtUtils.generateNewPasswordToken(new MyUserDetails(user));
         //TODO : ** url needs to be changed **
         String url="/auth/activate-new-password?token="+token;
-        System.out.println(url);
-        //code here
+        return(url);
     }
     
     public void setNewPasswordAndActivate(String email,String token,String newPassword) {
@@ -137,7 +117,7 @@ public class AuthenticationService {
             throw new UserIsEnabledException();
 
         if(!jwtUtils.validateToken(token,new MyUserDetails(user))){
-            throw new UsernameNotFoundException("token: "+token+" is not valid");
+            throw new UsernameNotFoundException("Invalid Token");
         }
 
         if(tokenRepo.findById(token).isPresent())throw new JwtException("Invalid Token");

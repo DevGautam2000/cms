@@ -2,11 +2,9 @@ package com.nrifintech.cms.controllers;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,141 +24,143 @@ import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
-@CrossOrigin
 @RestController
 @RequestMapping(Route.Cart.prefix)
 public class CartController {
 
-	@Autowired
-	private CartService cartService;
+    @Autowired
+    private CartService cartService;
 
-	@Autowired
-	private CartItemService cartItemService;
+    @Autowired
+    private CartItemService cartItemService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@PostMapping(Route.Cart.addToCart + "/{userId}")
-	public Response addToCart(@PathVariable Integer userId, @RequestBody List<CartItemUpdateRequest> reqs) {
+    private String itemNotFoundErrorMsg = "CartItem not found. ";
 
-		User user = userService.getuser(userId);
+    @PostMapping(Route.Cart.addToCart + "/{userId}")
+    public Response addToCart(@PathVariable Integer userId, @RequestBody List<CartItemUpdateRequest> reqs) {
 
-		if (userService.isNotNull(user)) {
+        User user = userService.getuser(userId);
 
-			Cart cart = user.getCart();
+        if (userService.isNotNull(user)) {
 
-			if (cartService.isNull(cart))
-				cart = new Cart();
+            Cart cart = user.getCart();
 
-			if (cartService.isNotNull(cart)) {
+            if (cartService.isNull(cart))
+                cart = new Cart();
 
-				cart = cartService.addToCart(reqs, cart);
+            if (cartService.isNotNull(cart)) {
 
-				if (cartService.isNotNull(cart)) {
+                cart = cartService.addToCart(reqs, cart);
 
-//					//save the cart 
-					cartService.saveCart(cart);
+                if (cartService.isNotNull(cart)) {
 
-					user.setCart(cart);
-					userService.saveUser(user);
+					//save the cart 
+                    cartService.saveCart(cart);
 
-					return Response.setMsg("Added to cart.", HttpStatus.OK);
-				} else
-					return Response.setErr("Duplicate Entry.", HttpStatus.BAD_REQUEST);
-			}
-		}
+                    user.setCart(cart);
+                    userService.saveUser(user);
 
-		return Response.setErr("User not found.", HttpStatus.BAD_REQUEST);
+                    return Response.setMsg("Added to cart.", HttpStatus.OK);
+                } else
+                    return Response.setErr("Duplicate Entry.", HttpStatus.BAD_REQUEST);
+            }
+        }
 
-	}
+        return Response.setErr("User not found.", HttpStatus.BAD_REQUEST);
 
-	@PostMapping(Route.Cart.updateQuantity + "/inc/{itemId}/{factor}")
-	public Response updateQuantityIncrease(@PathVariable Integer itemId, @PathVariable Integer factor) {
-		CartItem cartItem = cartItemService.getItem(itemId);
+    }
 
-		if (cartItemService.isNotNull(cartItem)) {
+    @PostMapping(Route.Cart.updateQuantity + "/inc/{itemId}/{factor}")
+    public Response updateQuantityIncrease(@PathVariable Integer itemId, @PathVariable Integer factor) {
+        CartItem cartItem = cartItemService.getItem(itemId);
 
-			cartItem.increaseBy(factor);
-			cartItemService.saveItem(cartItem);
-			return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
-		}
+        if (cartItemService.isNotNull(cartItem)) {
 
-		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
-	}
+            cartItem.increaseBy(factor);
+            cartItemService.saveItem(cartItem);
+            return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
+        }
 
-	@PostMapping(Route.Cart.updateQuantity + "/dec/{itemId}/{factor}")
-	public Response updateQuantityDecrease(@PathVariable Integer itemId, @PathVariable Integer factor) {
-		CartItem cartItem = cartItemService.getItem(itemId);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
+    }
 
-		if (cartItemService.isNotNull(cartItem)) {
+    @PostMapping(Route.Cart.updateQuantity + "/dec/{itemId}/{factor}")
+    public Response updateQuantityDecrease(@PathVariable Integer itemId, @PathVariable Integer factor) {
+        CartItem cartItem = cartItemService.getItem(itemId);
 
-			cartItem.decreaseBy(factor);
+        if (cartItemService.isNotNull(cartItem)) {
 
-			cartItemService.saveItem(cartItem);
-			return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
-		}
+            cartItem.decreaseBy(factor);
 
-		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
-	}
+            cartItemService.saveItem(cartItem);
+            return Response.setMsg("CartItem quantity updated. ", HttpStatus.OK);
+        }
 
-	@PostMapping(Route.Cart.remove + "/{cartId}/{itemId}")
-	public Response removeFromCart(@PathVariable Integer cartId, @PathVariable Integer itemId) {
-		Cart cart = cartService.getCart(cartId);
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
+    }
 
-		if (cartService.isNotNull(cart)) {
-			CartItem cartItem = cartItemService.getItem(itemId);
+    @PostMapping(Route.Cart.remove + "/{cartId}/{itemId}")
+    public Response removeFromCart(@PathVariable Integer cartId, @PathVariable Integer itemId) {
+        Cart cart = cartService.getCart(cartId);
 
-			if (cartItemService.isNotNull(cartItem)) {
-				cart.getCartItems().remove(cart.getCartItems().indexOf(cartItem));
-				cartService.saveCart(cart);
+        if (cartService.isNotNull(cart)) {
+            CartItem cartItem = cartItemService.getItem(itemId);
 
-				cartItemService.deleteItem(cartItem.getId());
-				return Response.setMsg("CartItem removed. ", HttpStatus.OK);
-			}
+            if (cartItemService.isNotNull(cartItem)) {
+                cart.getCartItems().remove(cart.getCartItems().indexOf(cartItem));
+                cartService.saveCart(cart);
 
-		}
-		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
-	}
+                cartItemService.deleteItem(cartItem.getId());
+                return Response.setMsg("CartItem removed. ", HttpStatus.OK);
+            }
 
-	@PostMapping(Route.Cart.clear + "/{cartId}")
-	public Response removeFromCart(@PathVariable Integer cartId) {
-		Cart cart = cartService.getCart(cartId);
+        }
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
+    }
 
-		if (cartService.isNotNull(cart)) {
+    @PostMapping(Route.Cart.clear + "/{cartId}")
+    public Response removeFromCart(@PathVariable Integer cartId) {
+        Cart cart = cartService.getCart(cartId);
 
-			cart = cartService.clearCart(cart);
+        if (cartService.isNotNull(cart)) {
 
-			if (cart.getCartItems().isEmpty()) {
-				return Response.setMsg("Cart cleared. ", HttpStatus.OK);
-			}
+            cart = cartService.clearCart(cart);
 
-			return Response.setErr("Error clearing cart. ", HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return Response.setErr("CartItem not found. ", HttpStatus.BAD_REQUEST);
-	}
+            if (cart.getCartItems().isEmpty()) {
+                return Response.setMsg("Cart cleared. ", HttpStatus.OK);
+            }
 
-	@ErrorHandlerImplemented(handler = NotFoundException.class)
-	@GetMapping(Route.Cart.getCart + "/{cartId}")
-	public Response getCart(@PathVariable Integer cartId) {
+            return Response.setErr("Error clearing cart. ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.BAD_REQUEST);
+    }
 
-		Cart cart = cartService.getCart(cartId);
-		return Response.set(cart, HttpStatus.OK);
+    @ErrorHandlerImplemented(handler = NotFoundException.class)
+    @GetMapping(Route.Cart.getCart + "/{cartId}")
+    public Response getCart(@PathVariable  Integer cartId) {
 
-	}
+        Cart cart = cartService.getCart(cartId);
 
-	@GetMapping(Route.Cart.getCart)
-	public Response getCart(Principal principal) {
+        return Response.set(cart, HttpStatus.OK);
 
-		User user = userService.getuser(principal.getName());
+    }
 
-		if (userService.isNotNull(user.getCart())) {
+    @GetMapping(Route.Cart.getCart)
+    public Response getCart(Principal principal) {
 
-			Cart cart = user.getCart();
-			return Response.set(cart, HttpStatus.OK);
+        User user = userService.getuser(principal.getName());
 
-		}
+        if (userService.isNotNull(user.getCart())) {
 
-		return Response.setErr("Cart does not exist for user.", HttpStatus.NOT_ACCEPTABLE);
-	}
+            Cart cart = user.getCart();
+            return Response.set(cart, HttpStatus.OK);
+
+        }
+
+        return Response.setErr(itemNotFoundErrorMsg, HttpStatus.NOT_ACCEPTABLE);
+    }
 
 }

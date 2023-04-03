@@ -1,9 +1,6 @@
 package com.nrifintech.cms.dtos;
 
-import java.math.BigInteger;
-
 import com.nrifintech.cms.types.Feedback;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,5 +10,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class FeedBackRatingStats {
     private Feedback feedback;
-    private BigInteger count;
+    private Object count;
 }

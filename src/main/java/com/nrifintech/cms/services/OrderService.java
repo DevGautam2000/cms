@@ -1,16 +1,17 @@
 package com.nrifintech.cms.services;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
-import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.OrderRepo;
@@ -87,7 +88,7 @@ public class OrderService implements Validator {
 			FeedBack f = order.getFeedBack();
 
 			if (isNull(f)) {
-				String trimmedComment = feedBack.getComments().toString().trim();
+				String trimmedComment = feedBack.getComments().trim();
 				feedBack.setComments(trimmedComment);
 
 				feedBackService.addFeedBack(feedBack);
@@ -101,38 +102,40 @@ public class OrderService implements Validator {
 		return order;
 	}
 
-	public Object addItemsToOrder(Integer orderId, List<String> itemIds, List<String> quantities) {
-		Order order = this.getOrder(orderId);
+	// public Object addItemsToOrder(Integer orderId, List<String> itemIds, List<String> quantities) {
+	// 	Order order = this.getOrder(orderId);
+	// // public Object addItemsToOrdr(Integer orderId, List<String> itemIds, List<String> quantities) {
+	// // 	Order order = this.getOrder(orderId);
 
-		if (isNotNull(order)) {
+	// // 	if (isNotNull(order)) {
 
-			List<CartItem> exItems = order.getCartItems();
+	// // 		List<CartItem> exItems = order.getCartItems();
 
-			if (exItems.isEmpty()) {
+	// // 		if (exItems.isEmpty()) {
 
-				List<CartItem> items = new ArrayList<>();
+	// // 			List<CartItem> items = new ArrayList<>();
 
-				itemIds.forEach(id -> {
+	// // 			itemIds.forEach(id -> {
 
-					Item item = itemService.getItem(Integer.valueOf(id));
+	// // 				Item item = itemService.getItem(Integer.valueOf(id));
 
-					if (isNotNull(item)) {
-						items.add(new CartItem(item, Integer.valueOf(quantities.get(itemIds.lastIndexOf(id)))));
-					}
+	// // 				if (isNotNull(item)) {
+	// // 					items.add(new CartItem(item, Integer.valueOf(quantities.get(itemIds.lastIndexOf(id)))));
+	// // 				}
 
-				});
+	// // 			});
 
-				order.setCartItems(items);
-				orderRepo.save(order);
+	// // 			order.setCartItems(items);
+	// // 			orderRepo.save(order);
 
-			} else
-				return exItems.size() > 0 ? new Item() : null;
-		}
-		return order;
-	}
+	// // 		} else
+	// // 			return exItems.size() > 0 ? new Item() : null;
+	// // 	}
+	// // 	return order;
+	// }
 
-	public void autoArchive() {
-		orderRepo.autoArchive();
+	public void autoArchive(String date) {
+		orderRepo.autoArchive(date);
 	}
 
 	public Boolean getServerEpoch(Timestamp prev, Timestamp curr) {
@@ -141,7 +144,20 @@ public class OrderService implements Validator {
 //		Timestamp prev = Timestamp.valueOf("2023-03-12 12:00:00");
 
 		return curr.getTime() - prev.getTime() <= SERVER_LIMIT_MILLIS;
+		
+	}
 
+	public Map<String, Integer> getOrderQuantity(Date date){
+
+		Map<String , Integer> result = new HashMap<>();
+
+		List<Order>  orders = orderRepo.findByOrderPlaced(date.toString());
+		if(!orders.isEmpty()) {
+			orders.stream().forEach(o -> o.getCartItems().forEach(item->{
+				result.put(item.getName(), result.getOrDefault(item.getName(), 0) + item.getQuantity());
+			}));
+		}
+		return(result);
 	}
 
 }
