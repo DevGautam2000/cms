@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.context.ApplicationEvent;
 
+/**
+ * > The LunchStartEvent class is a custom event that extends the ApplicationEvent class
+ */
 public class LunchStartEvent extends ApplicationEvent {
 
     public LunchStartEvent(List<String> recipients) {

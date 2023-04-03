@@ -13,6 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * MenuDto is a class that has an id, approval, date, menuType, and items
+ */
 @Getter
 @Setter
 @Builder

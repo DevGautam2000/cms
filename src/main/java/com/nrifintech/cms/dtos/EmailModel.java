@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * It's a model class that holds the data for an email
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

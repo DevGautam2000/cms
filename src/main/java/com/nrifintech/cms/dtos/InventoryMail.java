@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * This class is used to send an email to the user when the inventory is upated
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -17,6 +20,7 @@ public class InventoryMail {
     private Double quantityRequested;
     private Double quantityPurchased;
 
+    // This is a constructor.
     public InventoryMail(Inventory i , Double quantityPurchased){
         this.id = i.getId();
         this.name = i.getName();
@@ -25,6 +29,7 @@ public class InventoryMail {
         this.quantityPurchased = quantityPurchased;
     }
 
+   // A constructor.
     public InventoryMail(Inventory i){
         this.id = i.getId();
         this.name = i.getName();

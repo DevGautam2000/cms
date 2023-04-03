@@ -21,6 +21,7 @@ import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.routes.Route;
+import com.nrifintech.cms.services.ImageService;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Response;
@@ -42,6 +43,8 @@ public class UserController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private ImageService imageService;
 
 
 	/**
@@ -62,6 +65,9 @@ public class UserController {
 
 		if (userService.isNotNull(u))
 			return Response.setErr("User already exists.", HttpStatus.BAD_REQUEST);
+		if(!imageService.isValid(user.getAvatar())){
+			return( Response.setErr("Image is corrupt or Encoding not supported", HttpStatus.BAD_REQUEST));
+		}
 		this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
 		
 		

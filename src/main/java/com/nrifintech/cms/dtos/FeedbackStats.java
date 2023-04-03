@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * FeedbackStats is a class that has a totalCount, avgRating, and a list of feedbackRaingStats.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

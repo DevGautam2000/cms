@@ -4,6 +4,9 @@ import com.nrifintech.cms.types.ItemType;
 
 import lombok.*;
 
+/**
+ * ItemDto is a class that represents an item in the store.
+ */
 @Getter
 @Setter
 @Builder
