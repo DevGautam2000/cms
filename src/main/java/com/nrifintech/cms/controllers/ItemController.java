@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.ItemDto;
 import com.nrifintech.cms.entities.Item;
+import com.nrifintech.cms.errorcontroller.ImageFailureException;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.ItemService;
@@ -62,9 +63,10 @@ public class ItemController {
 	 * 
 	 * @param itemDto The itemDto is the object that is sent from the frontend.
 	 * @return A Response object.
+	 * @throws ImageFailureException
 	 */
 	@PostMapping(Route.Item.addItem)
-	public Response addItem(@RequestBody ItemDto itemDto) throws IOException, NoSuchAlgorithmException {
+	public Response addItem(@RequestBody ItemDto itemDto) throws IOException, NoSuchAlgorithmException, ImageFailureException {
 		Item item = new Item(itemDto);
 		Item i = itemService.addItem(item);
 		if (itemService.isNotNull(i))

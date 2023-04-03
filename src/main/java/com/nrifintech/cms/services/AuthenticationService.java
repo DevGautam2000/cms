@@ -20,6 +20,9 @@ import com.nrifintech.cms.types.UserStatus;
 
 import io.jsonwebtoken.JwtException;
 
+/**
+ * It has methods to authenticate, forget password, change password, set new password and activate user
+ */
 @Service
 public class AuthenticationService {
     @Autowired
@@ -34,6 +37,12 @@ public class AuthenticationService {
     
     //TODO: check password
     //return user
+   /**
+    * It takes a username and password, and if the username and password are valid, it returns a token
+    * 
+    * @param username The username of the user
+    * @param password The password of the user
+    */
     public void authenticate(String username,String password) throws Exception{
         try{
 
@@ -53,6 +62,13 @@ public class AuthenticationService {
     }
 
 
+  /**
+   * It takes an email address, finds the user with that email address, and if the user is active, it
+   * sends them an email with a link to reset their password
+   * 
+   * @param email The email address of the user who is trying to reset their password.
+   * @return A String
+   */
     public String forgetPassword(String email){
         User user=userService.getuser(email);
 
@@ -62,6 +78,13 @@ public class AuthenticationService {
         return(resetPasswordEmail(user));
     }
 
+   /**
+    * It takes a user object, creates a MyUserDetails object from it, generates a token from the
+    * MyUserDetails object, and returns a url with the token appended to it
+    * 
+    * @param user The user object that is being passed in from the controller.
+    * @return The URL to the reset password page.
+    */
     private String resetPasswordEmail(User user){
         System.out.println(user);
         MyUserDetails myUser = new MyUserDetails(user);
@@ -70,6 +93,14 @@ public class AuthenticationService {
         return(url);
     }
 
+  /**
+   * It takes an email, a token and a new password, checks if the user is active, if the token is
+   * valid, if the token is blacklisted, and if all of the above are true, it updates the password
+   * 
+   * @param email the email of the user
+   * @param token The token that was sent to the user's email address.
+   * @param newPassword the new password
+   */
     public void changePassword(String email,String token,String newPassword) {
 
         User user = userService.getuser(email);
@@ -89,6 +120,13 @@ public class AuthenticationService {
 
     }
 
+  /**
+   * It checks if the user is inactive, if so, it sends an email to the user with a link to reset the
+   * password
+   * 
+   * @param email The email address of the user.
+   * @return A String
+   */
     @Transactional
     public String setNewPassword(String email){
         User user=userService.getuser(email);
@@ -99,6 +137,12 @@ public class AuthenticationService {
         return(setNewPasswordEmail(user));
     }
 
+    /**
+     * It generates a token and returns a url with the token as a query parameter
+     * 
+     * @param user the user object that is being passed from the controller
+     * @return The url is being returned.
+     */
     @Transactional
     private String setNewPasswordEmail(User user){
         System.out.println(user);
@@ -108,6 +152,14 @@ public class AuthenticationService {
         return(url);
     }
     
+   /**
+    * It takes an email, a token and a new password, and if the token is valid, it activates the user
+    * and updates the password
+    * 
+    * @param email the email of the user
+    * @param token The token that was sent to the user's email
+    * @param newPassword The new password that the user wants to set
+    */
     public void setNewPasswordAndActivate(String email,String token,String newPassword) {
 
         final int statusIdEnabled=0;

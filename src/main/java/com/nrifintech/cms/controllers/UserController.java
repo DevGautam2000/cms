@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nrifintech.cms.dtos.UserInDto;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorcontroller.ImageFailureException;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.routes.Route;
@@ -52,9 +53,10 @@ public class UserController {
 	 * 
 	 * @param userDto The user object that is sent from the frontend.
 	 * @return Response object
+	 * @throws ImageFailureException
 	 */
 	@PostMapping(Route.User.addUser)
-	public Response addUser(@RequestBody UserInDto userDto) throws IOException, NoSuchAlgorithmException {
+	public Response addUser(@RequestBody UserInDto userDto) throws IOException, NoSuchAlgorithmException, ImageFailureException {
 		User user= new User(userDto);
 		if (user.getRole().ordinal() > Role.values().length)
 			return Response.setErr("Invalid role for user.", HttpStatus.BAD_REQUEST);
@@ -65,9 +67,7 @@ public class UserController {
 
 		if (userService.isNotNull(u))
 			return Response.setErr("User already exists.", HttpStatus.BAD_REQUEST);
-		if(!imageService.isValid(user.getAvatar())){
-			return( Response.setErr("Image is corrupt or Encoding not supported", HttpStatus.BAD_REQUEST));
-		}
+
 		this.applicationEventPublisher.publishEvent(new AddedNewUserEvent(user));
 		
 		

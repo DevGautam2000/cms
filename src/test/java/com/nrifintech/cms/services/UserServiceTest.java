@@ -27,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.nrifintech.cms.entities.User;
+import com.nrifintech.cms.errorcontroller.ImageFailureException;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;
@@ -84,7 +85,7 @@ public class UserServiceTest {
 
     @DisplayName("add user test")
     @Test
-    void testAddUserCase1() throws IOException, NoSuchAlgorithmException {
+    void testAddUserCase1() throws IOException, NoSuchAlgorithmException, ImageFailureException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -95,7 +96,7 @@ public class UserServiceTest {
         assertEquals(user1, created);
     }
     @Test
-    void testAddUserCase2() throws IOException, NoSuchAlgorithmException {
+    void testAddUserCase2() throws IOException, NoSuchAlgorithmException, ImageFailureException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);
@@ -106,7 +107,7 @@ public class UserServiceTest {
         assertEquals(user1, created);
     }
     @Test
-    void testAddUserCase3() throws IOException, NoSuchAlgorithmException {
+    void testAddUserCase3() throws IOException, NoSuchAlgorithmException, ImageFailureException {
         User user1 = new User(1,"avatar.png","abc@gamil.com","password","9876543210",Role.User,UserStatus.Active,EmailStatus.subscribed,null,null,null,null);
         when(userRepo.findByEmail(user1.getEmail())).thenReturn(Optional.ofNullable(user1));
         Mockito.when(userRepo.save(user1)).thenReturn(user1);

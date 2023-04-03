@@ -251,4 +251,9 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     Response.setErr(ex.getMessage(), HttpStatus.NOT_FOUND);
     // handle the error to bypass and do not send any response
   }
+
+  @ExceptionHandler({ImageFailureException.class})
+  public Response ImageException(Exception e){
+    return Response.setErr("Image is corrupt or file/format not supported", HttpStatus.BAD_REQUEST);
+  }
 }

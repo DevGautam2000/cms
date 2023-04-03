@@ -1,6 +1,7 @@
 package com.nrifintech.cms.services;
 
 import com.nrifintech.cms.entities.Item;
+import com.nrifintech.cms.errorcontroller.ImageFailureException;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.ItemRepo;
 import org.junit.Before;
@@ -40,7 +41,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public  void testAddItemSuccess() throws IOException, NoSuchAlgorithmException{
+    public  void testAddItemSuccess() throws IOException, NoSuchAlgorithmException, ImageFailureException{
 
         Item item = mock(Item.class);
         item.setId(20);
@@ -57,7 +58,7 @@ public class ItemServiceTest {
     }
 
     @Test
-    public  void testAddItemFailure() throws IOException, NoSuchAlgorithmException{
+    public  void testAddItemFailure() throws IOException, NoSuchAlgorithmException, ImageFailureException{
 
         Item item = mock(Item.class);
         item.setId(20);

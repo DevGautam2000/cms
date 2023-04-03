@@ -6,10 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
+
+import com.nrifintech.cms.errorcontroller.ImageFailureException;
 import com.nrifintech.cms.types.ImageFileDecider;
 
 /**
@@ -59,31 +59,6 @@ public class ImageService {
         return hexString.toString();
     }
 
-    /**
-     * If the string is null, return false. If the string is empty, return true. If the string matches
-     * the regex pattern, return true. Otherwise, return false
-     * 
-     * @param imageBase64 The base64 string that you want to validate.
-     * @return A boolean value.
-     */
-    public boolean isValid(String imageBase64){
-        if( imageBase64 == null ){
-            return(false);
-        }
-        if( imageBase64.length() == 0 ){
-            return(true);
-        }
-        String pattern = "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$";
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(imageBase64);
-
-        if(m.find()){
-            return(true);
-        }
-        else{
-            return(false);
-        }
-    }
 
    /**
     * It takes in the image name, type, image base64 and decider flag and returns the url of the image
@@ -94,17 +69,21 @@ public class ImageService {
     * @param deciderFlag This is an integer value that decides the folder in which the image will be
     * stored.
     * @return The URL of the image.
+ * @throws ImageFailureException
     */
-    public String uploadImage(String imageName , String type ,  String imageBase64  , int deciderFlag) throws IOException, NoSuchAlgorithmException{
-        byte[] image = Base64.getDecoder().decode(imageBase64);
-        
-        String path = "src\\main\\resources\\static\\assets\\" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "\\" +  toHexString(getSHA(type + "_" + imageName)) + ".webp";
-        File file = new File(path);
-        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
-            outputStream.write(image);
-        }
-        String url = "http://localhost:8080/content/assets/" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "/" +  toHexString(getSHA(type + "_" + imageName)) + ".webp";
-        return(url);
+    public String uploadImage(String imageName , String type ,  String imageBase64  , int deciderFlag) throws IOException, NoSuchAlgorithmException, ImageFailureException{
+           try {
+            byte[] image = Base64.getDecoder().decode(imageBase64);
+            String path = "src\\main\\resources\\static\\assets\\" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "\\" +  toHexString(getSHA(type + "_" + imageName)) + ".webp";
+            File file = new File(path);
+            try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+                outputStream.write(image);
+            }
+            String url = "http://localhost:8080/content/assets/" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "/" +  toHexString(getSHA(type + "_" + imageName)) + ".webp";
+            return(url);
+           } catch (Exception e) {
+            throw new ImageFailureException("Image corrupt/not supported");
+           }
     } 
 
    /**
