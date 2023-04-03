@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nrifintech.cms.dtos.ItemDto;
 import com.nrifintech.cms.entities.Item;
-import com.nrifintech.cms.errorcontroller.ImageFailureException;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.ItemService;

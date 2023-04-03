@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nrifintech.cms.MockMvcSetup;
 import com.nrifintech.cms.entities.User;
-import com.nrifintech.cms.errorcontroller.ImageFailureException;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.UserService;
 import com.nrifintech.cms.types.EmailStatus;

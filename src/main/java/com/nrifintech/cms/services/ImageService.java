@@ -9,7 +9,7 @@ import java.util.Base64;
 
 import org.springframework.stereotype.Service;
 
-import com.nrifintech.cms.errorcontroller.ImageFailureException;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.types.ImageFileDecider;
 
 /**

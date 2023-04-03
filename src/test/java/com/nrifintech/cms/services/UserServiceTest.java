@@ -27,7 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.nrifintech.cms.entities.User;
-import com.nrifintech.cms.errorcontroller.ImageFailureException;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Role;

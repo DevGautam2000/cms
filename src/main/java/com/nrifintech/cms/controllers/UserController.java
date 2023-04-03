@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nrifintech.cms.dtos.UserInDto;
 import com.nrifintech.cms.entities.Order;
 import com.nrifintech.cms.entities.User;
-import com.nrifintech.cms.errorcontroller.ImageFailureException;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.events.AddedNewUserEvent;
 import com.nrifintech.cms.events.UpdateUserStatusEvent;
 import com.nrifintech.cms.routes.Route;

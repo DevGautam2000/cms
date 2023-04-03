@@ -1,7 +1,7 @@
 package com.nrifintech.cms.services;
 
 import com.nrifintech.cms.entities.Item;
-import com.nrifintech.cms.errorcontroller.ImageFailureException;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.ItemRepo;
 import org.junit.Before;
