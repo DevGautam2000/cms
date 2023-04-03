@@ -253,6 +253,12 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     // handle the error to bypass and do not send any response
   }
 
+ /**
+  * If an exception is thrown, the function will return a response with a message and a status code
+  * 
+  * @param e The exception object
+  * @return A Response object with the error message and the status code.
+  */
   @ExceptionHandler({ImageFailureException.class})
   public Response ImageException(Exception e){
     return Response.setErr("Image is corrupt or file/format not supported", HttpStatus.BAD_REQUEST);

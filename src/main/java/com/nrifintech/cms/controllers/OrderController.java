@@ -457,7 +457,7 @@ public class OrderController {
 	public Response getOrderQuantity(@PathVariable Date date){
 		Map<String,Integer> responseMap = orderService.getOrderQuantity(date);
 		if(responseMap.isEmpty()){
-			return( Response.setErr("S no orders as of now", HttpStatus.NOT_FOUND));
+			return( Response.setErr("No orders as of now", HttpStatus.NOT_FOUND));
 		}
 		return( Response.set(responseMap,HttpStatus.OK) );
 	}

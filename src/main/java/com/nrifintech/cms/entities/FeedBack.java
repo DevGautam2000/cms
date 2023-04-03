@@ -9,6 +9,9 @@ import com.nrifintech.cms.dtos.FeedBackDto;
 import lombok.*;
 
 
+/**
+ * FeedBack is a class that has a constructor that takes a FeedBackDto as a parameter
+ */
 @Getter
 @Setter
 @ToString
@@ -26,6 +29,7 @@ public class FeedBack {
 	private String comments;
 	
 	
+	// A constructor that takes a FeedBackDto as a parameter
 	public FeedBack(FeedBackDto feedBack) {
 		this.id=feedBack.getId();
 		this.rating=feedBack.getRating();

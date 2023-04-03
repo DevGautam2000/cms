@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class BestSellerResponse {
     private String name;
+    private String imagePath;
     private Object count;
 }

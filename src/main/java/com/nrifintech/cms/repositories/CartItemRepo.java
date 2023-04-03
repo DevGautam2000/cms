@@ -18,7 +18,7 @@ public interface CartItemRepo extends JpaRepository<CartItem, Integer>{
     * @param date2 the end date of the period
     * @return A list of tuples containing the name of the item and the quantity of the item sold.
     */
-    @Query( value = "select name, (t.quant) from " + 
+    @Query( value = "select name, image_path , (t.quant) from " + 
             "( select source_id,sum(quantity) as quant from cart_item where id in" + 
             "( select cart_items_id from orders_cart_items where order_id in"+
              "( select id from orders where Cast(order_delivered as date) between :date1 and :date2))"+
