@@ -207,8 +207,6 @@ public class OrderController {
 	@PostMapping(Route.Order.placeOrder + "/{id}")
 	public Response placeOrder(@PathVariable Integer id) {
 
-		// if (!menuService.isServingToday())
-		// 	return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
 
 
@@ -241,7 +239,7 @@ public class OrderController {
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
 				if (Boolean.FALSE.equals(isPayable))
-					return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
+					return Response.setErr("Low wallet balance (Min: ₹"+ WalletService.LIMIT +").", HttpStatus.NOT_ACCEPTABLE);
 
 				Order lunchOrder = orderService.addNewOrder(MealType.Lunch);
 				Order breakfastOrder = orderService.addNewOrder(MealType.Breakfast);
@@ -282,8 +280,7 @@ public class OrderController {
 						breakfastOrderTotal += price;
 					}
 
-					if (lunchOrderTotal > wallet.getBalance() + WalletService.LIMIT
-							|| breakfastOrderTotal > wallet.getBalance() + WalletService.LIMIT) {
+					if (lunchOrderTotal+breakfastOrderTotal > wallet.getBalance() + WalletService.LIMIT) {
 						return Response.setErr("Low wallet balance.", HttpStatus.NOT_ACCEPTABLE);
 					}
 
