@@ -65,7 +65,7 @@ public class MenuController {
 	/**
 	 * > Submit a menu for review
 	 * 
-	 * @param id The id of the menu to be submitted.
+	 * @param id        The id of the menu to be submitted.
 	 * @param principal This is the user who is logged in.
 	 * @return A Response object.
 	 */
@@ -83,6 +83,17 @@ public class MenuController {
 				if (menu.getItems().isEmpty())
 					return Response.setErr("Menu has no items added.", HttpStatus.BAD_REQUEST);
 
+				if (menu.getApproval().equals(Approval.Rejected)) {
+
+					menu.setApproval(Approval.Pending);
+					menu = menuService.saveMenu(menu);
+
+					if (menuService.isNotNull(menu)) {
+						this.applicationEventPublisher.publishEvent(new MenuStatusChangeEvent(menu));
+						return Response.setMsg("Menu added for review.", HttpStatus.OK);
+					}
+				}
+
 				if (!menu.getApproval().equals(Approval.Incomplete))
 					return Response.setErr("Menu already " + menu.getApproval().toString().toLowerCase() + ".",
 							HttpStatus.INTERNAL_SERVER_ERROR);
@@ -90,8 +101,8 @@ public class MenuController {
 				menu.setApproval(Approval.Pending);
 				menu = menuService.saveMenu(menu);
 
-				if (menuService.isNotNull(menu)){
-					this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(menu) );
+				if (menuService.isNotNull(menu)) {
+					this.applicationEventPublisher.publishEvent(new MenuStatusChangeEvent(menu));
 					return Response.setMsg("Menu added for review.", HttpStatus.OK);
 				}
 
@@ -142,7 +153,7 @@ public class MenuController {
 	public Response removeMenu(@PathVariable Integer menuId) {
 
 		Menu menu = menuService.getMenu(menuId);
-		if(menu==null || menu.getApproval() != Approval.Incomplete){
+		if (menu == null || menu.getApproval() != Approval.Incomplete) {
 			return Response.setErr("Error removing menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -156,9 +167,10 @@ public class MenuController {
 	}
 
 	/**
-	 * > Approve a menu by setting its approval status to either `Approved` or `Rejected`
+	 * > Approve a menu by setting its approval status to either `Approved` or
+	 * `Rejected`
 	 * 
-	 * @param menuId The id of the menu to be approved.
+	 * @param menuId           The id of the menu to be approved.
 	 * @param approvalStatusId The status of the menu.
 	 * @return A Response object.
 	 */
@@ -174,17 +186,12 @@ public class MenuController {
 
 			String menuStatus = m.getApproval().toString();
 
-			if(menuStatus.equals(Approval.Rejected.toString())){
-				this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(m) );
-				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
-			}
-
 			if (!menuStatus.equals(Approval.Pending.toString()))
 				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
 			m = menuService.approveMenu(m, approvalStatusId);
-			if (menuService.isNotNull(m)){
-				this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(m) );
+			if (menuService.isNotNull(m)) {
+				this.applicationEventPublisher.publishEvent(new MenuStatusChangeEvent(m));
 				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
 			}
 
@@ -197,7 +204,7 @@ public class MenuController {
 	/**
 	 * > Add items to a menu
 	 * 
-	 * @param menuId The id of the menu you want to add items to.
+	 * @param menuId  The id of the menu you want to add items to.
 	 * @param itemIds a list of item ids to add to the menu
 	 * @return A Response object.
 	 */
@@ -233,7 +240,7 @@ public class MenuController {
 	/**
 	 * It returns a list of menus for a particular date
 	 * 
-	 * @param date The date for which you want to get the menu.
+	 * @param date      The date for which you want to get the menu.
 	 * @param principal This is the user who is logged in.
 	 * @return A list of menus
 	 */
@@ -243,8 +250,8 @@ public class MenuController {
 		if (!menuService.isServingToday(date))
 			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 
-List<Menu> menus = menuService.getMenuByDate(date,principal);
-			
+		List<Menu> menus = menuService.getMenuByDate(date, principal);
+
 		if (!menus.isEmpty())
 			return Response.set(menus, HttpStatus.OK);
 
