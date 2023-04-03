@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * FeedBackRatingStats is a class that has two fields: feedback and count.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

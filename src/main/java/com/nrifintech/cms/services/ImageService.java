@@ -12,9 +12,19 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 import com.nrifintech.cms.types.ImageFileDecider;
 
+/**
+ * It takes in a base64 image, converts it to a byte array, hashes the image name and type, and saves
+ * it to a file.
+ */
 @Service
 public class ImageService {
 
+   /**
+    * It takes a string as input, and returns a byte array of the SHA-256 hash of the input string
+    * 
+    * @param input The string to be hashed.
+    * @return The SHA-256 hash of the input string.
+    */
     public static byte[] getSHA(String input) throws NoSuchAlgorithmException
     {
         // Static getInstance method is called with hashing SHA
@@ -26,6 +36,12 @@ public class ImageService {
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
      
+   /**
+    * It converts a byte array into a hexadecimal string
+    * 
+    * @param hash The hash to be converted to a hex string.
+    * @return The hash of the input string.
+    */
     public static String toHexString(byte[] hash)
     {
         // Convert byte array into signum representation
@@ -43,6 +59,13 @@ public class ImageService {
         return hexString.toString();
     }
 
+    /**
+     * If the string is null, return false. If the string is empty, return true. If the string matches
+     * the regex pattern, return true. Otherwise, return false
+     * 
+     * @param imageBase64 The base64 string that you want to validate.
+     * @return A boolean value.
+     */
     public boolean isValid(String imageBase64){
         if( imageBase64 == null ){
             return(false);
@@ -62,6 +85,16 @@ public class ImageService {
         }
     }
 
+   /**
+    * It takes in the image name, type, image base64 and decider flag and returns the url of the image
+    * 
+    * @param imageName The name of the image
+    * @param type The type of the image.
+    * @param imageBase64 The base64 string of the image
+    * @param deciderFlag This is an integer value that decides the folder in which the image will be
+    * stored.
+    * @return The URL of the image.
+    */
     public String uploadImage(String imageName , String type ,  String imageBase64  , int deciderFlag) throws IOException, NoSuchAlgorithmException{
         byte[] image = Base64.getDecoder().decode(imageBase64);
         
@@ -74,6 +107,15 @@ public class ImageService {
         return(url);
     } 
 
+   /**
+    * It deletes an image from the server
+    * 
+    * @param imageName The name of the image file.
+    * @param type The type of the image, for example, if it's a profile picture, then the type would be
+    * "profile"
+    * @param deciderFlag This is an enum that decides the type of image.
+    * @return A boolean value.
+    */
     public boolean deleteImage(String imageName , String type , int deciderFlag) throws IOException, NoSuchAlgorithmException{
         String path = "src\\main\\resources\\static\\assets\\" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "\\" + toHexString(getSHA(type + "_" + imageName)) + ".webp";
         File file = new File(path);

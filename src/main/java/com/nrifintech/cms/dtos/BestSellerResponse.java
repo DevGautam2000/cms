@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * This class is a POJO that represents the response from the best seller API.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
