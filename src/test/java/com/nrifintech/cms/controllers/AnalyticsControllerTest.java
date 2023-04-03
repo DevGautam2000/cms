@@ -72,9 +72,9 @@ public class AnalyticsControllerTest extends MockMvcSetup{
             this.invalidDates.put(0, "2023-04-11");
             this.invalidDates.put(1, "2023-04-16");
 
-            this.bestSellerResponse.add(new BestSellerResponse("Chicken" , 100));
-            this.bestSellerResponse.add(new BestSellerResponse("Paneer" , 99));
-            this.bestSellerResponse.add(new BestSellerResponse("Roti" , 76));
+            this.bestSellerResponse.add(new BestSellerResponse("Chicken" ,"" , 100));
+            this.bestSellerResponse.add(new BestSellerResponse("Paneer" ,"", 99));
+            this.bestSellerResponse.add(new BestSellerResponse("Roti" ,"", 76));
 
             this.usersByRoleResponse.add( new UsersByRole(Role.Admin , 3));
             this.usersByRoleResponse.add( new UsersByRole(Role.Canteen, 2));

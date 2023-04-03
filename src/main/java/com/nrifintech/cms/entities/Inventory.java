@@ -19,6 +19,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 
+/**
+ * The Inventory class is a JPA entity class that represents the inventory table in the database
+ */
 @Data
 @Builder
 @AllArgsConstructor

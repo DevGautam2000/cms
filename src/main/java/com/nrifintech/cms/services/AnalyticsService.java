@@ -111,7 +111,7 @@ public class AnalyticsService {
      */
      public List<BestSellerResponse> getBestSeller(String date1 , String date2){
         List<Tuple> resTup = ( this.cartItemRepo.getBestSeller(date1, date2) );
-        List<BestSellerResponse> result = resTup.stream().map(t->new BestSellerResponse(t.get(0, String.class), t.get(1))).collect(Collectors.toList());
+        List<BestSellerResponse> result = resTup.stream().map(t->new BestSellerResponse(t.get(0, String.class), t.get(1,String.class) , t.get(2))).collect(Collectors.toList());
         return( result );
     }
 

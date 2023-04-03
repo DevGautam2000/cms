@@ -10,6 +10,11 @@ import javax.persistence.ManyToMany;
 
 import lombok.*;
 
+/**
+ * Cart Entity
+ * A cart has an id
+ * A cart has many cart items.
+ */
 @Getter
 @Setter
 @ToString
