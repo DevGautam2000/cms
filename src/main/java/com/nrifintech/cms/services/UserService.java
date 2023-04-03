@@ -40,9 +40,6 @@ public class UserService implements Validator {
 
 	public User addUser(User user) throws IOException, NoSuchAlgorithmException {
 		User exUser = this.getExistingUser(user.getEmail());
-
-	
-		
 		
 		if (isNull(exUser)) {
 			Wallet w = new Wallet();
@@ -53,7 +50,6 @@ public class UserService implements Validator {
 				String url = this.imageService.uploadImage(user.getEmail(), user.getRole().toString() , user.getAvatar() , 0);
 				user.setAvatar(url);
 				userRepo.save(user);
-				
 			}
 		}
 		

@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 import com.nrifintech.cms.types.ImageFileDecider;
@@ -41,13 +43,33 @@ public class ImageService {
         return hexString.toString();
     }
 
+    public boolean isValid(String imageBase64){
+        if( imageBase64 == null ){
+            return(false);
+        }
+        if( imageBase64.length() == 0 ){
+            return(true);
+        }
+        String pattern = "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(imageBase64);
+
+        if(m.find()){
+            return(true);
+        }
+        else{
+            return(false);
+        }
+    }
+
     public String uploadImage(String imageName , String type ,  String imageBase64  , int deciderFlag) throws IOException, NoSuchAlgorithmException{
         byte[] image = Base64.getDecoder().decode(imageBase64);
         
         String path = "src\\main\\resources\\static\\assets\\" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "\\" +  toHexString(getSHA(type + "_" + imageName)) + ".webp";
         File file = new File(path);
-        OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
-        outputStream.write(image);
+        try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
+            outputStream.write(image);
+        }
         String url = "http://localhost:8080/content/assets/" + ImageFileDecider.values()[deciderFlag].toString().toLowerCase() + "/" +  toHexString(getSHA(type + "_" + imageName)) + ".webp";
         return(url);
     } 
@@ -57,5 +79,4 @@ public class ImageService {
         File file = new File(path);
         return file.delete();
     }
-    //toHexString(getSHA(s3))
 }
