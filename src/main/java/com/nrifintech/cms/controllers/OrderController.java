@@ -239,7 +239,7 @@ public class OrderController {
 				Boolean isPayable = walletService.checkMinimumAmount(wallet);
 
 				if (Boolean.FALSE.equals(isPayable))
-					return Response.setErr("Low wallet balance (Min: ₹"+ WalletService.LIMIT +").", HttpStatus.NOT_ACCEPTABLE);
+					return Response.setErr("Low wallet balance (Min: "+ WalletService.LIMIT +").", HttpStatus.NOT_ACCEPTABLE);
 
 				Order lunchOrder = orderService.addNewOrder(MealType.Lunch);
 				Order breakfastOrder = orderService.addNewOrder(MealType.Breakfast);

@@ -174,6 +174,11 @@ public class MenuController {
 
 			String menuStatus = m.getApproval().toString();
 
+			if(menuStatus.equals(Approval.Rejected.toString())){
+				this.applicationEventPublisher.publishEvent( new MenuStatusChangeEvent(m) );
+				return Response.setMsg("Menu " + m.getApproval().toString().toLowerCase() + ".", HttpStatus.OK);
+			}
+
 			if (!menuStatus.equals(Approval.Pending.toString()))
 				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
