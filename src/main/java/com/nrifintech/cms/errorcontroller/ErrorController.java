@@ -11,11 +11,14 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.nrifintech.cms.errorhandler.ImageFailureException;
@@ -260,7 +263,30 @@ public class ErrorController extends ResponseEntityExceptionHandler {
   * @return A Response object with the error message and the status code.
   */
   @ExceptionHandler({ImageFailureException.class})
-  public Response ImageException(Exception e){
+  public Response imageException(Exception e){
     return Response.setErr("Image is corrupt or file/format not supported", HttpStatus.BAD_REQUEST);
+  }
+
+ /**
+  * If a NullPointerException is thrown, return a response with the message "Unexpected null value" and
+  * a status of 400
+  * 
+  * @param e The exception that was thrown
+  * @return A Response object with the error message and the status code.
+  */
+  @ExceptionHandler({NullPointerException.class})
+  public Response nullException(Exception e){
+    return Response.setErr("Unexpected null value", HttpStatus.BAD_REQUEST);
+  }
+
+  /**
+   * If the user passes in a parameter that is not expected, return a 400 error
+   * 
+   * @param e The exception that was thrown
+   * @return A Response object.
+   */
+  @ExceptionHandler({ MethodArgumentTypeMismatchException.class })
+  public Response wrongParams(Exception e){
+    return Response.setErr("Unexpected attributes passed", HttpStatus.BAD_REQUEST);
   }
 }
