@@ -4,6 +4,8 @@ import com.nrifintech.cms.entities.Item;
 import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.ItemRepo;
+import com.nrifintech.cms.types.ItemType;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +24,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +34,9 @@ public class ItemServiceTest {
 
     @Mock
     private ItemRepo itemRepo;
+
+    @Mock
+    private ImageService imageService;
 
     @InjectMocks
     private ItemService itemService;
@@ -43,13 +50,16 @@ public class ItemServiceTest {
     @Test
     public  void testAddItemSuccess() throws IOException, NoSuchAlgorithmException, ImageFailureException{
 
-        Item item = mock(Item.class);
+        Item item = new Item();
         item.setId(20);
         item.setName("Chicken");
+        item.setItemType(ItemType.NonVeg);
+        item.setImagePath("abc.jpg");
 
         ItemService mock = mock(ItemService.class);
         Mockito.when(mock.getItems()).thenReturn(new ArrayList<>());
         Mockito.when(itemRepo.save(any(Item.class))).thenReturn(item);
+        Mockito.when(imageService.uploadImage( anyString() , anyString() , anyString() , anyInt() )).thenReturn("url");
 
         Item expectedItem = itemService.addItem(item);
 
@@ -60,9 +70,11 @@ public class ItemServiceTest {
     @Test
     public  void testAddItemFailure() throws IOException, NoSuchAlgorithmException, ImageFailureException{
 
-        Item item = mock(Item.class);
+        Item item = new Item();
         item.setId(20);
         item.setName("Chicken");
+        item.setItemType(ItemType.NonVeg);
+        item.setImagePath("abc.jpg");
 
         List<Item> exItems = new ArrayList<>();
         exItems.add(Item.builder().id(22).name("Chicken").build());
@@ -70,6 +82,7 @@ public class ItemServiceTest {
         ItemService mock = mock(ItemService.class);
         Mockito.when(mock.getItems()).thenReturn(exItems);
         Mockito.when(itemRepo.save(any(Item.class))).thenReturn(null);
+        Mockito.when(imageService.uploadImage( anyString() , anyString() , anyString() , anyInt() )).thenReturn("url");
 
         Item expectedItem = itemService.addItem(item);
 

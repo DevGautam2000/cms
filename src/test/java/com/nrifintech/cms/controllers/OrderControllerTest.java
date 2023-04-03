@@ -634,6 +634,7 @@ public class OrderControllerTest extends MockMvcSetup {
         Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
 
         assertThat(HttpStatus.NOT_ACCEPTABLE.value(), is(res.getStatus()));
+        // assert res.getMessage().toString().contains("low wallet balance.");
         assertThat("low wallet balance.", is(res.getMessage().toString().trim().toLowerCase()));
 
     }

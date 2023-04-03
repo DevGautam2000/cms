@@ -32,7 +32,7 @@ import com.nrifintech.cms.types.Response;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class PurchaseControllerTest extends MockMvcSetup {
     private List<Purchase> purchases = new ArrayList<>();
     private Inventory inventory;

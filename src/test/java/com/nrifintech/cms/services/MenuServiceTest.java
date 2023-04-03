@@ -146,8 +146,8 @@ public class MenuServiceTest {
 
     @Test
     void testApproveMenu() {
-        assertEquals(true, menuService.approveMenu(menues.get(0), 1));
-        assertEquals(false, menuService.approveMenu(menues.get(2), 2));
+        assertEquals(Approval.Approved , menuService.approveMenu(menues.get(0), 1).getApproval());
+        assertEquals(null, menuService.approveMenu(menues.get(2), 2));
         // assertEquals(menues.get(0) , menuService.approveMenu(menues.get(0), 1));
         // assertEquals(null, menuService.approveMenu(menues.get(2), 2));
     }
