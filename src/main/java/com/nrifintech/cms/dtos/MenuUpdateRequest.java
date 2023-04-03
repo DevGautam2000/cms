@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * This class is used to update a menu item
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -5,12 +5,16 @@ import java.util.Map;
 
 import com.nrifintech.cms.types.WeekDay;
 
-
+/**
+ * It's a class that has a static variable WEEKDAY, a static variable days, a static method getDays,
+ * and an enum Month
+ */
 public class Calendar {
 
 	public static WeekDay WEEKDAY;
 	public static Map<WeekDay, Integer> days = new HashMap<>();
 
+	// Initializing the static variable days.
 	static {
 		days.put(WeekDay.Monday, 1);
 		days.put(WeekDay.Tuesday, 2);
@@ -23,6 +27,15 @@ public class Calendar {
 		NONE, January, February, March, April, May, June, July, August, September, November, December
 
 	};
+
+	/**
+	 * It returns the number of days in a month.
+	 * 
+	 * @param month The month for which you want to get the number of days.
+	 * @param year  The year for which you want to get the number of days in the
+	 *              month.
+	 * @return The number of days in the month.
+	 */
 
 	public static Integer getDays(Month month, Integer year) {
 

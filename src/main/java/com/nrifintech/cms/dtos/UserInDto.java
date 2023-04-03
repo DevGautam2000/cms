@@ -12,6 +12,9 @@ import com.nrifintech.cms.types.UserStatus;
 
 import lombok.*;
 
+/**
+ * UserInDto is a class that contains the information of a user
+ */
 @Getter
 @Setter
 @AllArgsConstructor

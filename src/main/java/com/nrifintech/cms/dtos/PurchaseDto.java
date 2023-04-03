@@ -5,6 +5,10 @@ import com.nrifintech.cms.entities.Inventory;
 
 import lombok.*;
 
+/**
+ * PurchaseDto is a class that contains the following fields: refId, quantity, amount, time, and
+ * inventoryRef
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

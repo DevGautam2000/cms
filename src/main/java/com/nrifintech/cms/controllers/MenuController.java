@@ -28,6 +28,9 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 
+/**
+ * > This class is a controller that handles requests to the `/menu` endpoint
+ */
 @RestController
 @RequestMapping(Route.Menu.prefix)
 public class MenuController {
@@ -41,6 +44,12 @@ public class MenuController {
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 
+	/**
+	 * It creates a new menu.
+	 * 
+	 * @param menuDto This is the object that will be sent to the server.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Menu.addMenu)
 	public Response newMenu(@RequestBody MenuDto menuDto) {
 		Menu menu = new Menu(menuDto);
@@ -53,6 +62,13 @@ public class MenuController {
 
 	}
 
+	/**
+	 * > Submit a menu for review
+	 * 
+	 * @param id The id of the menu to be submitted.
+	 * @param principal This is the user who is logged in.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Menu.submitMenu + "/{id}")
 	public Response submitMenu(@PathVariable Integer id, Principal principal) {
 
@@ -90,6 +106,12 @@ public class MenuController {
 		return Response.setErr("Menu cannot be added by user.", HttpStatus.NOT_FOUND);
 	}
 
+	/**
+	 * > This function returns a menu with the given id
+	 * 
+	 * @param id The id of the menu to be retrieved.
+	 * @return A Response object.
+	 */
 	@ErrorHandlerImplemented(handler = NotFoundException.class)
 	@GetMapping(Route.Menu.getMenu + "/{id}")
 	public Response getMenu(@PathVariable Integer id) {
@@ -97,6 +119,12 @@ public class MenuController {
 		return Response.set(m, HttpStatus.OK);
 	}
 
+	/**
+	 * It returns the monthly menu for the user.
+	 * 
+	 * @param principal This is the user object that is passed to the controller.
+	 * @return A list of Menu objects.
+	 */
 	@GetMapping(Route.Menu.getMonthMenu)
 	public Response getMonthlyMenu(Principal principal) {
 
@@ -104,6 +132,12 @@ public class MenuController {
 		return Response.set(monthlyMenu, HttpStatus.OK);
 	}
 
+	/**
+	 * It removes a menu from the database.
+	 * 
+	 * @param menuId The id of the menu to be removed.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Menu.removeMenu + "/{menuId}")
 	public Response removeMenu(@PathVariable Integer menuId) {
 
@@ -121,6 +155,13 @@ public class MenuController {
 
 	}
 
+	/**
+	 * > Approve a menu by setting its approval status to either `Approved` or `Rejected`
+	 * 
+	 * @param menuId The id of the menu to be approved.
+	 * @param approvalStatusId The status of the menu.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Menu.approveMenu + "/{menuId}/{approvalStatusId}")
 	public Response approveMenu(@PathVariable Integer menuId, @PathVariable Integer approvalStatusId) {
 
@@ -148,6 +189,13 @@ public class MenuController {
 
 	}
 
+	/**
+	 * > Add items to a menu
+	 * 
+	 * @param menuId The id of the menu you want to add items to.
+	 * @param itemIds a list of item ids to add to the menu
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Item.addItems + "tomenu/{menuId}/{itemIds}")
 	public Response addItemsToMenu(@PathVariable Integer menuId, @PathVariable List<String> itemIds) {
 
@@ -159,6 +207,13 @@ public class MenuController {
 
 	}
 
+	/**
+	 * > Removes an item from a menu
+	 * 
+	 * @param menuId The id of the menu you want to remove an item from.
+	 * @param itemId The id of the item to be removed from the menu.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Menu.removeFromMenu + "/{menuId}/{itemId}")
 	public Response removeItemFromMenu(@PathVariable Integer menuId, @PathVariable Integer itemId) {
 		Menu m = menuService.removeItemFromMenu(menuId, itemId);
@@ -170,6 +225,13 @@ public class MenuController {
 		return Response.setErr("Error removing item from menu.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	/**
+	 * It returns a list of menus for a particular date
+	 * 
+	 * @param date The date for which you want to get the menu.
+	 * @param principal This is the user who is logged in.
+	 * @return A list of menus
+	 */
 	@GetMapping(Route.Menu.getByDate + "/{date}")
 	public Response getMenuByDate(@PathVariable Date date, Principal principal) {
 

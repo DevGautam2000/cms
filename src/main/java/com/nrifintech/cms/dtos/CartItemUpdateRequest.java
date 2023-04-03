@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * This class is used to update the quantity of a cart item
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

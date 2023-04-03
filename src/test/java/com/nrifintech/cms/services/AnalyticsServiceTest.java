@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +148,7 @@ public class AnalyticsServiceTest {
     public void testGetFeedBackReport() {
         //
         when(feedBackRepo.findAll()).thenReturn(
-            List.of(new FeedBack())
+            Arrays.asList(new FeedBack())
         );
         when(feedBackRepo.feedbackStats()).thenReturn(
             MockMvcSetup

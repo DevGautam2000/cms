@@ -19,6 +19,9 @@ import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateNotFoundException;
 
+/**
+ * This class is used to send emails using SMTP
+ */
 @Service
 public class SMTPservices {
 
@@ -29,6 +32,12 @@ public class SMTPservices {
     Configuration fmConfiguration;
 
     
+    /**
+     * It takes an EmailModel object, creates a MimeMessage object, and sends the email
+     * 
+     * @param mail This is the object of the EmailModel class.
+     * @return A boolean value.
+     */
     public boolean sendMail(EmailModel mail) throws MessagingException, TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException{
 		MimeMessage mimeMessage =javaMailSender.createMimeMessage();
 		boolean flag = false;
@@ -56,6 +65,13 @@ public class SMTPservices {
 		return(flag);
     }
  
+   /**
+    * It takes a map of key-value pairs and a template name, and returns a string
+    * 
+    * @param model A map of key-value pairs that will be used to populate the template.
+    * @param templateName The name of the template file.
+    * @return The content of the template.
+    */
     public String getContentFromTemplate(Map <String, String >model, String templateName) throws IOException, TemplateException     { 
         StringBuffer content = new StringBuffer();
  

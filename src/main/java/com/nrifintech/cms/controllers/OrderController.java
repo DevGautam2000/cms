@@ -52,6 +52,9 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Status;
 import com.nrifintech.cms.utils.SameRoute;
 
+/**
+ * > This class is a Spring controller that handles requests to the `/order` endpoint
+ */
 @RestController
 @RequestMapping(Route.Order.prefix)
 public class OrderController {
@@ -79,6 +82,12 @@ public class OrderController {
 
 	private String orderNotFoundMessage = "Order not found.";
 
+	/**
+	 * It takes a list of orders, adds them to the database, and returns a response
+	 * 
+	 * @param orders A list of orders to be added.
+	 * @return A response object with a message and a status code.
+	 */
 	@PostMapping(Route.Order.addOrders)
 	public Response addOrders(@RequestBody List<Order> orders) {
 
@@ -89,9 +98,13 @@ public class OrderController {
 		}
 
 		return Response.setErr("Error adding orders.", HttpStatus.INTERNAL_SERVER_ERROR);
-
 	}
 
+	/**
+	 * > Get all orders from the database
+	 * 
+	 * @return A list of orders.
+	 */
 	@GetMapping(Route.Order.getOrders)
 	public Response getOrders() {
 		List<Order> o = orderService.getOrders();
@@ -104,6 +117,12 @@ public class OrderController {
 
 	}
 
+	/**
+	 * > Get a list of orders by their orderIds
+	 * 
+	 * @param orderIds A list of order ids.
+	 * @return A list of orders.
+	 */
 	@SameRoute
 	@GetMapping(Route.Order.getOrders + "/{orderIds}")
 	public Response getOrders(@PathVariable List<String> orderIds) {
@@ -118,6 +137,13 @@ public class OrderController {
 
 	}
 
+	/**
+	 * It adds a feedback to an order
+	 * 
+	 * @param orderId The id of the order to which the feedback is to be added.
+	 * @param feedBackDto This is the object that will be sent to the server.
+	 * @return A response object with a message and a status code.
+	 */
 	@PostMapping(Route.FeedBack.addFeedback + "/{orderId}")
 	public Response addFeedback(@PathVariable Integer orderId, @RequestBody FeedBackDto feedBackDto) {
 		FeedBack feedBack = new FeedBack(feedBackDto);
@@ -134,6 +160,14 @@ public class OrderController {
 
 	}
 
+	/**
+	 * > It updates the status of an order and sends an email to the user if the order is delivered
+	 * 
+	 * @param orderId the id of the order to be updated
+	 * @param statusId the status id of the order.
+	 * @param principal This is the user who is logged in.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Order.updateStatus + "/{orderId}/{statusId}")
 	public Response updateOrderStatus(@PathVariable Integer orderId, @PathVariable Integer statusId , Principal principal) {
 
@@ -164,12 +198,17 @@ public class OrderController {
 		return Response.setErr(orderNotFoundMessage, HttpStatus.BAD_REQUEST);
 	}
 
-	// for Canteen users to add a new order for a normal user
+	/**
+	 * It places an order for the user with the given id
+	 * 
+	 * @param id The id of the user who is placing the order.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.Order.placeOrder + "/{id}")
 	public Response placeOrder(@PathVariable Integer id) {
 
-		if (!menuService.isServingToday())
-			return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
+		// if (!menuService.isServingToday())
+		// 	return Response.setErr("No food will be served tomorrow.", HttpStatus.NOT_ACCEPTABLE);
 //		***********************************************
 
 
@@ -344,6 +383,13 @@ public class OrderController {
 		return Response.setErr("User does not exist.", HttpStatus.BAD_REQUEST);
 	}
 
+	/**
+	 * It cancels the order.
+	 * 
+	 * @param principal The principal object is used to get the user's email address.
+	 * @param orderId The order id of the order to be cancelled.
+	 * @return Response object
+	 */
 	@PostMapping(Route.Order.cancelOrder + "/{orderId}")
 	public Response cancelOrder(Principal principal, @PathVariable Integer orderId) {
 

@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * UsersByRole is a class that has a Role and a count of users with that role.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

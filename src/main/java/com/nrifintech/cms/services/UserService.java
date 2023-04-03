@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.nrifintech.cms.entities.User;
 import com.nrifintech.cms.entities.Wallet;
+import com.nrifintech.cms.errorhandler.ImageFailureException;
 import com.nrifintech.cms.errorhandler.NotFoundException;
 import com.nrifintech.cms.repositories.UserRepo;
 import com.nrifintech.cms.utils.Validator;
@@ -38,11 +39,8 @@ public class UserService implements Validator {
 		return userRepo.findById(id).orElseThrow(() -> new NotFoundException("User"));
 	}
 
-	public User addUser(User user) throws IOException, NoSuchAlgorithmException {
+	public User addUser(User user) throws IOException, NoSuchAlgorithmException, ImageFailureException {
 		User exUser = this.getExistingUser(user.getEmail());
-
-	
-		
 		
 		if (isNull(exUser)) {
 			Wallet w = new Wallet();
@@ -53,7 +51,6 @@ public class UserService implements Validator {
 				String url = this.imageService.uploadImage(user.getEmail(), user.getRole().toString() , user.getAvatar() , 0);
 				user.setAvatar(url);
 				userRepo.save(user);
-				
 			}
 		}
 		

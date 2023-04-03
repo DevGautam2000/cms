@@ -12,12 +12,19 @@ import lombok.NoArgsConstructor;
 
 
 
+/**
+ * This class is used to convert the User entity to a DTO
+ */
 public class UserDto{
 
 	private UserDto() {
 		throw new IllegalStateException("Utility class");
 	  }
 	  
+	/**
+	 * This class is a wrapper for the User class. It is used to return a subset of the User class to the
+	 * client
+	 */
 	@Data
 	public static class Privileged{
 		
@@ -37,6 +44,9 @@ public class UserDto{
 		}
 		
 	}
+	/**
+	 * It's a class that contains the fields that are to be returned to the client
+	 */
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Data
