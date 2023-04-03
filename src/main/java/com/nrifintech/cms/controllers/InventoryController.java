@@ -20,8 +20,13 @@ import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.types.Response;
 
-@RestController
+
+
+/**
+ * > This class is a controller that handles requests to the `/inventory` route
+ */
 @RequestMapping(Route.Inventory.prefix)
+@RestController
 public class InventoryController {
     
     @Autowired
@@ -30,6 +35,13 @@ public class InventoryController {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * > This function takes a JSON object, converts it to a Java object, saves it to the database, and
+     * returns the saved object
+     * 
+     * @param inventoryDto This is the object that will be sent to the server.
+     * @return A Response object.
+     */
     @PostMapping(Route.Inventory.saveOne)
     public Response saveOne(@RequestBody InventoryDto inventoryDto){
         Inventory inventory = new Inventory(inventoryDto);
@@ -40,11 +52,23 @@ public class InventoryController {
         return( Response.set(i,HttpStatus.OK) );
     }
 
+    /**
+     * It saves all the inventory items in the database.
+     * 
+     * @param inventory This is the list of inventory objects that we want to save.
+     * @return A Response object with the inventory list and a status of OK.
+     */
     @PostMapping(Route.Inventory.saveAll)
     public Response saveAll(@RequestBody List<Inventory> inventory){
         return( Response.set(this.inventoryService.addAlltoInventory(inventory),HttpStatus.OK) );
     }
 
+    /**
+     * > This function gets an inventory by id
+     * 
+     * @param id The id of the inventory you want to get.
+     * @return A Response object.
+     */
     @GetMapping(Route.Inventory.getById + "{id}")
     public Response getById(@PathVariable int id){
         Inventory inventory = this.inventoryService.getInventoryById(id);
@@ -56,12 +80,23 @@ public class InventoryController {
         }
     }
 
+    /**
+     * > This function returns a list of all inventory items
+     * 
+     * @return A list of inventory objects
+     */
     @GetMapping(Route.Inventory.get)
     public Response getAll(){
         List<Inventory> inventory = this.inventoryService.getAllInventory();
         return Response.set(inventory, HttpStatus.OK);
     }
 
+    /**
+     * > This function will return a list of inventory items that match the name passed in the URL
+     * 
+     * @param name The name of the inventory item
+     * @return A list of inventory objects
+     */
     @GetMapping(Route.Inventory.getByName + "{name}")
     public Response getByName(@PathVariable String name){
         List<Inventory> inventory = this.inventoryService.getInventoryByName(name);
@@ -73,6 +108,12 @@ public class InventoryController {
         }
     }
 
+   /**
+    * > This function deletes an inventory item by its id
+    * 
+    * @param id The id of the inventory to be deleted
+    * @return A Response object is being returned.
+    */
     @GetMapping(Route.Inventory.remove + "{id}")
     public Response delete(@PathVariable int id){
         boolean flag = this.inventoryService.removeInventoryById(id);
@@ -82,12 +123,25 @@ public class InventoryController {
         return Response.setErr("Deletion failed", HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * This function is used to update the quantity in hand of a particular item in the inventory
+     * 
+     * @param id The id of the item you want to update
+     * @param qtyhand The quantity in hand of the item
+     */
     @GetMapping(Route.Inventory.updateQtyInHand + "{id}" + "/" + "{qtyhand}")
     public void updateQtyInHand(@PathVariable int id , @PathVariable double qtyhand){
         this.inventoryService.updateQtyInHand(qtyhand, id);
 
     }
 
+    /**
+     * This function updates the quantity requested of an inventory item and sends an email to all
+     * admin users
+     * 
+     * @param id the id of the inventory item
+     * @param qtyreq the new quantity requested
+     */
     @GetMapping(Route.Inventory.updateQtyReq + "{id}" + "/" + "{qtyreq}")
     public void updateQtyRequested(@PathVariable int id , @PathVariable double qtyreq){
         this.inventoryService.updateQtyRequested(qtyreq, id);

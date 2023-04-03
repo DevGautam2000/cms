@@ -9,6 +9,12 @@ import com.nrifintech.cms.entities.Menu;
 
 public interface MenuRepo extends JpaRepository<Menu,Integer>{
 
+	/**
+	 * Find all menus for a given day.
+	 * 
+	 * @param forDay The date for which you want to find the menu.
+	 * @return A list of Menu objects.
+	 */
 	List<Menu> findMenuByDate(Date forDay);
 	
 }

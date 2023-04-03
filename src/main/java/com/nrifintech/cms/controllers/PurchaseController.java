@@ -21,6 +21,9 @@ import com.nrifintech.cms.services.InventoryService;
 import com.nrifintech.cms.services.PurchaseService;
 import com.nrifintech.cms.types.Response;
 
+/**
+ * > This class is a Spring controller that handles requests to the `/purchase` endpoint
+ */
 @RestController
 @RequestMapping(Route.Purchase.prefix)
 public class PurchaseController {
@@ -34,6 +37,12 @@ public class PurchaseController {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * > This function will save the purchase request and will send an email to all canteen users
+     * 
+     * @param purchaseDto This is the object that will be sent from the frontend.
+     * @return Response object is being returned.
+     */
     @PostMapping(Route.Purchase.save)
     public Response save(@RequestBody PurchaseDto purchaseDto){
         Purchase purchase = new Purchase(purchaseDto);
@@ -49,6 +58,12 @@ public class PurchaseController {
         return( Response.set(obj , HttpStatus.OK));
     }
 
+   /**
+    * It rolls back a purchase.
+    * 
+    * @param id The id of the purchase to be rolled back.
+    * @return A Response object.
+    */
     @GetMapping(Route.Purchase.rollback+"{id}")
     public Response rollback(@PathVariable int id){
         Purchase purchase = this.purchaseService.rollbackPurchase(id);
@@ -58,6 +73,12 @@ public class PurchaseController {
         return( Response.set(purchase, HttpStatus.OK));
     }
 
+   /**
+    * > This function gets a purchase by its id
+    * 
+    * @param id The id of the purchase you want to get.
+    * @return A Response object.
+    */
     @GetMapping(Route.Purchase.get+"{id}")
     public Response getById(@PathVariable int id){
         Purchase purchase = this.purchaseService.getPurchaseById(id);
@@ -67,6 +88,11 @@ public class PurchaseController {
         return( Response.set(purchase, HttpStatus.OK));
     }
 
+    /**
+     * It returns a list of all purchases.
+     * 
+     * @return A list of all purchases
+     */
     @GetMapping(Route.Purchase.get)
     public Response get(){
         List<Purchase> purchase = this.purchaseService.getAllPurchase();

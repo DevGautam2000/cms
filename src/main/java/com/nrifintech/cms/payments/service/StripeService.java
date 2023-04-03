@@ -10,16 +10,27 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 
+// A service class which is used to create a charge.
 @Service
 public class StripeService {
 
 	@Value("${stripe.key.secret}")
 	private String API_SECRET_KEY;
 
+	// This is the default constructor.
 	public StripeService() {
 
 	}
 
+	/**
+	 * It creates a charge using the Stripe API
+	 * 
+	 * @param email The email address of the customer.
+	 * @param token The token returned by Stripe.js.
+	 * @param amount The amount to be charged, in the smallest currency unit. For example, if you want to
+	 * charge .50, this would be 1050.
+	 * @return The chargeId is being returned.
+	 */
 	public String createCharge(String email, String token, int amount) throws StripeException {
 
 		String chargeId = null;

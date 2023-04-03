@@ -27,22 +27,32 @@ import com.nrifintech.cms.types.EmailStatus;
 import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.types.UserStatus;
-import com.nrifintech.cms.utils.ForDevelopmentOnly;
 
+/**
+ * > This class is a controller that handles requests to the `/user` endpoint
+ */
 @RestController
 @RequestMapping(Route.User.prefix)
 public class UserController {
 
 	@Autowired
 	private UserService userService;
+
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private ImageService imageService;
 
-	@ForDevelopmentOnly
+
+	/**
+	 * It adds a new user to the database.
+	 * 
+	 * @param userDto The user object that is sent from the frontend.
+	 * @return Response object
+	 */
 	@PostMapping(Route.User.addUser)
 	public Response addUser(@RequestBody UserInDto userDto) throws IOException, NoSuchAlgorithmException {
 		User user= new User(userDto);
@@ -64,6 +74,11 @@ public class UserController {
 		return Response.setMsg("User added.", HttpStatus.OK);
 	}
 
+	/**
+	 * > This function returns a list of all users in the database
+	 * 
+	 * @return A Response object.
+	 */
 	@GetMapping(Route.User.getUsers)
 	public Response getUsers() {
 		List<User> users = userService.getUsers();
@@ -74,6 +89,12 @@ public class UserController {
 		return Response.setErr("No users found.", HttpStatus.BAD_REQUEST);
 	}
 
+	/**
+	 * It removes a user from the database.
+	 * 
+	 * @param userDto This is the object that will be sent to the server.
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.User.removeUser)
 	public Response removeUser(@RequestBody UserInDto userDto) throws IOException, NoSuchAlgorithmException {
 		
@@ -87,6 +108,12 @@ public class UserController {
 
 	}
 
+	/**
+	 * > Get all orders for a user
+	 * 
+	 * @param userId The id of the user whose orders you want to get.
+	 * @return A list of orders.
+	 */
 	@GetMapping(Route.User.getOrders + "/{userId}")
 	public Response getOrders(@PathVariable Integer userId) {
 
@@ -100,6 +127,13 @@ public class UserController {
 
 	}
 
+	/**
+	 * It updates the status of a user
+	 * 
+	 * @param userId The id of the user to update.
+	 * @param statusId 0 = active, 1 = inactive
+	 * @return A Response object.
+	 */
 	@PostMapping(Route.User.updateStatus + "/{userId}/{statusId}")
 	public Response updateUserStatus(@PathVariable Integer userId, @PathVariable Integer statusId) {
 
@@ -119,6 +153,13 @@ public class UserController {
 				HttpStatus.OK);
 	}
 
+	/**
+	 * It toggles the subscription status of a user
+	 * 
+	 * @param id The id of the user
+	 * @param subStatusId 0 = unsubscribed, 1 = subscribed
+	 * @return A Response object.
+	 */
 	@GetMapping(Route.User.subscriptionToggler + "/{id}/{subStatusId}")
 	public Response subsciptionToggler(@PathVariable int id, @PathVariable int subStatusId){
 		if(subStatusId > 1) 
@@ -136,6 +177,12 @@ public class UserController {
 				HttpStatus.OK);
 	}
 
+	/**
+	 * > This function returns the email status of a user
+	 * 
+	 * @param userId The user's id
+	 * @return A Response object is being returned.
+	 */
 	@GetMapping(Route.User.getEmailStatus + "/{userId}")
 	public Response getEmailStatus(@PathVariable Integer userId) {
 

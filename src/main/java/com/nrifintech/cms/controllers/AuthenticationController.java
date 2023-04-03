@@ -34,6 +34,9 @@ import com.nrifintech.cms.types.Response;
 import com.nrifintech.cms.types.Role;
 import com.nrifintech.cms.utils.ErrorHandlerImplemented;
 import io.jsonwebtoken.JwtException;
+/**
+ * This class handles requests to the `/authentication` endpoint
+ */
 
 @RestController
 @RequestMapping(Route.Authentication.prefix)
@@ -57,6 +60,12 @@ public class AuthenticationController {
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 
+	/**
+	 * It generates a token for the user.
+	 * 
+	 * @param jwtRequest The request body that contains the username and password.
+	 * @return A JwtResponse object with the token.
+	 */
 	@ErrorHandlerImplemented(
 		handlers={UsernameNotFoundException.class , UserIsDisabledException.class})
 	@PostMapping(Route.Authentication.generateToken)
@@ -69,6 +78,13 @@ public class AuthenticationController {
 		return Response.set(new JwtResponse(token), HttpStatus.OK);
 	}
 
+	/**
+	 * It returns the current user's information
+	 * 
+	 * @param principal The principal object is the user object that is returned by the authentication
+	 * provider.
+	 * @return A Response object.
+	 */
 	@GetMapping(Route.Authentication.currentUser)
 	public Response getCurrentUser(Principal principal) {
 
@@ -87,6 +103,13 @@ public class AuthenticationController {
 		return Response.set(userDto, HttpStatus.OK);
 	}
 
+	/**
+	 * It takes in a username, generates a random token, saves it in the database, and sends an email to
+	 * the user with a link to reset their password
+	 * 
+	 * @param user The user object that contains the username of the user who forgot their password.
+	 * @return A Response object with a message and a status code.
+	 */
 	@PostMapping(Route.Authentication.forgotPassword)
 	public Response forgotPassword(@RequestBody JwtRequest user) {
 		//authService.forgetPassword(user.getUsername());
@@ -99,6 +122,15 @@ public class AuthenticationController {
 
 	}
 
+	/**
+	 * It takes a token and a JwtRequest object as parameters, and then calls the authService's
+	 * changePassword function, passing in the username, token, and encoded password from the JwtRequest
+	 * object
+	 * 
+	 * @param token The token that was sent to the user's email.
+	 * @param userInfo This is the object that contains the username and password.
+	 * @return A Response object with a message and a status code.
+	 */
 	@PostMapping(Route.Authentication.changePassword)
 	public Response changePassword(@RequestParam String token, @RequestBody JwtRequest userInfo) {
 
@@ -108,6 +140,13 @@ public class AuthenticationController {
 	}
 
 	
+	/**
+	 * > This function sends an email to the user with a link to reset their password
+	 * 
+	 * @param user The user object that contains the username of the user who wants to reset their
+	 * password.
+	 * @return A Response object with a message and a status code.
+	 */
 	@PostMapping(Route.Authentication.setNewPassword)
 	public Response setNewPassword(@RequestBody JwtRequest user) {
 
@@ -116,6 +155,15 @@ public class AuthenticationController {
 		return Response.setMsg("Email sent.", HttpStatus.OK);
 	}
 
+	/**
+	 * It takes a token and a JwtRequest object as parameters, and then calls the authService's
+	 * setNewPasswordAndActivate function, which takes the username, token, and encoded password from the
+	 * JwtRequest object as parameters
+	 * 
+	 * @param token The token that was sent to the user's email.
+	 * @param userInfo This is the object that contains the username and password.
+	 * @return A Response object with a message and a status code.
+	 */
 	@PostMapping(Route.Authentication.activateNewPassword)
 	public Response setNewPasswordAndActivate(@RequestParam String token, @RequestBody JwtRequest userInfo) {
 		

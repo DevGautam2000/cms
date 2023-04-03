@@ -1,13 +1,18 @@
 package com.nrifintech.cms.routes;
 
+/**
+ * It contains all the routes that are used in the application
+ */
 public class Route {
 	public static final String root="http://localhost:8080";
+	// Defining a route for the admin.
 	public interface Admin {
 		String prefix = "/admin/";
 
 		String getAdmin = "getadmin";
 	}
 
+	// Defining the routes for the user.
 	public interface User {
 		String prefix = "/user/";
 
@@ -26,6 +31,7 @@ public class Route {
 
 	}
 
+	// Defining the routes for the menu.
 	public interface Menu {
 		String prefix = "/menu/";
 
@@ -42,6 +48,7 @@ public class Route {
 		String submitMenu = "submitmenu";
 	}
 
+	// Defining the routes for the item.
 	public interface Item {
 		String prefix = "/item/";
 
@@ -51,6 +58,7 @@ public class Route {
 		String addItems = "additems";
 	}
 
+	// Defining the routes for the feedback.
 	public interface FeedBack {
 		String prefix = "/feedback/";
 
@@ -58,6 +66,7 @@ public class Route {
 		String getFeedback = "getfeedback";
 	}
 
+	// Defining the routes for the order.
 	public interface Order {
 		String prefix = "/order/";
 
@@ -75,6 +84,7 @@ public class Route {
 	
 	}
 
+	// Defining the routes for the cart.
 	public interface Cart {
 		String prefix = "/cart/";
 
@@ -88,6 +98,7 @@ public class Route {
 		String clear = "clear";
 	}
 
+	// Used to define the routes for the cart item.
 	public interface CartItem {
 		String prefix = "/cartitem/";
 
@@ -98,6 +109,7 @@ public class Route {
 	}
 
 
+	// Used to define the routes for the authentication.
 	public interface Authentication{
 		String prefix = "/auth/";
 		
@@ -111,12 +123,14 @@ public class Route {
 
 	}
 
+	// Defining the routes for the wallet.
 	public interface Wallet {
 		String prefix = "/wallet/";
 		String getWallet = "getwallet";
 		String addMoney = "addmoney";
 	}
 
+	// Defining the routes for the inventory.
 	public interface Inventory{
 		String prefix = "/inventory/";
 		String saveOne = "save/one";
@@ -129,6 +143,7 @@ public class Route {
 		String updateQtyInHand = "update/qtyhand/";
 	}
 
+	// Defining the routes for the purchase.
 	public interface Purchase {
 		String prefix = "/purchase/";
 		String save = "save";
@@ -136,6 +151,7 @@ public class Route {
 		String rollback = "rollback/";
 	}
 
+	// Defining the routes for the analytics.
 	public interface Analytics{
 		String prefix = "/analytics/";
 		String getTotalExp = "totalexp";
@@ -148,6 +164,7 @@ public class Route {
 		String getUserStats = "userstats";
 	}
 
+	// Defining the routes for the excel.
 	public interface Excel {
 		String prefix  = "/excel/";
 
