@@ -144,7 +144,7 @@ public class ErrorController extends ResponseEntityExceptionHandler {
     }
     
     @ExceptionHandler({ MessagingException.class, TemplateNotFoundException.class, MalformedTemplateNameException.class, 
-          ParseException.class, IOException.class, TemplateException.class })
+          ParseException.class,  TemplateException.class })
     public void smtpException(
       Exception ex, WebRequest request) {
     	Response.setErr(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
