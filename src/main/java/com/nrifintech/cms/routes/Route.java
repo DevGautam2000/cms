@@ -56,6 +56,7 @@ public class Route {
 		String getItem = "getitem";
 		String addItem = "additem";
 		String addItems = "additems";
+		String updateItems = "updateitem";
 	}
 
 	// Defining the routes for the feedback.

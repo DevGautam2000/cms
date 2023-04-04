@@ -91,4 +91,17 @@ public class ItemController {
 		return Response.setErr("Error adding item.", HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+
+	@PostMapping(Route.Item.updateItems)
+	public Response updateItem(@RequestBody ItemDto itemDto) {
+		if( itemDto == null || itemDto.getId() ==  null  ){
+			return Response.setErr("Sorry ID was null / empty or null post body",HttpStatus.BAD_REQUEST);
+		}
+		if( itemDto.getName() == null || itemDto.getName() == "" || itemDto.getItemType() == null || itemDto.getPrice() == null || itemDto.getPrice() < 0 || itemDto.getQuantity() == null || itemDto.getQuantity() < 0 ){
+			return Response.setErr("Sorry bad params",HttpStatus.BAD_REQUEST);
+		}
+		Item item = new Item(itemDto);
+		return Response.set(this.itemService.updateItem(item), HttpStatus.OK);
+	}
+
 }
