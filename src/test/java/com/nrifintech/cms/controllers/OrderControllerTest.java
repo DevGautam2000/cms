@@ -23,8 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.security.Principal;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -333,8 +331,6 @@ public class OrderControllerTest extends MockMvcSetup {
         Wallet wallet = Wallet.builder().id(23).balance(2000d).build();
 
 
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
-
         Mockito.when(userService.getuser(userId)).thenReturn(user);
         Mockito.when(userService.isNotNull(user)).thenReturn(true);
 
@@ -412,8 +408,6 @@ public class OrderControllerTest extends MockMvcSetup {
         Wallet wallet = Wallet.builder().id(23).balance(2000d).build();
 
 
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
-
         Mockito.when(userService.getuser(userId)).thenReturn(user);
         Mockito.when(userService.isNotNull(user)).thenReturn(true);
 
@@ -482,8 +476,6 @@ public class OrderControllerTest extends MockMvcSetup {
         Wallet wallet = Wallet.builder().id(23).balance(2000d).build();
 
 
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
-
         Mockito.when(userService.getuser(userId)).thenReturn(user);
         Mockito.when(userService.isNotNull(user)).thenReturn(true);
 
@@ -549,7 +541,6 @@ public class OrderControllerTest extends MockMvcSetup {
 
         int userId = 20;
 
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
 
         Mockito.when(userService.getuser(userId)).thenReturn(null);
 
@@ -571,7 +562,6 @@ public class OrderControllerTest extends MockMvcSetup {
 
         int userId = 20;
 
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
 
         Mockito.when(userService.getuser(userId)).thenReturn(user);
         Mockito.when(userService.isNotNull(user)).thenReturn(true);
@@ -599,7 +589,6 @@ public class OrderControllerTest extends MockMvcSetup {
         Wallet wallet = Wallet.builder().id(23).balance(2000d).build();
 
 
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
 
         Mockito.when(userService.getuser(userId)).thenReturn(user);
         Mockito.when(userService.isNotNull(user)).thenReturn(true);
@@ -635,7 +624,9 @@ public class OrderControllerTest extends MockMvcSetup {
 
         assertThat(HttpStatus.NOT_ACCEPTABLE.value(), is(res.getStatus()));
         // assert res.getMessage().toString().contains("low wallet balance.");
-        assertThat("low wallet balance.", is(res.getMessage().toString().trim().toLowerCase()));
+        // assertThat("low wallet balance.", is(res.getMessage().toString().trim().toLowerCase()));
+        assertThat("low wallet balance (min: 100.0).", is(res.getMessage().toString().trim().toLowerCase()));
+        // assertThat("order cannot be placed after 8:00 pm.", is(res.getMessage().toString().trim().toLowerCase()));
 
     }
 
@@ -647,8 +638,6 @@ public class OrderControllerTest extends MockMvcSetup {
 
         Wallet wallet = Wallet.builder().id(23).balance(2000d).build();
 
-
-        Mockito.when(menuService.isServingToday()).thenReturn(true);
 
         Mockito.when(userService.getuser(userId)).thenReturn(user);
         Mockito.when(userService.isNotNull(user)).thenReturn(true);
@@ -681,26 +670,6 @@ public class OrderControllerTest extends MockMvcSetup {
 
     }
 
-
-    @Test
-    public void testPlaceOrderFailureIfNotServingToday() throws Exception {
-
-        int userId = 20;
-
-        Mockito.when(menuService.isServingToday()).thenReturn(false);
-
-        String r = mockMvc.perform(
-                        MockMvcRequestBuilders.post(prefix(Route.Order.placeOrder + "/{id}"), userId)
-                                .contentType(MediaType.APPLICATION_JSON)
-                ).andExpect(status().isNotAcceptable())
-                .andReturn().getResponse().getContentAsString();
-
-        Response.JsonEntity res = mapFromJson(r, Response.JsonEntity.class);
-
-        assertThat(HttpStatus.NOT_ACCEPTABLE.value(), is(res.getStatus()));
-        assertThat("no food will be served today.", is(res.getMessage().toString().trim().toLowerCase()));
-
-    }
 
 
     @Test

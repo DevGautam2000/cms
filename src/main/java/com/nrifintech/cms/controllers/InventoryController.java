@@ -123,31 +123,46 @@ public class InventoryController {
         return Response.setErr("Deletion failed", HttpStatus.BAD_REQUEST);
     }
 
+   
     /**
-     * This function is used to update the quantity in hand of a particular item in the inventory
-     * 
-     * @param id The id of the item you want to update
-     * @param qtyhand The quantity in hand of the item
-     */
-    @GetMapping(Route.Inventory.updateQtyInHand + "{id}" + "/" + "{qtyhand}")
-    public void updateQtyInHand(@PathVariable int id , @PathVariable double qtyhand){
-        this.inventoryService.updateQtyInHand(qtyhand, id);
-
-    }
-
-    /**
-     * This function updates the quantity requested of an inventory item and sends an email to all
-     * admin users
+     * It updates the quantity in hand of a particular inventory item
      * 
      * @param id the id of the inventory item
-     * @param qtyreq the new quantity requested
+     * @param qtyhand the quantity that is being sold
+     * @return Response is a class that I have created.
      */
+    @GetMapping(Route.Inventory.updateQtyInHand + "{id}" + "/" + "{qtyhand}")
+    public Response updateQtyInHand(@PathVariable int id , @PathVariable double qtyhand){
+        Inventory i = this.inventoryService.getInventoryById(id);
+        if(i==null){
+            return Response.setErr("Inventory item not found",HttpStatus.NOT_FOUND);
+        }
+        Double presentInHand = i.getQuantityInHand();
+        if(presentInHand+qtyhand<0.0){
+            return Response.setErr("Sorry cannot update", HttpStatus.BAD_REQUEST);
+        }
+        this.inventoryService.updateQtyInHand(qtyhand, id);
+        return Response.set("Stocks updated", HttpStatus.OK);
+    }
+
+ 
+  /**
+   * It updates the quantity requested of an inventory item and sends an email to all admin users
+   * 
+   * @param id the id of the inventory item
+   * @param qtyreq the quantity requested
+   * @return A Response object.
+   */
     @GetMapping(Route.Inventory.updateQtyReq + "{id}" + "/" + "{qtyreq}")
-    public void updateQtyRequested(@PathVariable int id , @PathVariable double qtyreq){
+    public Response updateQtyRequested(@PathVariable int id , @PathVariable double qtyreq){
         this.inventoryService.updateQtyRequested(qtyreq, id);
         //this should go to all admin users...
         Inventory i = this.inventoryService.getInventoryById(id);
         this.applicationEventPublisher.publishEvent( new UpdateQtyReqEvent(new InventoryMail( i )) );
+        if(i==null){
+            return Response.setErr("Inventory item not found",HttpStatus.NOT_FOUND);
+        }
+        return Response.set("Updated Stocks", HttpStatus.OK);
     }
 
 }

@@ -120,7 +120,7 @@ public class AnalyticsServiceTest {
         when(cartItemRepo.getBestSeller(any(), any())).thenReturn(
             bestSellerResponse.stream().map(e->   
                 MockMvcSetup
-                .tupleOf(e.getName(), e.getCount(), String.class)
+                .tupleOf(e.getName(), e.getCount().toString(), String.class)
             ).collect(Collectors.toList())
         );
 
