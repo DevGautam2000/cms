@@ -96,4 +96,56 @@ public class MockMvcSetup {
              }
          };
      }
+
+     public static Tuple tupleOf(Object a, Object b ,Object c, Class<?> _class){
+        return  new Tuple(){
+ 
+             @Override
+             public <X> X get(TupleElement<X> tupleElement) {
+                 return null;
+             }
+     
+             @Override
+             public <X> X get(String s, Class<X> aClass) {
+                 return null;
+             }
+     
+             @Override
+             public Object get(String s) {
+                 return null;
+             }
+     
+             @Override
+             public <X> X get(int i, Class<X> aClass) {
+                 Map<Integer , Object> tuple = new HashMap<>();
+                 if(aClass.getName().equals(_class.getName())){
+                     tuple.put(0, a);
+                     tuple.put(1, b);
+                     tuple.put(2, c);
+                 }
+                 return (X) tuple.get(i);
+             }
+     
+             @Override
+             public Object get(int i) {
+                Map<Integer , Object> tuple = new HashMap<>();
+                
+                     tuple.put(0, a);
+                     tuple.put(1, b);
+                     tuple.put(2, c);
+                
+                 return tuple.get(i);
+             }
+     
+             @Override
+             public Object[] toArray() {
+                 return new Object[0];
+             }
+     
+             @Override
+             public List<TupleElement<?>> getElements() {
+                 return null;
+             }
+         };
+     }
 }

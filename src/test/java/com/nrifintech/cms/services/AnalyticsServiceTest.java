@@ -120,13 +120,13 @@ public class AnalyticsServiceTest {
         when(cartItemRepo.getBestSeller(any(), any())).thenReturn(
             bestSellerResponse.stream().map(e->   
                 MockMvcSetup
-                .tupleOf(e.getName(), e.getCount().toString(), String.class)
+                .tupleOf(e.getName(), "" , e.getCount().toString(), String.class)
             ).collect(Collectors.toList())
         );
 
-        
-        assertArrayEquals(bestSellerResponse.toArray(), 
-            analyticsService.getBestSeller("31-3-2023","31-3-2023").toArray()
+        System.out.println(bestSellerResponse);
+        assertEquals(bestSellerResponse.toString(), 
+            analyticsService.getBestSeller("31-3-2023","31-3-2023").toString()
         );
     }
 
