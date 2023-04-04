@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.nrifintech.cms.dtos.UrlQuantity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class OrderService implements Validator {
 
 	private static final Integer SERVER_LIMIT_MILLIS = 86400000; //difference in millis for 1 day
 	private static final LocalTime SERVING_TIME = LocalTime.parse("07:00");
-	
+
 
 	@Autowired
 	private OrderRepo orderRepo;
@@ -39,7 +40,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * It takes a list of orders, saves them to the database, and returns the saved orders
-	 * 
+	 *
 	 * @param orders The list of orders to be added.
 	 * @return A list of orders
 	 */
@@ -50,7 +51,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * It saves an order to the database
-	 * 
+	 *
 	 * @param order The order object that is to be saved.
 	 * @return The order object is being returned.
 	 */
@@ -61,7 +62,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * This function creates a new order and sets the order type to the order type passed in
-	 * 
+	 *
 	 * @param orderType The type of meal that the order is for.
 	 * @return A new Order object is being returned.
 	 */
@@ -75,7 +76,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * If the order exists, return it. If it doesn't, throw an exception
-	 * 
+	 *
 	 * @param id The id of the order you want to retrieve.
 	 * @return The order object is being returned.
 	 */
@@ -86,7 +87,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * > This function returns a list of all the orders in the database
-	 * 
+	 *
 	 * @return A list of all the orders in the database.
 	 */
 	public List<Order> getOrders() {
@@ -96,7 +97,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * > This function takes a list of order IDs and returns a list of orders
-	 * 
+	 *
 	 * @param orderIds List of order ids
 	 * @return A list of orders.
 	 */
@@ -119,9 +120,9 @@ public class OrderService implements Validator {
 
 	/**
 	 * It adds a feedback to an order
-	 * 
+	 *
 	 * @param orderId The id of the order
-	 * @param feedBack 
+	 * @param feedBack
 	 * @return The order object is being returned.
 	 */
 	public Object addFeedBackToOrder(Integer orderId, FeedBack feedBack) {
@@ -181,7 +182,7 @@ public class OrderService implements Validator {
 
 	/**
 	 * It takes a date as a parameter and then calls the autoArchive function in the orderRepo class
-	 * 
+	 *
 	 * @param date the date to be used to archive orders
 	 */
 	public void autoArchive(String date) {
@@ -191,7 +192,7 @@ public class OrderService implements Validator {
 	/**
 	 * If the difference between the current timestamp and the previous timestamp is less than or equal to
 	 * the server limit, then return true
-	 * 
+	 *
 	 * @param prev The timestamp of the previous request
 	 * @param curr The current timestamp
 	 * @return A Boolean value.
@@ -202,7 +203,7 @@ public class OrderService implements Validator {
 //		Timestamp prev = Timestamp.valueOf("2023-03-12 12:00:00");
 
 		return curr.getTime() - prev.getTime() <= SERVER_LIMIT_MILLIS;
-		
+
 	}
 
 /**
@@ -211,17 +212,24 @@ public class OrderService implements Validator {
  * @param date The date for which you want to get the order quantity.
  * @return A map of the item name and the quantity of that item that was ordered on the given date.
  */
-	public Map<String, Integer> getOrderQuantity(Date date){
+public Map<String, UrlQuantity> getOrderQuantity(Date date){
 
-		Map<String , Integer> result = new HashMap<>();
+	Map<String , UrlQuantity> result = new HashMap<>();
 
-		List<Order>  orders = orderRepo.findByOrderPlaced(date.toString());
-		if(!orders.isEmpty()) {
-			orders.stream().forEach(o -> o.getCartItems().forEach(item->{
-				result.put(item.getName() + "?url=" + item.getImagePath(), result.getOrDefault(item.getName(), 0) + item.getQuantity());
-			}));
-		}
-		return(result);
+	List<Order>  orders = orderRepo.findByOrderPlaced(date.toString());
+	if(!orders.isEmpty()) {
+		orders.stream().forEach(o -> o.getCartItems().forEach(item->{
+			if( result.get(item.getName()) == null ){
+				result.put(item.getName() , new UrlQuantity(item.getImagePath() , item.getQuantity()));
+			}
+			else {
+				result.get(item.getName()).setCount(result.get(item.getName()).getCount() + item.getQuantity());
+			}
+
+		}));
 	}
+	orders.stream().forEach(o->o.getCartItems().forEach(item->System.out.println(item)));
+	return(result);
+}
 
 }
