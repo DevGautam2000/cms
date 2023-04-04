@@ -66,7 +66,7 @@ public class PurchaseService {
         if( purchase==null ){
             return(null);
         }
-        if( inventoryRepo.findById(purchase.getInventoryRef().getId()).isEmpty()){
+        if( inventoryRepo.findById(purchase.getInventoryRef().getId()).isPresent()){
             return(null);
         }
         purchaseRepo.delete(purchase);

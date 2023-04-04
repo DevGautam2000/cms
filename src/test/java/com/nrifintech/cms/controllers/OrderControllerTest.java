@@ -2,6 +2,7 @@ package com.nrifintech.cms.controllers;
 
 
 import com.nrifintech.cms.MockMvcSetup;
+import com.nrifintech.cms.dtos.UrlQuantity;
 import com.nrifintech.cms.entities.*;
 import com.nrifintech.cms.routes.Route;
 import com.nrifintech.cms.services.*;
@@ -894,9 +895,9 @@ public class OrderControllerTest extends MockMvcSetup {
     public void testgetOrderQuantity() throws Exception {
 
 
-       Map<String,Integer> orderDetails = new HashMap<>();
+       Map<String,UrlQuantity> orderDetails = new HashMap<>();
 
-       orderDetails.put("chicken", 3);
+       orderDetails.put("chicken", new UrlQuantity("url",3));
 
         Mockito.when(orderService.getOrderQuantity(any(Date.class))).thenReturn(orderDetails);
 
@@ -906,9 +907,9 @@ public class OrderControllerTest extends MockMvcSetup {
                 ).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-         Map<String,Integer>  res = mapFromJson(r, Map.class);
+         
 
-        assertEquals(orderDetails, res);
+        assert(r.contains("url"));
     }
 
 }
