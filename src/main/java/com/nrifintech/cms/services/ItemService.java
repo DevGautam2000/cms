@@ -101,5 +101,16 @@ public class ItemService implements Validator {
         return items;
     }
 
+    public Item updateItem(Item item){
+        Item i = this.getItem(item.getId());
+        i.setName(item.getName());
+        i.setDescription(item.getDescription());
+        i.setImagePath(item.getImagePath());
+        i.setPrice(item.getPrice());
+        i.setQuantity(item.getQuantity());
+        i.setItemType(item.getItemType());
+        return this.itemRepo.save(i);
+    }
+
 
 }

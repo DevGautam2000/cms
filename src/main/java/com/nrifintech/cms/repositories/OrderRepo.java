@@ -83,6 +83,6 @@ public interface OrderRepo extends JpaRepository<Order, Integer> {
      * @param date The date to search for.
      * @return A list of orders
      */
-    @Query(value = "select * from orders where Cast(order_placed as date) = :date", nativeQuery = true)
+    @Query(value = "select * from orders where Cast(order_placed as date) = :date and status != 3", nativeQuery = true)
     public List<Order> findByOrderPlaced(@Param("date") String date);
 }

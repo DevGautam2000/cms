@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.nrifintech.cms.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nrifintech.cms.dtos.FeedBackDto;
-import com.nrifintech.cms.dtos.OrderResponseRequest;
-import com.nrifintech.cms.dtos.OrderToken;
-import com.nrifintech.cms.dtos.WalletEmailResponse;
 import com.nrifintech.cms.entities.Cart;
 import com.nrifintech.cms.entities.CartItem;
 import com.nrifintech.cms.entities.FeedBack;
@@ -455,7 +452,7 @@ public class OrderController {
 
 	@GetMapping(Route.Order.getOrderQuantity + "/{date}")
 	public Response getOrderQuantity(@PathVariable Date date){
-		Map<String,Integer> responseMap = orderService.getOrderQuantity(date);
+		Map<String, UrlQuantity> responseMap = orderService.getOrderQuantity(date);
 		if(responseMap.isEmpty()){
 			return( Response.setErr("No orders as of now", HttpStatus.NOT_FOUND));
 		}
