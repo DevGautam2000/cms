@@ -143,7 +143,7 @@ public class MenuService implements Validator {
 					m.getItems().add(f);
 
 					menuRepo.save(m);
-				} else
+				}
 					return null;
 			}
 			return null;

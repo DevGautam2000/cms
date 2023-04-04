@@ -1,9 +1,8 @@
 package com.nrifintech.cms.services;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +31,6 @@ import com.nrifintech.cms.types.Approval;
 import com.nrifintech.cms.types.ItemType;
 import com.nrifintech.cms.types.MealType;
 import com.nrifintech.cms.types.Role;
-import com.stripe.param.PlanCreateParams.TransformUsage.Round;
 
 @SpringBootTest
 public class MenuServiceTest {
@@ -149,8 +146,10 @@ public class MenuServiceTest {
 
     @Test
     void testApproveMenu() {
-        assertEquals(menues.get(0) , menuService.approveMenu(menues.get(0), 1));
+        assertEquals(Approval.Approved , menuService.approveMenu(menues.get(0), 1).getApproval());
         assertEquals(null, menuService.approveMenu(menues.get(2), 2));
+        // assertEquals(menues.get(0) , menuService.approveMenu(menues.get(0), 1));
+        // assertEquals(null, menuService.approveMenu(menues.get(2), 2));
     }
 
     @Test

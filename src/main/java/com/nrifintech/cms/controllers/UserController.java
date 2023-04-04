@@ -2,6 +2,7 @@ package com.nrifintech.cms.controllers;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,10 @@ public class UserController {
 		
 		return Response.setMsg("User added.", HttpStatus.OK);
 	}
+	
+	
+	
+	
 
 	/**
 	 * > This function returns a list of all users in the database
@@ -89,6 +94,35 @@ public class UserController {
 		return Response.setErr("No users found.", HttpStatus.BAD_REQUEST);
 	}
 
+	/**
+	 * > This function updates the user information and saves it to the database
+	 * 
+	 * @return A Response object.
+	 */
+	@PostMapping(Route.User.updateUser)
+	public Response updateUser(@RequestBody UserInDto userDto) {
+		User user = new User(userDto);
+		
+		
+		
+		User exUser = userService.getuser(user.getId());
+
+		if (userService.isNotNull(exUser)){
+			
+			exUser.setPhoneNumber(user.getPhoneNumber());
+			if(user.getStatus()!= null)
+				exUser.setStatus(user.getStatus());
+			
+			
+			userService.saveUser(exUser);
+			
+			return Response.setMsg("User updated.", HttpStatus.OK);
+		}
+
+		return Response.setErr("User not found.", HttpStatus.NOT_FOUND);
+	}
+	
+	
 	/**
 	 * It removes a user from the database.
 	 * 

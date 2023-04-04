@@ -91,6 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority(Role.Admin.toString()).antMatchers(Route.User.prefix + Route.User.getUsers)
                 .hasAnyAuthority(Role.Admin.toString()).antMatchers(Route.User.prefix + Route.User.updateStatus)
                 .hasAnyAuthority(Role.Admin.toString())
+                .antMatchers(Route.User.prefix + Route.User.updateUser)
+                .hasAnyAuthority(Role.Admin.toString())
 
                 .antMatchers(Route.Menu.prefix + Route.Menu.getMenu + "/*")
                 .hasAnyAuthority(Role.Admin.toString(), Role.Canteen.toString())// , Role.User.toString())

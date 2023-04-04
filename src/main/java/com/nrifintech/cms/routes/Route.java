@@ -28,6 +28,8 @@ public class Route {
 		String subscriptionToggler = "subscriptiontoggle";
 		String getEmailStatus = "getemailstatus";
 
+		String updateUser = "updateuser";
+
 
 	}
 
