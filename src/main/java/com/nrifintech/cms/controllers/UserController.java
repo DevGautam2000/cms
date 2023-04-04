@@ -100,12 +100,12 @@ public class UserController {
 	 * @return A Response object.
 	 */
 	@PostMapping(Route.User.updateUser)
-	public Response updateUser(Principal principal, @RequestBody UserInDto userDto) {
+	public Response updateUser(@RequestBody UserInDto userDto) {
 		User user = new User(userDto);
 		
 		
 		
-		User exUser = userService.getuser(principal.getName());
+		User exUser = userService.getuser(user.getId());
 
 		if (userService.isNotNull(exUser)){
 			
