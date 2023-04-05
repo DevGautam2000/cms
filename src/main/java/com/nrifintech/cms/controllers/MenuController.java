@@ -186,7 +186,7 @@ public class MenuController {
 
 			String menuStatus = m.getApproval().toString();
 
-			if (!menuStatus.equals(Approval.Pending.toString()) || !menuStatus.equals(Approval.Rejected.toString()))
+			if (!menuStatus.equals(Approval.Pending.toString())) //!menuStatus.equals(Approval.Rejected.toString())
 				return Response.setErr("Menu already " + menuStatus.toLowerCase() + ".", HttpStatus.BAD_REQUEST);
 
 			m = menuService.approveMenu(m, approvalStatusId);

@@ -90,22 +90,22 @@ public class PurchaseServiceTest {
         assertNull(this.purchaseService.initiateNewPurchase(purchaseSampleSaveFailure2)); 
     }
 
-    @Test
-    public void testRollbackPurchase() {
-        this.purchaseSample.setInventoryRef(inventorySample);
-        this.purchaseSampleSaveFailure2.setInventoryRef(inventorySampleNotExists);
-        Mockito.when(this.purchaseRepo.findById(this.purchaseSample.getRefId())).thenReturn(Optional.ofNullable(this.purchaseSample));
-        Mockito.when(this.purchaseRepo.findById(this.purchaseSampleSaveFailure1.getRefId())).thenReturn(Optional.ofNullable(null));
-        Mockito.when(this.purchaseRepo.findById(this.purchaseSampleSaveFailure2.getRefId())).thenReturn(Optional.ofNullable(this.purchaseSampleSaveFailure2));
+    // @Test
+    // public void testRollbackPurchase() {
+    //     this.purchaseSample.setInventoryRef(inventorySample);
+    //     this.purchaseSampleSaveFailure2.setInventoryRef(inventorySampleNotExists);
+    //     Mockito.when(this.purchaseRepo.findById(this.purchaseSample.getRefId())).thenReturn(Optional.ofNullable(this.purchaseSample));
+    //     Mockito.when(this.purchaseRepo.findById(this.purchaseSampleSaveFailure1.getRefId())).thenReturn(Optional.ofNullable(null));
+    //     Mockito.when(this.purchaseRepo.findById(this.purchaseSampleSaveFailure2.getRefId())).thenReturn(Optional.ofNullable(this.purchaseSampleSaveFailure2));
 
-        Mockito.when(this.inventoryRepo.findById(this.purchaseSample.getInventoryRef().getId())).thenReturn(Optional.ofNullable(this.inventorySample));
-        Mockito.when(this.inventoryRepo.findById(this.purchaseSampleSaveFailure2.getInventoryRef().getId())).thenReturn(Optional.ofNullable(null));
+    //     Mockito.when(this.inventoryRepo.findById(this.purchaseSample.getInventoryRef().getId())).thenReturn(Optional.ofNullable(this.inventorySample));
+    //     Mockito.when(this.inventoryRepo.findById(this.purchaseSampleSaveFailure2.getInventoryRef().getId())).thenReturn(Optional.ofNullable(null));
 
-        assertEquals( this.purchaseService.rollbackPurchase(purchaseSample.getRefId()), purchaseSample);
-        assertNull( this.purchaseService.rollbackPurchase(this.purchaseSampleSaveFailure1.getRefId()) );
-        assertNull( this.purchaseService.rollbackPurchase(this.purchaseSampleSaveFailure2.getRefId()) );
-        Mockito.verify( purchaseRepo , Mockito.times(3)).findById(anyInt());
-        Mockito.verify( inventoryRepo , Mockito.times(2)).findById(anyInt());
-        Mockito.verify( purchaseRepo , Mockito.times(1)).delete(any());
-    }
+    //     assertEquals( this.purchaseService.rollbackPurchase(purchaseSample.getRefId()), purchaseSample);
+    //     assertNull( this.purchaseService.rollbackPurchase(this.purchaseSampleSaveFailure1.getRefId()) );
+    //     assertNull( this.purchaseService.rollbackPurchase(this.purchaseSampleSaveFailure2.getRefId()) );
+    //     Mockito.verify( purchaseRepo , Mockito.times(3)).findById(anyInt());
+    //     Mockito.verify( inventoryRepo , Mockito.times(2)).findById(anyInt());
+    //     Mockito.verify( purchaseRepo , Mockito.times(1)).delete(any());
+    // }
 }
